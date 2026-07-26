@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>任務詳情 - 冒險者公會</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="/" class="logo">⚔️ 冒險者公會</a>
+    <div class="nav-right">
+      <span id="userArea"></span>
+      <button id="btnLogin" class="btn btn-outline">登入</button>
+      <button id="btnLogout" class="btn btn-outline" style="display:none">登出</button>
+    </div>
+  </div>
+</nav>
+
+<main class="container">
+  <div id="taskDetail" class="task-detail">
+    <div class="loading">🏰 載入任務中...</div>
+  </div>
+</main>
+
+<!-- Login Modal -->
+<div id="loginModal" class="modal" style="display:none">
+  <div class="modal-content modal-sm">
+    <span class="modal-close" onclick="closeLoginModal()">&times;</span>
+    <h2>🏰 進入公會</h2>
+    <div id="loginForm">
+      <label>Email</label>
+      <input type="email" id="loginEmail" placeholder="your@email.com">
+      <label>密碼</label>
+      <input type="password" id="loginPassword" placeholder="至少 6 位">
+      <button class="btn btn-primary btn-full" onclick="handleLogin()">登入</button>
+      <button class="btn btn-outline btn-full" style="margin-top:5px" onclick="handleSignup()">註冊新冒險者</button>
+    </div>
+    <div id="loginMsg" style="margin-top:10px;color:#e74c3c;text-align:center"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const SUPABASE_URL = 'https://wrwsjlydozfzejixofwm.supabase.co'
+const SUPABASE_KEY = 'sb_publishable_ri-Jt8XuWTrnI1RCKuVdMQ_f4LARc7Y'
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+let currentUser = null
+
+async function init() {
+  const { data: { user } } = await supabase.auth.getUser()
+  currentUser = user
+  updateUI()
+  loadTask()
+}
+
+function updateUI() {
+  const userArea = document.getElementById('userArea')
+  const btnLogin = document.getElementById('btnLogin')
+  const btnLogout = document.getElementById('btnLogout')
+  if (currentUser) {
+    userArea.innerHTML = `<a href="/profile" class="user-link">👤 ${currentUser.user_metadata?.name || currentUser.email?.split('@')[0]}</a>`
+    btnLogin.style.display = 'none'; btnLogout.style.display = 'inline-block'
+  } else {
+    userArea.innerHTML = ''
+    btnLogin.style.display = 'inline-block'; btnLogout.style.display = 'none'
+  }
+}
+
+async function loadTask() {
+  const params = new URLSearchParams(window.location.search)
+  const id = params.get('id')
+  if (!id) { window.location.href = '/'; return }
+
+  const { data: task, error } = await supabase.from('tasks').select(`
+    *,
+    poster:profiles!tasks_poster_id_fkey(name, rank, avatar, rating_avg, completed_tasks),
+    taker:profiles!tasks_taker_id_fkey(name, rank, avatar)
+  `).eq('id', id).single()
+
+  const detail = document.getElementById('taskDetail')
+  if (error || !task) { detail.innerHTML = `<div class="loading">❌ 任務不存在</div>`; return }
+
+  const rankBadge = (r) => `<span class="rank-badge rank-badge-lg" style="background:${({S:'#ffd700',A:'#e74c3c',B:'#e67e22',C:'#2ecc71',D:'#3498db',E:'#9b59b6',F:'#95a5a6'}[r]||'#95a5a6')}">${r}</span>`
+  const diffStars = '⭐'.repeat(task.difficulty || 1)
+  const skills = (task.skill_tags || []).map(s => `<span class="tag">${s}</span>`).join(' ')
+  const statusText = { open:'🟢 可接取', in_progress:'🟡 進行中', completed:'✅ 已完成', disputed:'🔴 爭議中', cancelled:'⚫ 已取消' }
+
+  const isMine = currentUser && task.poster_id === currentUser.id
+  const isTaken = currentUser && task.taker_id === currentUser.id
+  const canTake = currentUser && task.status === 'open' && !isMine
+  const canComplete = isMine && task.status === 'in_progress'
+
+  let actions = ''
+  if (canTake) actions += `<button class="btn btn-primary" onclick="takeTask('${task.id}')">⚔️ 接取任務</button>`
+  if (canComplete) actions += `<button class="btn btn-primary" onclick="completeTask('${task.id}')">✅ 標記完成</button>`
+  if (isTaken && task.status === 'in_progress') actions += `<button class="btn btn-outline" onclick="dropTask('${task.id}')">放棄任務</button>`
+  if (isMine && task.status === 'open') actions += `<button class="btn btn-outline" onclick="cancelTask('${task.id}')">取消任務</button>`
+
+  detail.innerHTML = `
+    <a href="/" style="color:#e94560;text-decoration:none;">← 回到看板</a>
+    <h1 style="margin-top:16px">${escHtml(task.title)}</h1>
+    <div class="task-detail-meta">
+      <span>${statusText[task.status]}</span>
+      <span>難度 ${diffStars}</span>
+      <span>💰 ${task.budget || 0} 點</span>
+      ${task.deadline ? `<span>📅 截止: ${new Date(task.deadline).toLocaleDateString('zh-TW')}</span>` : ''}
+    </div>
+    <div class="task-detail-desc">${escHtml(task.description)}</div>
+    <div style="margin-bottom:16px">${skills}</div>
+    <div style="display:flex; gap:20px; flex-wrap:wrap; margin-bottom:16px;">
+      <div>
+        <strong>發案者</strong><br>
+        <a href="/profile?id=${task.poster_id}" style="color:#e0e0e0;text-decoration:none;">
+          ${rankBadge(task.poster?.rank)} ${escHtml(task.poster?.name || '未知')}
+        </a>
+        ${task.poster ? `<br><small style="color:#999">⭐ ${task.poster.rating_avg || 0} | ✅ ${task.poster.completed_tasks || 0} 任務</small>` : ''}
+      </div>
+      ${task.taker ? `
+      <div>
+        <strong>接案者</strong><br>
+        <a href="/profile?id=${task.taker_id}" style="color:#e0e0e0;text-decoration:none;">
+          ${rankBadge(task.taker?.rank)} ${escHtml(task.taker?.name || '未知')}
+        </a>
+      </div>` : ''}
+    </div>
+    <div class="task-detail-actions">${actions}</div>
+    <small style="color:#666">發佈於 ${new Date(task.created_at).toLocaleString('zh-TW')}</small>
+  `
+}
+
+async function takeTask(id) {
+  if (!currentUser) return openLoginModal()
+  await supabase.from('tasks').update({ taker_id: currentUser.id, status: 'in_progress', updated_at: new Date().toISOString() }).eq('id', id)
+  loadTask()
+}
+
+async function completeTask(id) {
+  await supabase.from('tasks').update({ status: 'completed', updated_at: new Date().toISOString() }).eq('id', id)
+  loadTask()
+}
+
+async function dropTask(id) {
+  if (!confirm('確定要放棄這個任務嗎？')) return
+  await supabase.from('tasks').update({ taker_id: null, status: 'open', updated_at: new Date().toISOString() }).eq('id', id)
+  loadTask()
+}
+
+async function cancelTask(id) {
+  if (!confirm('確定要取消這個任務嗎？')) return
+  await supabase.from('tasks').update({ status: 'cancelled', updated_at: new Date().toISOString() }).eq('id', id)
+  loadTask()
+}
+
+function openLoginModal() { document.getElementById('loginModal').style.display = 'flex' }
+function closeLoginModal() { document.getElementById('loginModal').style.display = 'none' }
+
+async function handleLogin() {
+  const email = document.getElementById('loginEmail').value
+  const password = document.getElementById('loginPassword').value
+  const msg = document.getElementById('loginMsg')
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  if (error) { msg.textContent = '❌ ' + error.message; return }
+  currentUser = data.user
+  closeLoginModal()
+  updateUI()
+  loadTask()
+}
+
+async function handleSignup() {
+  const email = document.getElementById('loginEmail').value
+  const password = document.getElementById('loginPassword').value
+  const msg = document.getElementById('loginMsg')
+  if (!email || !password) { msg.textContent = '請填寫 Email 和密碼'; return }
+  if (password.length < 6) { msg.textContent = '密碼至少 6 位'; return }
+  const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { name: email.split('@')[0] } } })
+  if (error) { msg.textContent = '❌ ' + error.message; return }
+  msg.textContent = '✅ 註冊成功！'
+  currentUser = data.user
+  setTimeout(() => { closeLoginModal(); updateUI(); loadTask() }, 500)
+}
+
+async function handleLogout() {
+  await supabase.auth.signOut()
+  currentUser = null
+  updateUI()
+  window.location.href = '/'
+}
+
+function escHtml(s) { if (!s) return ''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
+
+document.getElementById('btnLogin').addEventListener('click', openLoginModal)
+document.getElementById('btnLogout').addEventListener('click', handleLogout)
+init()
+</script>
+</body>
+</html>

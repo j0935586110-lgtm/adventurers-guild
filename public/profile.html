@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>冒險者檔案 - 冒險者公會</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="/" class="logo">⚔️ 冒險者公會</a>
+    <div class="nav-right">
+      <span id="userArea"></span>
+      <button id="btnLogin" class="btn btn-outline">登入</button>
+      <button id="btnLogout" class="btn btn-outline" style="display:none">登出</button>
+    </div>
+  </div>
+</nav>
+
+<main class="container">
+  <div id="profileContent">
+    <div class="loading">🏰 載入冒險者檔案...</div>
+  </div>
+</main>
+
+<!-- Login Modal -->
+<div id="loginModal" class="modal" style="display:none">
+  <div class="modal-content modal-sm">
+    <span class="modal-close" onclick="closeLoginModal()">&times;</span>
+    <h2>🏰 進入公會</h2>
+    <div id="loginForm">
+      <label>Email</label>
+      <input type="email" id="loginEmail" placeholder="your@email.com">
+      <label>密碼</label>
+      <input type="password" id="loginPassword" placeholder="至少 6 位">
+      <button class="btn btn-primary btn-full" onclick="handleLogin()">登入</button>
+      <button class="btn btn-outline btn-full" style="margin-top:5px" onclick="handleSignup()">註冊新冒險者</button>
+    </div>
+    <div id="loginMsg" style="margin-top:10px;color:#e74c3c;text-align:center"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const SUPABASE_URL = 'https://wrwsjlydozfzejixofwm.supabase.co'
+const SUPABASE_KEY = 'sb_publishable_ri-Jt8XuWTrnI1RCKuVdMQ_f4LARc7Y'
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+let currentUser = null
+
+async function init() {
+  const { data: { user } } = await supabase.auth.getUser()
+  currentUser = user
+  updateUI()
+  loadProfile()
+}
+
+function updateUI() {
+  const userArea = document.getElementById('userArea')
+  const btnLogin = document.getElementById('btnLogin')
+  const btnLogout = document.getElementById('btnLogout')
+  if (currentUser) {
+    userArea.innerHTML = `<a href="/profile" class="user-link">👤 ${currentUser.user_metadata?.name || currentUser.email?.split('@')[0]}</a>`
+    btnLogin.style.display = 'none'; btnLogout.style.display = 'inline-block'
+  } else {
+    userArea.innerHTML = ''
+    btnLogin.style.display = 'inline-block'; btnLogout.style.display = 'none'
+  }
+}
+
+async function loadProfile() {
+  const params = new URLSearchParams(window.location.search)
+  let profileId = params.get('id')
+  if (!profileId && currentUser) profileId = currentUser.id
+  if (!profileId) { document.getElementById('profileContent').innerHTML = '<div class="loading">請先登入或指定冒險者 ID</div>'; return }
+
+  const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', profileId).single()
+  if (error || !profile) {
+    document.getElementById('profileContent').innerHTML = '<div class="loading">❌ 冒險者不存在</div>'
+    return
+  }
+
+  // Get their tasks
+  const { data: postedTasks } = await supabase.from('tasks').select('id,title,status,skill_tags,difficulty,budget').eq('poster_id', profileId).order('created_at',{ascending:false}).limit(10)
+  const { data: takenTasks } = await supabase.from('tasks').select('id,title,status,skill_tags,difficulty,budget').eq('taker_id', profileId).order('created_at',{ascending:false}).limit(10)
+
+  const rankColors = {S:'#ffd700',A:'#e74c3c',B:'#e67e22',C:'#2ecc71',D:'#3498db',E:'#9b59b6',F:'#95a5a6'}
+  const isMe = currentUser && currentUser.id === profileId
+
+  const skillsHtml = (profile.skills || []).map(s => `<span class="tag">${s}</span>`).join(' ') || '<span style="color:#666">尚未設定技能</span>'
+  const rankColor = rankColors[profile.rank] || '#95a5a6'
+
+  const taskListHtml = (tasks, label, emptyMsg) => {
+    if (!tasks || tasks.length === 0) return `<h3>${label}</h3><p style="color:#999">${emptyMsg}</p>`
+    return `<h3>${label} (${tasks.length})</h3>` + tasks.map(t => `
+      <div class="review-card" onclick="location.href='/task?id=${t.id}'" style="cursor:pointer">
+        <span style="color:#999;font-size:.85em">${({open:'🟢',in_progress:'🟡',completed:'✅',disputed:'🔴',cancelled:'⚫'}[t.status]||'')} ${t.status}</span>
+        <strong>${escHtml(t.title)}</strong>
+        <span style="float:right;color:#f1c40f">💰 ${t.budget||0}</span>
+        <div style="margin-top:4px">${'⭐'.repeat(t.difficulty||1)} ${(t.skill_tags||[]).map(s=>`<span class="tag">${s}</span>`).join(' ')}</div>
+      </div>
+    `).join('')
+  }
+
+  document.getElementById('profileContent').innerHTML = `
+    <a href="/" style="color:#e94560;text-decoration:none;">← 回到看板</a>
+    <div class="profile-header">
+      <div class="profile-rank"><span class="rank-badge rank-badge-lg" style="background:${rankColor};font-size:2em;padding:8px 20px;">${profile.rank} 級</span></div>
+      <h1>${escHtml(profile.name)}</h1>
+      ${profile.bio ? `<p style="color:#aaa;max-width:500px;margin:8px auto;">${escHtml(profile.bio)}</p>` : ''}
+      <div class="profile-skills">${skillsHtml}</div>
+      <div class="profile-stats">
+        <div class="profile-stat"><div class="num">${profile.completed_tasks || 0}</div><div class="label">完成任務</div></div>
+        <div class="profile-stat"><div class="num">⭐ ${profile.rating_avg || 0}</div><div class="label">評價</div></div>
+      </div>
+      ${isMe ? `<button class="btn btn-outline" style="margin-top:16px" onclick="editProfile()">✏️ 編輯檔案</button>` : ''}
+    </div>
+    <div class="profile-reviews">
+      ${taskListHtml(postedTasks, '📋 發佈的任務', '尚未發佈任何任務')}
+      ${taskListHtml(takenTasks, '⚔️ 接取的任務', '尚未接取任何任務')}
+    </div>
+  `
+}
+
+function editProfile() {
+  const name = prompt('冒險者名稱：', currentUser?.user_metadata?.name || '')
+  const bio = prompt('自我介紹：', '')
+  if (!name) return
+  supabase.from('profiles').update({ name, bio: bio || '', updated_at: new Date().toISOString() }).eq('id', currentUser.id).then(({error}) => {
+    if (error) alert('更新失敗: ' + error.message)
+    else loadProfile()
+  })
+}
+
+function openLoginModal() { document.getElementById('loginModal').style.display = 'flex' }
+function closeLoginModal() { document.getElementById('loginModal').style.display = 'none' }
+
+async function handleLogin() {
+  const email = document.getElementById('loginEmail').value
+  const password = document.getElementById('loginPassword').value
+  const msg = document.getElementById('loginMsg')
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  if (error) { msg.textContent = '❌ ' + error.message; return }
+  currentUser = data.user
+  closeLoginModal()
+  updateUI()
+  loadProfile()
+}
+
+async function handleSignup() {
+  const email = document.getElementById('loginEmail').value
+  const password = document.getElementById('loginPassword').value
+  const msg = document.getElementById('loginMsg')
+  if (!email || !password) { msg.textContent = '請填寫 Email 和密碼'; return }
+  if (password.length < 6) { msg.textContent = '密碼至少 6 位'; return }
+  const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { name: email.split('@')[0] } } })
+  if (error) { msg.textContent = '❌ ' + error.message; return }
+  msg.textContent = '✅ 註冊成功！'
+  currentUser = data.user
+  setTimeout(() => { closeLoginModal(); updateUI(); loadProfile() }, 500)
+}
+
+async function handleLogout() {
+  await supabase.auth.signOut()
+  currentUser = null
+  updateUI()
+  window.location.href = '/'
+}
+
+function escHtml(s) { if (!s) return ''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
+
+document.getElementById('btnLogin').addEventListener('click', openLoginModal)
+document.getElementById('btnLogout').addEventListener('click', handleLogout)
+init()
+</script>
+</body>
+</html>

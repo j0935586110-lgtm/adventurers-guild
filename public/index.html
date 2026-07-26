@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>冒險者公會</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="/" class="logo">⚔️ 冒險者公會</a>
+      <div class="nav-right">
+        <button id="btnPost" class="btn btn-primary">📋 發佈任務</button>
+        <span id="userArea"></span>
+        <button id="btnLogin" class="btn btn-outline">登入</button>
+        <button id="btnLogout" class="btn btn-outline" style="display:none">登出</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <main class="container">
+    <!-- Stats bar -->
+    <div class="stats-bar">
+      <span id="statsOpen">載入中...</span>
+      <div class="filter-bar">
+        <select id="filterSkill" class="select-sm">
+          <option value="">全部技能</option>
+        </select>
+        <select id="filterRank" class="select-sm">
+          <option value="">全部階級</option>
+          <option value="S">S 級</option><option value="A">A 級</option>
+          <option value="B">B 級</option><option value="C">C 級</option>
+          <option value="D">D 級</option><option value="E">E 級</option><option value="F">F 級</option>
+        </select>
+        <select id="filterStatus" class="select-sm">
+          <option value="">全部狀態</option>
+          <option value="open">可接取</option>
+          <option value="in_progress">進行中</option>
+          <option value="completed">已完成</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Task board -->
+    <div id="taskBoard" class="task-grid">
+      <div class="loading">🏰 公會看板載入中...</div>
+    </div>
+  </main>
+
+  <!-- Post Task Modal -->
+  <div id="postModal" class="modal" style="display:none">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal()">&times;</span>
+      <h2>📋 發佈新任務</h2>
+      <form id="postForm" onsubmit="postTask(event)">
+        <label>任務標題</label>
+        <input type="text" id="postTitle" required placeholder="例如：幫我設計一個 logo">
+
+        <label>任務描述</label>
+        <textarea id="postDesc" rows="4" required placeholder="詳細描述任務內容..."></textarea>
+
+        <label>預算（點數）</label>
+        <input type="number" id="postBudget" value="0" min="0">
+
+        <label>技能標籤（逗號分隔）</label>
+        <input type="text" id="postSkills" placeholder="例如：設計, 繪圖, Photoshop">
+
+        <label>難度 (1-5)</label>
+        <select id="postDifficulty">
+          <option value="1">⭐ (初級)</option>
+          <option value="2">⭐⭐</option>
+          <option value="3" selected>⭐⭐⭐ (中級)</option>
+          <option value="4">⭐⭐⭐⭐</option>
+          <option value="5">⭐⭐⭐⭐⭐ (傳奇)</option>
+        </select>
+
+        <label>截止日期（可選）</label>
+        <input type="date" id="postDeadline">
+
+        <button type="submit" class="btn btn-primary btn-full">🗡️ 發佈任務</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div id="loginModal" class="modal" style="display:none">
+    <div class="modal-content modal-sm">
+      <span class="modal-close" onclick="closeLoginModal()">&times;</span>
+      <h2>🏰 進入公會</h2>
+      <div id="loginForm">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="your@email.com">
+        <label>密碼</label>
+        <input type="password" id="loginPassword" placeholder="至少 6 位">
+        <button class="btn btn-primary btn-full" onclick="handleLogin()">登入</button>
+        <button class="btn btn-outline btn-full" style="margin-top:5px" onclick="handleSignup()">註冊新冒險者</button>
+      </div>
+      <div id="loginMsg" style="margin-top:10px;color:#e74c3c;text-align:center"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="auth.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
