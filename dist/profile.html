@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>冒險者檔案 - 冒險者公會</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="/" class="logo">⚔️ 冒險者公會</a>
+    <div class="nav-right">
+      <span id="userArea"></span>
+      <button id="btnLogin" class="btn btn-outline">登入</button>
+      <button id="btnLogout" class="btn btn-outline" style="display:none">登出</button>
+    </div>
+  </div>
+</nav>
+<main class="container">
+  <div id="profileContent"><div class="loading">🏰 載入中...</div></div>
+</main>
+
+<div id="loginModal" class="modal" style="display:none">
+  <div class="modal-content modal-sm">
+    <span class="modal-close" onclick="closeLoginModal()">&times;</span>
+    <h2>🏰 進入公會</h2>
+    <div id="loginForm">
+      <label>Email</label>
+      <input type="email" id="loginEmail">
+      <label>密碼</label>
+      <input type="password" id="loginPassword">
+      <button class="btn btn-primary btn-full" onclick="handleLogin()">登入</button>
+      <button class="btn btn-outline btn-full" style="margin-top:5px" onclick="handleSignup()">註冊</button>
+    </div>
+    <div id="loginMsg" style="margin-top:10px;color:#e74c3c;text-align:center"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const SUPABASE_URL = 'https://wrwsjlydozfzejixofwm.supabase.co'
+const SUPABASE_KEY = 'sb_publishable_ri-Jt8XuWTrnI1RCKuVdMQ_f4LARc7Y'
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+let currentUser = null
+let currentProfile = null
+
+async function init() {
+  const { data: { user } } = await supabase.auth.getUser()
+  currentUser = user
+  if (user) {
+    const { data: p } = await supabase.from('users').select('*').eq('id', user.id).single()
+    currentProfile = p
+  }
+  updateUI()
+  loadProfile()
+}
+
+function updateUI() {
+  const userArea = document.getElementById('userArea')
+  if (currentProfile) {
+    userArea.innerHTML = `<a href="/profile" class="user-link">👤 ${escHtml(currentProfile.display_name)}</a> <span style="color:#f1c40f">💰 ${currentProfile.balance_g_coin||0}G</span>`
+    document.getElementById('btnLogin').style.display = 'none'
+    document.getElementById('btnLogout').style.display = 'inline-block'
+  } else {
+    userArea.innerHTML = ''
+    document.getElementById('btnLogin').style.display = 'inline-block'
+    document.getElementById('btnLogout').style.display = 'none'
+  }
+}
+
+async function loadProfile() {
+  const params = new URLSearchParams(window.location.search)
+  let profileId = params.get('id')
+  if (!profileId && currentProfile) profileId = currentProfile.id
+  if (!profileId) { document.getElementById('profileContent').innerHTML = '<div class="loading">請先登入</div>'; return }
+
+  const { data: profile, error } = await supabase.from('users').select('*').eq('id', profileId).single()
+  if (error || !profile) { document.getElementById('profileContent').innerHTML = '<div class="loading">❌ 冒險者不存在</div>'; return }
+
+  // Get their quests
+  const { data: posted } = await supabase.from('quests').select('*').eq('client_id', profileId).order('created_at',{ascending:false}).limit(20)
+  const { data: taken } = await supabase.from('quests').select('*').eq('adventurer_id', profileId).order('created_at',{ascending:false}).limit(20)
+
+  const isMe = currentProfile && currentProfile.id === profileId
+  const statusMap = { posted:'🟢',accepted:'🟡',submitted:'📦',verified:'✅',canceled:'⚫',disputed:'🔴',expired:'⏰' }
+
+  const taskList = (tasks, title) => {
+    if (!tasks || !tasks.length) return `<h3>${title}</h3><p style="color:#999">尚無記錄</p>`
+    return `<h3>${title} (${tasks.length})</h3>` + tasks.map(t => `
+      <div class="review-card" onclick="location.href='/task?id=${t.id}'" style="cursor:pointer">
+        <span>${statusMap[t.status]||''} <strong>${escHtml(t.title)}</strong></span>
+        <span style="float:right;color:#f1c40f">💰 ${t.reward_g_coin||0}G</span>
+      </div>`).join('')
+  }
+
+  const skills = (profile.skill_tags || []).map(s => `<span class="tag">${escHtml(s)}</span>`).join(' ') || '<span style="color:#666">未設定技能</span>'
+
+  document.getElementById('profileContent').innerHTML = `
+    <a href="/" style="color:#e94560;text-decoration:none;">← 回到看板</a>
+    <div class="profile-header">
+      <h1>${escHtml(profile.display_name)}</h1>
+      <p style="color:#aaa">${escHtml(profile.bio || '這個冒險者很懶，沒留下介紹')}</p>
+      <div class="profile-skills">${skills}</div>
+      <div class="profile-stats">
+        <div class="profile-stat"><div class="num">💰 ${profile.balance_g_coin||0}G</div><div class="label">可用餘額</div></div>
+        <div class="profile-stat"><div class="num">🔒 ${profile.frozen_g_coin||0}G</div><div class="label">託管中</div></div>
+        <div class="profile-stat"><div class="num">⭐ ${profile.reputation_points||0}</div><div class="label">信譽值</div></div>
+      </div>
+      ${isMe ? `<button class="btn btn-outline" style="margin-top:12px" onclick="editProfile()">✏️ 編輯檔案</button>` : ''}
+    </div>
+    <div class="profile-reviews">
+      ${taskList(posted, '📋 發佈的任務')}
+      ${taskList(taken, '⚔️ 接取的任務')}
+    </div>
+  `
+}
+
+async function editProfile() {
+  const name = prompt('名稱：', currentProfile.display_name)
+  const bio = prompt('自我介紹：', currentProfile.bio || '')
+  if (!name) return
+  const { error } = await supabase.from('users').update({ display_name: name, bio }).eq('id', currentProfile.id)
+  if (error) alert('失敗: ' + error.message)
+  else { currentProfile.display_name = name; currentProfile.bio = bio; updateUI(); loadProfile() }
+}
+
+function openLoginModal() { document.getElementById('loginModal').style.display = 'flex' }
+function closeLoginModal() { document.getElementById('loginModal').style.display = 'none' }
+
+async function handleLogin() {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: document.getElementById('loginEmail').value,
+    password: document.getElementById('loginPassword').value
+  })
+  if (error) { document.getElementById('loginMsg').textContent = '❌ ' + error.message; return }
+  currentUser = data.user
+  const { data: p } = await supabase.from('users').select('*').eq('id', data.user.id).single()
+  currentProfile = p
+  closeLoginModal(); updateUI(); loadProfile()
+}
+
+async function handleSignup() {
+  const email = document.getElementById('loginEmail').value
+  const password = document.getElementById('loginPassword').value
+  if (!email||!password) return
+  const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { name: email.split('@')[0] } } })
+  if (error) { document.getElementById('loginMsg').textContent = '❌ ' + error.message; return }
+  currentUser = data.user
+  await new Promise(r=>setTimeout(r,1000))
+  const { data: p } = await supabase.from('users').select('*').eq('id', data.user.id).single()
+  currentProfile = p
+  closeLoginModal(); updateUI(); loadProfile()
+}
+
+async function handleLogout() { await supabase.auth.signOut(); currentUser=null; currentProfile=null; window.location.href='/' }
+
+function escHtml(s) { if(!s)return''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+
+document.getElementById('btnLogin').addEventListener('click',openLoginModal)
+document.getElementById('btnLogout').addEventListener('click',handleLogout)
+init()
+</script>
+</body>
+</html>

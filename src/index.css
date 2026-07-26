@@ -1,0 +1,61 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+TC:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@theme {
+  --font-sans: "Noto Serif TC", serif;
+  --font-serif: "Cinzel", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+:root {
+  --bg-dark: #0f0d0b;
+  --text-primary: #e0d5c1;
+  --gold: #d4af37;
+  --border-guild: #3d3428;
+  --parchment-start: #2a241d;
+  --parchment-end: #1a1612;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+}
+
+.immersive-shadow {
+  box-shadow: 0 0 20px rgba(0,0,0,0.8), inset 0 0 100px rgba(212, 175, 55, 0.05);
+}
+
+.parchment-bg {
+  background: radial-gradient(circle, var(--parchment-start) 0%, var(--parchment-end) 100%);
+  position: relative;
+}
+
+.parchment-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.05"/></svg>');
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.glow-gold {
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+.fantasy-card {
+  @apply bg-[#1a1612]/60 border border-[#3d3428] shadow-sm relative overflow-hidden backdrop-blur-sm transition-all;
+}
+
+.fantasy-button {
+  @apply px-4 py-2 bg-[#d4af37] text-black font-serif font-bold tracking-widest transition-all hover:bg-[#c49f27] disabled:opacity-50 shadow-[0_0_20px_rgba(212,175,55,0.2)];
+}
+
+.g-coin {
+  color: #ffd700;
+}
+
