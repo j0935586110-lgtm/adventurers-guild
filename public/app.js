@@ -118,33 +118,37 @@ async function loadQuests(filters = {}) {
 
 function questCard(q) {
   const statusMap = {
-    posted: '🟢 招募中', accepted: '🟡 進行中', submitted: '📦 待驗收',
-    verified: '✅ 已完成', canceled: '⚫ 已取消', disputed: '🔴 爭議中', expired: '⏰ 已過期'
+    posted: '招募中', accepted: '進行中', submitted: '待驗收',
+    verified: '已完成', canceled: '已取消', disputed: '爭議中', expired: '已過期'
   }
-  const catMap = { combat:'⚔️', gathering:'🌿', daily:'📋', magic_tech:'🔮', other:'📦' }
+  const statusClass = {
+    posted:'status-posted', accepted:'status-accepted', submitted:'status-submitted',
+    verified:'status-verified', canceled:'status-canceled', disputed:'status-disputed', expired:'status-expired'
+  }
+  const catLabel = { combat:'COMBAT', gathering:'GATHERING', daily:'DAILY', magic_tech:'MAGIC', other:'OTHER' }
   const isMine = currentProfile && q.client_id === currentProfile.id
   const isTaken = currentProfile && q.adventurer_id === currentProfile.id
   const canTake = currentProfile && q.status === 'posted' && !isMine
 
   let actionBtn = ''
-  if (canTake) actionBtn = `<button class="btn btn-sm btn-primary" onclick="event.stopPropagation();acceptQuest('${q.id}')">⚔️ 接取</button>`
-  if (isTaken && q.status === 'accepted') actionBtn = `<span class="badge badge-you">你的任務</span>`
-  if (isTaken && q.status === 'submitted') actionBtn = `<span class="badge badge-you">待驗收</span>`
-  if (isMine && q.status === 'posted') actionBtn = `<button class="btn btn-sm btn-outline" onclick="event.stopPropagation();cancelQuest('${q.id}')">取消</button>`
+  if (canTake) actionBtn = `<button class="btn btn-sm btn-primary" onclick="event.stopPropagation();acceptQuest('${q.id}')">ACCEPT</button>`
+  if (isTaken && q.status === 'accepted') actionBtn = `<span class="badge-you">YOUR QUEST</span>`
+  if (isTaken && q.status === 'submitted') actionBtn = `<span class="badge-you">PENDING</span>`
+  if (isMine && q.status === 'posted') actionBtn = `<button class="btn btn-sm btn-outline" onclick="event.stopPropagation();cancelQuest('${q.id}')">CANCEL</button>`
 
   return `
     <div class="task-card" onclick="viewQuest('${q.id}')">
       <div class="task-header">
-        <span class="task-status">${statusMap[q.status] || q.status}</span>
-        <span>${catMap[q.category] || ''}</span>
+        <span class="task-status ${statusClass[q.status] || ''}">${statusMap[q.status] || q.status}</span>
+        <span class="task-category">${catLabel[q.category] || ''}</span>
       </div>
       <h3 class="task-title">${escHtml(q.title)}</h3>
-      <p class="task-desc">${escHtml((q.description || '').substring(0, 100))}</p>
+      <p class="task-desc">${escHtml((q.description || '').substring(0, 120))}</p>
       <div class="task-meta">
-        <span>👤 ${escHtml(q.client?.display_name || '未知')}</span>
-        <span class="task-budget">💰 ${q.reward_g_coin || 0} G</span>
+        <span>${escHtml(q.client?.display_name || 'Unknown')}</span>
+        <span class="g-coin">${q.reward_g_coin || 0} G</span>
       </div>
-      ${actionBtn}
+      ${actionBtn ? `<div style="margin-top:8px">${actionBtn}</div>` : ''}
     </div>
   `
 }
