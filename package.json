@@ -4,5 +4,8 @@
   "private": true,
   "scripts": {
     "vercel-build": "echo 'Static site - no build'"
+  },
+  "devDependencies": {
+    "vercel": "^57.0.0"
   }
 }
