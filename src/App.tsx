@@ -22,7 +22,7 @@ interface Quest {
 
 // --- Navbar ---
 function Navbar() {
-  const { profile, signOut } = useGuild();
+  const { profile, signOut, signInWithGoogle } = useGuild();
   const { t, i18n } = useTranslation();
   if (!profile) return null;
   return (
@@ -100,7 +100,7 @@ function QuestCard({ quest, onSelect }: { quest: Quest; onSelect: (q: Quest) => 
       <p className="text-[#e0d5c1]/60 text-xs line-clamp-1 mb-4">{quest.description}</p>
       <div className="flex items-center justify-between mt-auto pt-3 border-t border-[#3d3428]">
         <div className="text-[9px] opacity-40 font-mono uppercase tracking-widest leading-none">
-          {isPoster ? t('commissioned_by_you') : isTaker ? t('your_current_job') : t('open_contract')}
+          {!profile ? 'LOGIN TO ACCEPT' : isPoster ? t('commissioned_by_you') : isTaker ? t('your_current_job') : t('open_contract')}
         </div>
         <ChevronRight size={14} className="text-[#3d3428] group-hover:text-[#d4af37] transition-colors" />
       </div>
@@ -273,8 +273,8 @@ function QuestDetails({ quest, onClose, onUpdated }: { quest: Quest; onClose: ()
 }
 
 // --- AuthForm ---
-function AuthForm() {
-  const { signIn, signUp } = useGuild();
+function AuthForm({ onGuest }: { onGuest: () => void }) {
+  const { signIn, signUp, signInWithGoogle } = useGuild();
   const { t } = useTranslation();
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
@@ -301,6 +301,17 @@ function AuthForm() {
           </div>
           <h1 className="font-serif text-4xl font-bold tracking-[0.2em] text-[#d4af37] glow-gold">{t('app_title')}</h1>
         </div>
+        {/* Google Sign In */}
+        <button onClick={signInWithGoogle}
+          className="w-full flex items-center justify-center gap-3 py-4 border-2 border-[#3d3428] bg-[#1a1612] text-[#e0d5c1] font-serif tracking-widest hover:border-[#d4af37] hover:text-[#d4af37] transition-all text-sm">
+          <svg className="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          {t('google_sign_in')}
+        </button>
+        <div className="flex items-center gap-4">
+          <div className="flex-1 h-px bg-[#3d3428]"></div>
+          <span className="text-[10px] text-[#e0d5c1]/30 font-mono uppercase tracking-widest">OR</span>
+          <div className="flex-1 h-px bg-[#3d3428]"></div>
+        </div>
         <form onSubmit={submit} className="bg-[#1a1612] border border-[#3d3428] p-8 space-y-5">
           {mode === 'signup' && (
             <div>
@@ -311,24 +322,27 @@ function AuthForm() {
             </div>
           )}
           <div>
-            <label className="block text-[10px] font-mono uppercase tracking-widest opacity-40 mb-2">EMAIL</label>
+            <label className="block text-[10px] font-mono uppercase tracking-widest opacity-40 mb-2">{t('email')}</label>
             <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
               className="w-full bg-[#0f0d0b] border border-[#3d3428] p-3 text-[#e0d5c1] focus:border-[#d4af37] outline-none text-sm" />
           </div>
           <div>
-            <label className="block text-[10px] font-mono uppercase tracking-widest opacity-40 mb-2">PASSWORD</label>
+            <label className="block text-[10px] font-mono uppercase tracking-widest opacity-40 mb-2">{t('password')}</label>
             <input type="password" required minLength={6} value={password} onChange={e => setPassword(e.target.value)}
               className="w-full bg-[#0f0d0b] border border-[#3d3428] p-3 text-[#e0d5c1] focus:border-[#d4af37] outline-none text-sm" />
           </div>
           {msg && <div className="text-red-400 text-xs font-mono text-center">{msg}</div>}
-          <button type="submit" className="w-full fantasy-button py-4 text-lg">
-            {mode === 'login' ? t('sign_in') : t('sign_up')}
-          </button>
+          <button type="submit" className="w-full fantasy-button py-4 text-lg">{mode === 'login' ? t('sign_in') : t('sign_up')}</button>
           <button type="button" onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
             className="w-full text-xs text-[#e0d5c1]/40 font-mono uppercase tracking-widest hover:text-[#d4af37] transition-colors">
             {mode === 'login' ? t('no_account') : t('have_account')}
           </button>
         </form>
+        {/* Guest mode */}
+        <button onClick={onGuest}
+          className="w-full text-center text-xs text-[#e0d5c1]/25 font-mono uppercase tracking-[0.3em] hover:text-[#d4af37]/50 transition-colors py-2">
+          {t('guest_browse')}
+        </button>
       </motion.div>
     </div>
   );
@@ -342,6 +356,7 @@ function MainApp() {
   const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
   const [isPosting, setIsPosting] = useState(false);
   const [activeTab, setActiveTab] = useState<'board' | 'my-quests' | 'my-jobs'>('board');
+  const [isGuest, setIsGuest] = useState(false);
 
   const loadQuests = useCallback(async () => {
     const { data } = await supabase.from('quests').select(`
@@ -352,35 +367,49 @@ function MainApp() {
     if (data) setQuests(data as Quest[]);
   }, []);
 
-  useEffect(() => { if (profile) loadQuests(); }, [profile, loadQuests]);
+  useEffect(() => { if (profile || isGuest) loadQuests(); }, [profile, isGuest, loadQuests]);
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-[#0f0d0b]">
       <div className="font-serif text-2xl text-[#d4af37] glow-gold animate-pulse tracking-widest">{t('summoning')}</div>
     </div>
   );
-  if (!profile) return <AuthForm />;
+  if (!profile && !isGuest) return <AuthForm onGuest={() => setIsGuest(true)} />;
 
   const filtered = quests.filter(q => {
+    if (!profile && activeTab !== 'board') return false; // guest can only see board
     if (activeTab === 'board') return q.status === 'posted';
-    if (activeTab === 'my-quests') return q.client_id === profile.id;
-    if (activeTab === 'my-jobs') return q.adventurer_id === profile.id;
+    if (activeTab === 'my-quests') return q.client_id === profile?.id;
+    if (activeTab === 'my-jobs') return q.adventurer_id === profile?.id;
     return true;
   });
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0f0d0b]">
-      <Navbar />
+      {profile ? <Navbar /> : (
+        <nav className="border-b border-[#3d3428] bg-[#1a1612]/80 backdrop-blur-md sticky top-0 z-50 px-8 py-4">
+          <div className="max-w-7xl mx-auto flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-full border-2 border-[#d4af37] bg-[#2a241d] flex items-center justify-center font-serif text-xl text-[#d4af37] glow-gold">G</div>
+              <h1 className="font-serif text-2xl font-bold tracking-[0.2em] text-[#d4af37] glow-gold">{t('app_title')}</h1>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-[#d4af37]/50 border border-[#d4af37]/30 px-3 py-1">{t('guest_badge')}</span>
+              <button onClick={() => window.location.reload()} className="fantasy-button text-xs px-4 py-2">{t('sign_in')}</button>
+            </div>
+          </div>
+        </nav>
+      )}
       <main className="flex-1 max-w-7xl w-full mx-auto flex gap-12 p-12">
         <aside className="w-80 space-y-8 shrink-0">
           <div className="p-6 border border-[#3d3428] bg-[#1a1612]/40 rounded-sm">
             <h2 className="font-serif text-[#d4af37] text-sm tracking-[0.3em] mb-6 glow-gold">{t('guild_board')}</h2>
             <nav className="space-y-2">
               {[
-                { id: 'board', label: t('the_market'), icon: <MapIcon size={16} /> },
-                { id: 'my-quests', label: t('commissions'), icon: <FileText size={16} /> },
-                { id: 'my-jobs', label: t('current_jobs'), icon: <Sword size={16} /> },
-              ].map(tab => (
+                { id: 'board', label: t('the_market'), icon: <MapIcon size={16} />, show: true },
+                { id: 'my-quests', label: t('commissions'), icon: <FileText size={16} />, show: !!profile },
+                { id: 'my-jobs', label: t('current_jobs'), icon: <Sword size={16} />, show: !!profile },
+              ].filter(tab => tab.show).map(tab => (
                 <button key={tab.id} onClick={() => setActiveTab(tab.id as any)}
                   className={`w-full flex items-center gap-4 px-4 py-3 font-serif text-sm tracking-widest transition-all border ${activeTab === tab.id ? 'bg-[#d4af37] text-black border-[#d4af37] shadow-[0_0_15px_rgba(212,175,55,0.2)]' : 'text-[#e0d5c1]/40 border-transparent hover:border-[#3d3428] hover:text-[#e0d5c1]'}`}>
                   {tab.icon}{tab.label}
@@ -388,10 +417,16 @@ function MainApp() {
               ))}
             </nav>
           </div>
+          {profile ? (
           <button onClick={() => setIsPosting(true)}
             className="w-full fantasy-button flex items-center justify-center gap-3 py-4 text-lg">
             <Plus size={20} />{t('post_commission')}
           </button>
+          ) : (
+          <div className="text-center text-[10px] text-[#e0d5c1]/20 font-mono uppercase tracking-widest py-4 border border-[#3d3428]/30">
+            {t('login_required')}
+          </div>
+          )}
         </aside>
         <section className="flex-1">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

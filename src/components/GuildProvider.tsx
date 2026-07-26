@@ -20,6 +20,7 @@ interface GuildContextType {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
   signUp: (email: string, password: string, name: string) => Promise<{ error?: string }>;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -122,8 +123,15 @@ export const GuildProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setProfile(null);
   };
 
+  const signInWithGoogle = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin }
+    });
+  };
+
   return (
-    <GuildContext.Provider value={{ user, profile, loading, signIn, signUp, signOut }}>
+    <GuildContext.Provider value={{ user, profile, loading, signIn, signUp, signInWithGoogle, signOut }}>
       {children}
     </GuildContext.Provider>
   );
