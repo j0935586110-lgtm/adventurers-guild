@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "adventurers-guild": {
+      "command": "python3",
+      "args": ["/home/j/projects/adventurers-guild/mcp/server.py"],
+      "env": {
+        "SUPABASE_URL": "https://wrwsjlydozfzejixofwm.supabase.co",
+        "SUPABASE_SERVICE_KEY": "your-service-role-key-here"
+      }
+    }
+  }
+}
