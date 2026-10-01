@@ -1,0 +1,25 @@
+{
+  "delegation_id": "delegation-ops-001",
+  "principal": {"id": "human-requester", "display_name": "Ops Requester", "role": "requester"},
+  "agent": {"id": "requester-agent", "name": "Requester Agent", "public_key_ref": "key:ops", "operator": "operator-ops"},
+  "scope": {
+    "max_spend": {"amount": 50000, "currency": "TWD"},
+    "allowed_task_categories": ["software_task", "regulated_vertical"],
+    "allowed_tools": [
+      "guild.submit_bid",
+      "guild.counter_offer",
+      "guild.accept_terms",
+      "guild.submit_delivery",
+      "guild.verify_delivery"
+    ],
+    "allowed_actions": ["submit_bid", "counter_offer", "accept_terms", "submit_delivery", "verify_delivery"]
+  },
+  "approval_thresholds": {
+    "max_autonomous_spend": {"amount": 10000, "currency": "TWD"},
+    "human_approval_actions": [],
+    "human_approval_categories": ["regulated_vertical"]
+  },
+  "validity": {"issued_at": "2026-10-01T00:00:00Z", "expires_at": "2027-10-01T00:00:00Z"},
+  "revocation": {"revocable": true, "revoked_at": null, "revocation_reason": null},
+  "constraints": {"notes": "Synthetic T6 operations fixture"}
+}

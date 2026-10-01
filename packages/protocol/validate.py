@@ -18,6 +18,11 @@ CASES = [
     ("delegation.schema.json", "delegation.revoked.json", True),
     ("delegation.schema.json", "delegation.exceeds-spend.json", True),
     ("delegation.schema.json", "delegation.invalid.json", False),
+    # T6 additions — proposal-oriented write layer artifacts.
+    ("delegation.schema.json", "delegation.ops.valid.json", True),
+    ("bid.schema.json", "bid.submitted.valid.json", True),
+    ("bid.schema.json", "bid.counter.valid.json", True),
+    ("contract.schema.json", "contract.terms.valid.json", True),
 ]
 
 
@@ -50,10 +55,23 @@ def check_flow_links():
     print("PASS flow links: Task → Bid → Contract")
 
 
+def check_counter_links():
+    bid = load(FIX / "bid.valid.json")
+    counter = load(FIX / "bid.counter.valid.json")
+    contract = load(FIX / "contract.terms.valid.json")
+    assert counter["task_id"] == bid["task_id"]
+    assert counter["parent_bid_id"] == bid["bid_id"]
+    assert contract["task_id"] == bid["task_id"]
+    assert contract["accepted_bid_id"] == counter["bid_id"]
+    assert contract["provider"] == counter["provider"]
+    print("PASS counter links: Bid → Counter → Contract terms")
+
+
 def main():
     for case in CASES:
         validate_case(*case)
     check_flow_links()
+    check_counter_links()
     print("Protocol v0.1 validation complete")
 
 
