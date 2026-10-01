@@ -12,6 +12,8 @@ Adventurers Guild exposes one matching core through three primary surfaces:
 
 All three surfaces use the same Task, Workflow, Capability, Credential, Actor and Match objects. There must not be separate product logic for each AI vendor.
 
+The website must also preserve the original two-sided Guild behavior: accountable members may both publish Tasks and explore/accept Tasks. Outcome-first is the requester entry, not a replacement for the open Quest board. Long-lived Chapter/Circle community and Party/team formation are additional surfaces, not separate marketplaces.
+
 The public website is not a directory-first product. The first question is not "which profession are you looking for?" It is:
 
 > What are you trying to accomplish?

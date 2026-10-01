@@ -30,8 +30,8 @@ A normalized statement of what an Actor can do, independent of job title. Exampl
 ### Credential
 Evidence that an Actor is permitted or qualified to perform work where authority matters. Examples: professional licence, organization certification, verified tool access, jurisdiction-specific authorization.
 
-### Actor
-A provider that can perform work. Actor types are `human`, `agent`, `hybrid`, or `organization`. Actors expose capabilities, credentials, availability, constraints, and supported execution modes.
+### Actor / Member
+A participant that can perform or coordinate work. Base member types are `human`, `organization`, `ai_agent`, and `robot`. Human/Organization may be accountable principals; AI Agent/Robot participation requires an inspectable ownership/delegation/responsibility chain for consequential work. A provider may also be a composed Party rather than one member.
 
 ### Match
 A computed relationship between Task and Actor. A Match is not a contract. It records why the Actor is eligible, which requirements were satisfied, which were not, and the score/rank used for discovery.
@@ -102,8 +102,9 @@ Need
 → Workflow / Task Graph
 → Task
 → Capability / Credential requirements
-→ Actor discovery
-→ Match
+→ Member / Actor discovery
+→ Match or Party composition
+→ Human + AI Agent + Robot + Organization execution unit
 → Orchestration plan / optional coordinator
 ──────── matching boundary ────────
 → Bid / Negotiation
@@ -140,8 +141,9 @@ A future adapter may expose the same matching semantics to ChatGPT, Gemini, Herm
 1. `workflow.schema.json` or an equivalent minimal Task-Graph representation
 2. `capability.schema.json`
 3. `credential.schema.json`
-4. `actor.schema.json`
-5. Task schema extension for `required_capabilities`
+4. minimal actor/member + responsibility representation
+5. Party / execution-unit representation only when V0 evidence requires it
+6. Task schema extension for `required_capabilities`
 6. deterministic eligibility filter
 7. deterministic/inspectable matching score
 8. fixtures covering human, agent, hybrid, licensed-only, coordinator, and ineligible matches

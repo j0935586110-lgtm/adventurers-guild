@@ -393,3 +393,121 @@ Human：描述 outcome → 看 Workflow → 修改 → 選擇自理或 Coordinat
 AI：使用者在 ChatGPT/Gemini/Hermes 說自然語言 → Agent 呼叫公會 MCP → 公會回 Workflow/Match → Agent 解釋並讓使用者確認 → 需要寫入或不可逆操作時走 Delegation/Approval gate。
 
 Provider：建立 Actor profile → 宣告 Capability/Constraint → 提交 Credential/Evidence → 設定地區/價格/可用時間 → 只收到通過 hard eligibility 的任務。
+## 9. 2026-10-01 整合版未來架構：公會 = 社群 + 任務 + 組隊 + 信任
+
+正式上位架構：`docs/architecture/guild-social-composable-work-network.md`。
+
+冒險者公會不是把原本的「任何人都能發任務、接任務、累積聲望」拿掉，而是把它升級成 Human + AI Agent + Robot 的可組合協作網路。
+
+核心不設永久買方／賣方身份。同一個會員今天可以發布任務，明天可以接任務；角色只存在於個別 Task：requester、provider、coordinator、verifier 等。
+
+未來執行單位不一定是一個人：
+
+```text
+Human + AI Agent + Robot + Organization + Tools
+                    ↓
+                 Party
+                    ↓
+                  Task
+```
+
+`Party`（隊伍）是一個真正的 Execution Unit，可由既有長期隊伍或系統依任務動態組成。
+### 9.1 成員與責任鏈
+
+成員類型：Human、Organization、AI Agent、Robot。
+
+Human 與 Organization 可以直接成為責任主體／Principal。AI Agent 與 Robot 不能以「無主體會員」方式承接有後果的工作，必須存在可追溯的：`owner`、`operator`、`principal`、`responsible_party`。
+
+例如：
+
+```text
+神瑋科技
+├─ Hermes Agent
+├─ 報價 Agent
+└─ Robot-01
+```
+
+Hermes 可以有自己的 Capability、任務紀錄與 Reputation，但它的授權與責任仍可追溯到所屬 Human/Organization。Robot 同理。
+
+資格與聲望必須分離：Credential 決定「能不能做」；Reputation 幫助決定「在能做的人裡選誰」。高聲望不能取代法定或專業資格。
+
+### 9.2 社群結構
+
+`Guild → Chapter / Circle / Event / Party`。
+Chapter 是長期分會，可像商務引薦社群、公益/聯誼社群或專業分會一樣自訂會員、同業、引薦、聚會與治理規則。
+
+Circle 是較輕的興趣／學習／公益／聯誼圈，不要求商業交易。
+
+Event 是活動：交流會、早餐會、讀書會、公益服務、運動、講座等，不必產生 Task。
+
+Party 是工作隊伍，為任務或 Workflow 組成；任務結束後可以解散，但成員仍留在 Chapter/Circle 的長期信任網路裡。
+
+因此公會同時維護兩張圖：
+
+```text
+Social Graph              Work Graph
+會員 / 分會 / 圈子         Task / Workflow
+活動 / 引薦 / 關係         Capability / Credential
+社群貢獻                  Evidence / Verification
+                          Reputation / Party history
+```
+
+兩張圖合起來才是完整的 Guild Trust Network。
+
+### 9.3 雙向評價與聲望
+
+完成並驗證的 Task 後，Requester 與 Provider 應可雙向評價；評價可採雙方提交後或期限到期後再公開，降低報復性評分。
+底層不能只有單一 `reputation_points`。至少保留可分解來源：work reputation、capability reputation、organization reputation、party reputation、community/referral reputation。
+
+只有 Verified Task / Evidence 才應實質影響工作聲望。Referral 也應成為正式物件：誰介紹誰、介紹了哪種需求，以及最後是否產生成功驗證結果。
+
+### 9.4 公會前端語言
+
+後端採嚴謹 domain model，前端可保留 RPG 公會語言：
+
+| 公會 UI | Domain |
+|---|---|
+| 冒險者 | Member / Actor |
+| 分會 | Chapter |
+| 圈子 | Circle |
+| 隊伍 | Party |
+| 任務 / 委託 | Task |
+| 技能 | Capability |
+| 資格 / 證章 | Credential |
+| 戰績 | Evidence-backed history |
+| 聲望 | Reputation |
+
+網站同時保留兩個核心入口：`發布任務` 與 `探索任務`；Outcome-first 的「你想完成什麼？」是需求方入口，不取代原本公開任務大廳。
+
+後續可加入：找隊友/組隊、分會/圈子、活動、引薦、我的聲望。
+### 9.5 完整工作流
+
+```text
+Need / 公開 Task
+↓
+Workflow / Task Graph
+↓
+Capability + Credential + Responsibility
+↓
+Match 個別成員，或組成 Party
+↓
+Human + AI Agent + Robot + Organization
+↓
+Proposal / Contract
+↓
+Execution + Evidence
+↓
+Verification
+↓
+Bidirectional Review
+↓
+Reputation
+↓
+Referral / 再組隊 / 長期社群關係
+```
+
+ChatGPT、Gemini、Hermes、Codex 等 AI 透過同一套 MCP/API 使用這個模型；網站是 Human surface，MCP 是 Agent surface，業務邏輯不按模型供應商分叉。
+
+### 9.6 目前不立即全做
+
+這是 Future Architecture，不代表現在就建立完整 BNI/扶輪式社群平台。V0/V1 仍優先驗證 outcome decomposition、matching、coordination 與真實供需行為。

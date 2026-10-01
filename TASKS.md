@@ -100,7 +100,24 @@ Extend Task with `required_capabilities`. Implement deterministic hard eligibili
 ### M5 Match engine + MCP discovery — TODO
 Produce inspectable Match results and expose model-neutral discovery operations: `publish_task`, `search_tasks`, `get_task`, `find_matches`, `get_actor`, `get_capabilities`, `get_credentials` (exact names may be normalized during implementation).
 
-Acceptance: demonstrate one need decomposed into Tasks where different steps can match Agent, Human, Hybrid, and licensed-only Actors without using a profession label as the atomic matching key. T1–T7 tests must remain green.
+Acceptance: demonstrate one need decomposed into Tasks where different steps can match Human, AI Agent, Robot, Organization or a composed Party while preserving credential and responsibility requirements. T1–T7 tests must remain green.
+
+## FUTURE ARCHITECTURE — DESIGN / VALIDATION ONLY
+Canonical: `docs/architecture/guild-social-composable-work-network.md`
+Do not implement these as a broad platform before V0/V1 evidence. Capture observed needs first.
+
+### F0 Identity / accountability model — DESIGN
+Separate `owner`, `operator`, `principal`, and `responsible_party`. Human and Organization may be accountable principals; AI Agent and Robot members must belong to an accountable Human/Organization for consequential work.
+
+### F1 Party / Execution Unit — DESIGN
+Model a task team as a composition of Human + AI Agent + Robot + Organization + Tools with combined capabilities/credentials and explicit responsibility allocation. Support both existing teams and dynamically composed Parties.
+
+### F2 Trust / bidirectional reputation — DESIGN
+Preserve two-way requester/provider reviews. Bind work reputation to verified Tasks/Evidence; keep capability reputation, party reputation, organization reputation and referral reputation separable. Credentials gate eligibility before reputation ranking.
+
+### F3 Guild community layer — DESIGN
+Model `Guild`, `Chapter`, `Circle`, `Event`, and `Referral`. Chapters may define configurable membership/referral/profession/governance rules; Circles support non-commercial fellowship; Parties remain task-oriented and temporary.
+
 
 ## P2 — Agent-to-Agent local loop
 Status: T6–T7 DONE; T8 PAUSED behind Matching Core

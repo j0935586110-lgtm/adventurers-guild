@@ -4,7 +4,7 @@ Updated: 2026-10-01
 Status: ACTIVE — evolving Adventurers Guild into Agent Work Network
 
 ## North Star
-An open task-matching network that decomposes needs into executable work, expresses that work as capabilities and credentials, and directly matches it to the smallest suitable set of human, Agent, hybrid, or organization Actors. Transaction automation exists underneath matching; it is not the current product focus.
+An open social + work network where Humans and Organizations are accountable principals, AI Agents and Robots participate through explicit ownership/delegation, and members can publish work, accept work, form long-lived communities or temporary Parties, and accumulate evidence-backed trust. Work is matched by capability, credential and responsibility rather than permanent buyer/seller roles or job titles.
 
 ## Existing assets (preserve)
 - React/Vite web application.
@@ -24,16 +24,17 @@ The Guild is no longer framed mainly as a human freelance marketplace. It become
 Insurance and real estate are future pressure-test verticals. MVP remains digital work first.
 
 ## Current architecture target
-1. Need → Task decomposition
-2. Capability model
-3. Credential model
-4. Actor model: human / agent / hybrid / organization
-5. Eligibility filter and Match engine
-6. Identity & Delegation (existing foundation)
+1. Identity / Ownership / Responsibility: Human and Organization principals; owned/delegated AI Agents and Robots
+2. Social layer: Guild / Chapter / Circle / Event / Referral
+3. Need → Workflow / Task Graph
+4. Capability + Credential requirements
+5. Actor discovery, eligibility and Match
+6. Party / Execution Unit composition: Human + AI Agent + Robot + Organization + Tools
 7. Bid / Negotiation / Contract (existing foundation; not current priority)
-8. Delivery / Verification / Audit (preserve; expand after matching proof)
-9. Escrow / settlement adapters (deferred)
+8. Delivery / Evidence / Verification / bidirectional Review / Reputation
+9. Audit and settlement adapters (deferred until value proof)
 
+Canonical future architecture: `docs/architecture/guild-social-composable-work-network.md`.
 Canonical matching architecture: `docs/architecture/task-matching-professional-decoupling.md`.
 Canonical UX/discovery architecture: `docs/architecture/user-experience-agent-discovery.md`.
 
@@ -63,7 +64,8 @@ Then adapt the existing MCP server rather than replacing it.
 ## Safety / governance
 - Human approval required for public GitHub actions, production deploys, registry publication, real-money actions, or irreversible contracts.
 - Agent permissions must be scoped, revocable, and auditable.
-- High-risk regulated verticals route to licensed/responsible humans or entities.
+- AI Agents and Robots doing consequential work must have an inspectable owner/operator/principal/responsible-party chain.
+- High-risk regulated verticals route to licensed/responsible humans or entities; reputation never substitutes for required credentials.
 
 ## Collaboration
 Hermes = coordinator / durable-goal owner.
