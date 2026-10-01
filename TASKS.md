@@ -67,9 +67,22 @@ a catastrophic fail-open. Verified independently: `validate.py` 11 PASS,
 ## P2 — Agent-to-Agent local loop
 Status: QUEUED
 
-### T6 Minimal API/MCP extension
+### T6 Minimal API/MCP extension — PARTIAL (67ba5e1)
+Status: pure write layer done; MCP wrappers NOT done.
+
 Add proposal-oriented operations without removing existing 8 MCP tools.
 Candidate tools: `submit_bid`, `counter_offer`, `accept_terms`, `submit_delivery`, `verify_delivery`.
+
+**Delivered in `67ba5e1`:** `packages/protocol/ops.py` — all five operations as
+pure functions, each gated by `authorize()`. Denial returns the gate's exact
+reason code, carries no data, and does not mutate inputs. Verified independently:
+expired / revoked / over-budget / wrong-currency / not-yet-valid / unauthorised
+action all deny; a permitted action returns `OK` with data; inputs unchanged
+after every denial.
+
+**Still outstanding:** the MCP wrappers. `mcp/` is untouched, so the eight
+existing tools are intact and the five new operations are not yet reachable over
+MCP.
 
 ### T7 Two test agents
 Requester Agent and Provider Agent must complete a fake digital task end-to-end with no manual data copying.
