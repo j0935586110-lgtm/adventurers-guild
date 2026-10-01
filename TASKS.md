@@ -85,8 +85,30 @@ argument on every tool and the system clock is never read; expired, revoked,
 not-yet-valid and unauthorised-action requests all deny with **no `data` key**.
 `tests/test_protocol_tools.py` 17 passed; `packages/protocol/` 65 passed.
 
-### T7 Two test agents
+### T7 Two test agents — DONE (4f3eaba)
 Requester Agent and Provider Agent must complete a fake digital task end-to-end with no manual data copying.
+
+**`4f3eaba`** — `packages/protocol/agents.py` adds `RequesterAgent`,
+`ProviderAgent` and a shared `Market` that carries both the published
+artifacts and the ordered transition record. Each role holds a T5
+delegation permitting exactly its own actions and reaches the five
+operations only through `attempt()`, so the frozen gate decides every
+write rather than the role code.
+
+The no-manual-copying property is structural: `counter_offer`,
+`accept_terms` and `submit_delivery` read their parent from the Market
+instead of accepting it as an argument, so an agent cannot name a parent
+that did not come from a previous authorized step.
+
+Verified independently — a distinctive amount and note absent from every
+fixture propagate through to the recorded transitions; cross-role
+attempts, mid-flow expiry, over-budget and wrong-currency requests are
+all denied, carry no `data` key, and leave the Market unpoluted
+(`bids=0 contracts=0`). `tests/test_end_to_end.py` 23 passed; whole suite
+105 passed.
+
+Audit coverage is enough to assert ordering only; T8 remains the formal
+audit-trail deliverable.
 
 ### T8 Append-only audit trail
 Every state transition records actor, principal, action, payload reference, timestamp, and evidence reference.
