@@ -5,8 +5,32 @@ import math
 from typing import Any
 
 
+REASON_CODES = frozenset({
+    "OK",
+    "INVALID_DELEGATION",
+    "INVALID_AMOUNT",
+    "DELEGATION_EXPIRED",
+    "DELEGATION_NOT_YET_VALID",
+    "DELEGATION_REVOKED",
+    "SPEND_EXCEEDS_MAX",
+    "CURRENCY_MISMATCH",
+    "ACTION_NOT_ALLOWED",
+    "CATEGORY_NOT_ALLOWED",
+    "THRESHOLD_EXCEEDED",
+    "REQUIRES_HUMAN_APPROVAL",
+})
+
+
 @dataclass(frozen=True)
 class Decision:
+    """Outcome of one authorization check.
+
+    ``reason_code`` is always a member of :data:`REASON_CODES`.
+
+    An ``amount`` of ``0`` is allowed and yields ``OK``: a zero-value action
+    spends nothing, so it cannot breach a non-negative cap.
+    """
+
     allowed: bool
     reason_code: str
     detail: str
@@ -48,12 +72,16 @@ def check_spend(delegation, amount) -> Decision:
         if not _mapping(delegation) or not _mapping(delegation.get("scope")):
             return _deny("INVALID_DELEGATION", "Delegation scope is missing or malformed")
         requested = _amount(amount)
+        if requested is None:
+            return _deny("INVALID_AMOUNT", "Requested amount must be a finite, non-negative number")
         limit = delegation["scope"]["max_spend"]
+        if not _mapping(limit):
+            return _deny("INVALID_DELEGATION", "Maximum spend is missing or malformed")
         maximum = _amount(limit["amount"])
-        if requested is None or not isinstance(limit.get("currency"), str) or not limit["currency"]:
-            return _deny("INVALID_DELEGATION", "Spend amount or maximum spend is malformed")
         if maximum is None:
             return _deny("INVALID_DELEGATION", "Maximum spend is malformed")
+        if not isinstance(limit.get("currency"), str) or not limit["currency"]:
+            return _deny("INVALID_DELEGATION", "Maximum spend currency is malformed")
         if requested > maximum:
             return _deny("SPEND_EXCEEDS_MAX", f"Requested amount {requested} exceeds maximum {maximum}")
         return Decision(True, "OK", "Requested spend is within the delegation maximum")
@@ -130,8 +158,19 @@ def check_revoked(delegation) -> Decision:
         return _deny("INVALID_DELEGATION", "Delegation revocation data is incomplete")
 
 
-def authorize(delegation, action, amount, now) -> Decision:
-    """Authorize one action; malformed or incomplete input always denies."""
+def authorize(delegation, action, amount, now, *, currency=None) -> Decision:
+    """Authorize one action; malformed or incomplete input always denies.
+
+    ``currency`` is an optional keyword argument. When it is ``None`` (the
+    default) the request currency is treated as unspecified and the currency
+    check is skipped; no other behaviour changes. This function is a pure
+    function with no state, so it cannot convert money between currencies: if
+    a request currency is supplied it must exactly equal both
+    ``scope.max_spend.currency`` and
+    ``approval_thresholds.max_autonomous_spend.currency``. Any mismatch is
+    refused with ``CURRENCY_MISMATCH`` rather than attempting conversion or
+    comparing amounts across currencies.
+    """
     try:
         revoked = check_revoked(delegation)
         if not revoked.allowed:
@@ -155,9 +194,24 @@ def authorize(delegation, action, amount, now) -> Decision:
         if category is not None and category in thresholds["human_approval_categories"]:
             return _deny("REQUIRES_HUMAN_APPROVAL", f"Category requires human approval: {category}")
         autonomous = thresholds["max_autonomous_spend"]
+        if not _mapping(autonomous):
+            return _deny("INVALID_DELEGATION", "Autonomous spend threshold is missing or malformed")
         autonomous_amount = _amount(autonomous["amount"])
         if autonomous_amount is None or not isinstance(autonomous.get("currency"), str) or not autonomous["currency"]:
             return _deny("INVALID_DELEGATION", "Autonomous spend threshold is malformed")
+        if currency is not None:
+            scope_currency = delegation["scope"]["max_spend"]["currency"]
+            if currency != scope_currency:
+                return _deny(
+                    "CURRENCY_MISMATCH",
+                    f"Request currency {currency!r} does not match max_spend currency {scope_currency!r}",
+                )
+            threshold_currency = autonomous["currency"]
+            if currency != threshold_currency:
+                return _deny(
+                    "CURRENCY_MISMATCH",
+                    f"Request currency {currency!r} does not match autonomous threshold currency {threshold_currency!r}",
+                )
         if amount > autonomous_amount:
             return _deny("THRESHOLD_EXCEEDED", f"Amount {amount} exceeds autonomous threshold {autonomous_amount}")
         return Decision(True, "OK", "Action and spend are authorized")
