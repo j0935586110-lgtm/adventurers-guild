@@ -36,11 +36,13 @@ Insurance and real estate are future pressure-test verticals. MVP remains digita
 
 Canonical matching architecture: `docs/architecture/task-matching-professional-decoupling.md`.
 
-## Immediate engineering objective
-Prove professional decoupling and direct matching:
-Need → Task(s) → required capabilities/credentials → eligible Actors → explainable ranked Match.
+## Immediate product objective
+Validate that professional decoupling and orchestration solve a real user problem before expanding code:
+Need → Workflow / Task Graph → required capabilities/credentials → eligible Actors → explainable Match → explicit coordination responsibility.
 
-T5–T7 already prove that matched Agents can later negotiate and execute. Do not expand that transaction layer until the matching core is proven.
+Run 10–20 concierge tests on a concrete outcome, starting with the hypothesis `中古屋買到能入住`. The product is not validated by positive feedback; it is validated by real demand submission, provider contact/quote actions, lower coordination effort, and continued use.
+
+T5–T7 already prove that matched Agents can later negotiate and execute. Do not expand that transaction layer until the matching value proposition is proven.
 
 ## First protocol artifacts
 Create and validate:
@@ -82,15 +84,12 @@ Independent reviewer = agy or separate agent for important protocol/security cha
 - T6 five protocol-native MCP proposal tools complete without replacing the original 8 Quest tools.
 - T7 Requester/Provider Agent E2E complete: Task → Bid → Counter → Terms → Delivery → Verification with no manual data copying; whole suite 105 passed at checkpoint.
 
-## Next checkpoint — Matching Core
-Implement and validate, in order:
-1. `capability.schema.json`;
-2. `credential.schema.json`;
-3. `actor.schema.json`;
-4. extend Task with `required_capabilities` while preserving compatibility;
-5. deterministic hard eligibility filtering;
-6. inspectable Match scoring/ranking;
-7. model-neutral MCP/API discovery tools such as `find_matches` and `get_actor`.
+## Next checkpoint — Validation before automation
+1. Run V0 concierge demand validation on 10–20 real complex needs.
+2. Capture accepted/rejected Workflow nodes and whether users prefer multi-Actor orchestration or a single coordinator.
+3. Define the minimal Workflow/Orchestration representation from observed cases.
+4. Only then implement/lock Capability, Credential, Actor, eligibility and Match schemas/logic.
+5. Keep model-neutral MCP/API discovery as the interface target after the user value is demonstrated.
 
 T8 append-only audit remains required but is paused behind this matching milestone unless it blocks matching correctness or traceability.
 

@@ -19,7 +19,7 @@ Core statement:
 Transaction automation remains useful infrastructure, but it is not the current product priority.
 ## 2. Core primitives
 
-The matching core has five primary objects:
+The matching core has six primary objects:
 
 ### Task
 A concrete unit of work derived from a need. It describes goal, requirements, constraints, deliverables, location/deadline, execution mode, required capabilities, and required credentials.
@@ -35,12 +35,17 @@ A provider that can perform work. Actor types are `human`, `agent`, `hybrid`, or
 
 ### Match
 A computed relationship between Task and Actor. A Match is not a contract. It records why the Actor is eligible, which requirements were satisfied, which were not, and the score/rank used for discovery.
+
+### Workflow / Orchestration
+A dependency graph that connects multiple Tasks into one user outcome. It records ordering, prerequisites, hand-offs, responsible Actors, checkpoints, and fallback paths. Coordination itself is a Capability; the system must not assume that removing an intermediary also removes the coordination work.
 ## 3. Matching flow
 
 ```text
 Need
   ↓
-Task decomposition
+Workflow / outcome decomposition
+  ↓
+Task graph
   ↓
 required_capabilities
 + required_credentials
@@ -94,10 +99,12 @@ Current product path:
 
 ```text
 Need
+→ Workflow / Task Graph
 → Task
 → Capability / Credential requirements
 → Actor discovery
 → Match
+→ Orchestration plan / optional coordinator
 ──────── matching boundary ────────
 → Bid / Negotiation
 → Contract
@@ -130,27 +137,28 @@ A future adapter may expose the same matching semantics to ChatGPT, Gemini, Herm
 
 ## 7. Next implementation artifacts
 
-1. `capability.schema.json`
-2. `credential.schema.json`
-3. `actor.schema.json`
-4. Task schema extension for `required_capabilities`
-5. deterministic eligibility filter
-6. deterministic/inspectable matching score
-7. fixtures covering human, agent, hybrid, licensed-only, and ineligible matches
+1. `workflow.schema.json` or an equivalent minimal Task-Graph representation
+2. `capability.schema.json`
+3. `credential.schema.json`
+4. `actor.schema.json`
+5. Task schema extension for `required_capabilities`
+6. deterministic eligibility filter
+7. deterministic/inspectable matching score
+8. fixtures covering human, agent, hybrid, licensed-only, coordinator, and ineligible matches
 
 No real-money integration, j1 worker execution, new escrow design, or automatic contract acceptance is part of this milestone.
 ## 8. Acceptance criteria for the matching milestone
 
 The milestone is complete when:
 
-- a need can be represented as one or more Tasks;
+- a need can be represented as a Workflow containing one or more Tasks;
 - each Task can declare required capabilities and credentials separately;
 - Actors can advertise capabilities and credentials without relying on a profession label;
 - hard credential/constraint failures are rejected deterministically;
 - eligible Actors receive an inspectable Match result explaining why they matched;
 - the same Task can match a human, an Agent, or a hybrid provider when requirements allow it;
 - regulated actions can require a credential without forcing unrelated steps through that professional;
-- at least one end-to-end example demonstrates professional decoupling;
+- at least one end-to-end example demonstrates professional decoupling and explicit coordination responsibility;
 - matching is exposed through a model-neutral MCP/API surface;
 - T1–T7 compatibility remains green.
 
@@ -164,4 +172,4 @@ The milestone is complete when:
 - DAO/token design;
 - regulated production transactions.
 
-The next product proof is not "two Agents can transact". T7 already demonstrated that infrastructure. The next proof is: **a real need can be decomposed and directly matched to the smallest set of capable and properly credentialed Actors.**
+The next product proof is not "two Agents can transact". T7 already demonstrated that infrastructure. The next proof is: **a real need can be decomposed into an understandable Workflow, matched to capable and properly credentialed Actors, and coordinated with less user effort than existing alternatives.**

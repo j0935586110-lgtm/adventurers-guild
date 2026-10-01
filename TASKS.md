@@ -64,13 +64,22 @@ NaN and infinity — `nan > cap` is False, so an unguarded NaN would have been
 a catastrophic fail-open. Verified independently: `validate.py` 11 PASS,
 `pytest packages/protocol/` 32 passed, `REASON_CODES` == 12 exact set.
 
-## CURRENT PRIORITY — Matching Core / Professional Decoupling
+## CURRENT PRIORITY — Demand Validation + Matching Core
 Status: ACTIVE (2026-10-01)
 Architecture: `docs/architecture/task-matching-professional-decoupling.md`
+Research/validation plan: `PLAN.md` §7.
 
-T5–T7 are preserved as completed transaction infrastructure. New work now prioritizes discovering the right Actor before expanding negotiation, contract, settlement, or execution infrastructure.
+T5–T7 are preserved as completed transaction infrastructure. Do not expand negotiation, contract, settlement, execution, or audit infrastructure until the matching value proposition is validated.
 
-### M1 Capability model — TODO
+### V0 Concierge demand validation — ACTIVE
+Run 10–20 real complex-needs interviews/tests before treating the architecture as product validation. Start with the outcome hypothesis `中古屋買到能入住`. Return a Workflow/Task Graph, required capabilities/credentials, Actor choices, and an optional coordinator. Measure task edits, willingness to use multiple Actors, demand for a single responsible coordinator, time-to-qualified-provider, actual contact/quote actions, and repeat-task continuation.
+
+Kill/pivot criteria are defined in `PLAN.md` §7.8. Praise or stated interest does not count as validation; observable action does.
+
+### M0 Workflow / orchestration model — DESIGN ONLY until V0 signal
+Define the minimum representation of Task dependencies, hand-offs, checkpoints, fallback paths, and coordination responsibility. `project_coordination` must be a capability, not an assumed free system function.
+
+### M1 Capability model — TODO after/alongside V0 evidence
 Create `packages/protocol/capability.schema.json` and fixtures. Capabilities describe what can be done independent of profession title.
 
 ### M2 Credential model — TODO
