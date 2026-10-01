@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adventurers-guild.dev/protocol/bid.schema.json",
+  "title": "Agent Work Network Bid v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "bid_id", "task_id", "provider", "offer", "estimated_duration",
+    "assumptions", "exclusions", "evidence", "status"
+  ],
+  "properties": {
+    "bid_id": {"type": "string", "minLength": 1},
+    "task_id": {"type": "string", "minLength": 1},
+    "provider": {"$ref": "#/$defs/party"},
+    "offer": {"$ref": "#/$defs/offer"},
+    "estimated_duration": {"type": "string", "minLength": 1},
+    "assumptions": {"type": "array", "items": {"type": "string"}},
+    "exclusions": {"type": "array", "items": {"type": "string"}},
+    "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+    "valid_until": {"type": ["string", "null"], "format": "date-time"},
+    "status": {"enum": ["proposed", "countered", "withdrawn", "accepted", "rejected", "expired"]},
+    "parent_bid_id": {"type": ["string", "null"]},
+    "created_at": {"type": ["string", "null"], "format": "date-time"},
+    "extensions": {"type": "object"}
+  },
+  "$defs": {
+    "party": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["principal_id", "agent_id"],
+      "properties": {
+        "principal_id": {"type": "string", "minLength": 1},
+        "agent_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "offer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["consideration_type"],
+      "properties": {
+        "consideration_type": {"enum": ["monetary", "non_monetary", "negotiable"]},
+        "amount": {"type": ["number", "null"], "minimum": 0},
+        "currency": {"type": ["string", "null"], "minLength": 1},
+        "note": {"type": ["string", "null"]}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "reference"],
+      "properties": {
+        "type": {"enum": ["url", "hash", "credential", "portfolio", "test_result", "other"]},
+        "reference": {"type": "string", "minLength": 1},
+        "note": {"type": ["string", "null"]}
+      }
+    }
+  }
+}

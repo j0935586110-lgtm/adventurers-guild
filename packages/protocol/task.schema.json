@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adventurers-guild.dev/protocol/task.schema.json",
+  "title": "Agent Work Network Task v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_id", "task_type", "goal", "requester", "requirements",
+    "budget", "deliverables", "acceptance_criteria",
+    "execution_mode", "approval_policy", "privacy_level"
+  ],
+  "properties": {
+    "task_id": {"type": "string", "minLength": 1},
+    "task_type": {"type": "string", "minLength": 1},
+    "goal": {"type": "string", "minLength": 1},
+    "requester": {"$ref": "#/$defs/party"},
+    "requirements": {"type": "array", "items": {"type": "string"}},
+    "constraints": {"type": "array", "items": {"type": "string"}, "default": []},
+    "budget": {"$ref": "#/$defs/budget"},
+    "deadline": {"type": ["string", "null"], "format": "date-time"},
+    "location": {"type": ["string", "null"]},
+    "required_credentials": {"type": "array", "items": {"type": "string"}, "default": []},
+    "deliverables": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/deliverable"}},
+    "acceptance_criteria": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/criterion"}},
+    "execution_mode": {"enum": ["agent", "human", "hybrid", "licensed_human"]},
+    "approval_policy": {"$ref": "#/$defs/approvalPolicy"},
+    "privacy_level": {"enum": ["public", "unlisted", "private"]},
+    "extensions": {"type": "object"}
+  },
+  "$defs": {
+    "party": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["principal_id", "agent_id"],
+      "properties": {
+        "principal_id": {"type": "string", "minLength": 1},
+        "agent_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["consideration_type"],
+      "properties": {
+        "consideration_type": {"enum": ["monetary", "non_monetary", "negotiable"]},
+        "max_amount": {"type": ["number", "null"], "minimum": 0},
+        "currency": {"type": ["string", "null"], "minLength": 1},
+        "note": {"type": ["string", "null"]}
+      }
+    },
+    "deliverable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "description"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "description": {"type": "string", "minLength": 1}
+      }
+    },
+    "criterion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "description", "verification", "required"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "description": {"type": "string", "minLength": 1},
+        "verification": {"enum": ["deterministic", "requester_confirmation", "third_party", "hybrid"]},
+        "required": {"type": "boolean"}
+      }
+    },
+    "approvalPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["accept_terms", "release_value"],
+      "properties": {
+        "accept_terms": {"enum": ["agent_allowed", "human_required"]},
+        "release_value": {"enum": ["agent_allowed", "human_required"]},
+        "max_autonomous_amount": {"type": ["number", "null"], "minimum": 0}
+      }
+    }
+  }
+}
