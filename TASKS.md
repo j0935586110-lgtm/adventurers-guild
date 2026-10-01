@@ -67,22 +67,23 @@ a catastrophic fail-open. Verified independently: `validate.py` 11 PASS,
 ## P2 — Agent-to-Agent local loop
 Status: QUEUED
 
-### T6 Minimal API/MCP extension — PARTIAL (67ba5e1)
-Status: pure write layer done; MCP wrappers NOT done.
+### T6 Minimal API/MCP extension — DONE (67ba5e1 + 58fbc3e)
+Status: pure write layer and MCP surface both landed.
 
 Add proposal-oriented operations without removing existing 8 MCP tools.
 Candidate tools: `submit_bid`, `counter_offer`, `accept_terms`, `submit_delivery`, `verify_delivery`.
 
-**Delivered in `67ba5e1`:** `packages/protocol/ops.py` — all five operations as
-pure functions, each gated by `authorize()`. Denial returns the gate's exact
-reason code, carries no data, and does not mutate inputs. Verified independently:
-expired / revoked / over-budget / wrong-currency / not-yet-valid / unauthorised
-action all deny; a permitted action returns `OK` with data; inputs unchanged
-after every denial.
+**`67ba5e1`** — `packages/protocol/ops.py`: all five operations as pure
+functions, each gated by `authorize()`. Denial returns the gate's exact reason
+code, carries no data, and does not mutate inputs.
 
-**Still outstanding:** the MCP wrappers. `mcp/` is untouched, so the eight
-existing tools are intact and the five new operations are not yet reachable over
-MCP.
+**`58fbc3e`** — the MCP surface. `mcp/protocol_tools.py` defines the five tools
+and delegates to `ops.py`; `mcp/server.py` gains nineteen additive lines and
+loses none. Verified independently: 8/8 existing tool definitions, 8/8 dispatch
+branches and 8/8 handler implementations still present; `now` is a required
+argument on every tool and the system clock is never read; expired, revoked,
+not-yet-valid and unauthorised-action requests all deny with **no `data` key**.
+`tests/test_protocol_tools.py` 17 passed; `packages/protocol/` 65 passed.
 
 ### T7 Two test agents
 Requester Agent and Provider Agent must complete a fake digital task end-to-end with no manual data copying.
