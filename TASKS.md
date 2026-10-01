@@ -64,8 +64,31 @@ NaN and infinity — `nan > cap` is False, so an unguarded NaN would have been
 a catastrophic fail-open. Verified independently: `validate.py` 11 PASS,
 `pytest packages/protocol/` 32 passed, `REASON_CODES` == 12 exact set.
 
+## CURRENT PRIORITY — Matching Core / Professional Decoupling
+Status: ACTIVE (2026-10-01)
+Architecture: `docs/architecture/task-matching-professional-decoupling.md`
+
+T5–T7 are preserved as completed transaction infrastructure. New work now prioritizes discovering the right Actor before expanding negotiation, contract, settlement, or execution infrastructure.
+
+### M1 Capability model — TODO
+Create `packages/protocol/capability.schema.json` and fixtures. Capabilities describe what can be done independent of profession title.
+
+### M2 Credential model — TODO
+Create `packages/protocol/credential.schema.json` and fixtures. Credentials represent required authority/qualification separately from capabilities.
+
+### M3 Actor model — TODO
+Create `packages/protocol/actor.schema.json` for `human`, `agent`, `hybrid`, and `organization` Actors with capabilities, credentials, availability, constraints, and supported execution modes.
+
+### M4 Task matching semantics — TODO
+Extend Task with `required_capabilities`. Implement deterministic hard eligibility checks for capabilities, required credentials, execution mode, jurisdiction/location/deadline constraints. Fail closed on missing mandatory requirements.
+
+### M5 Match engine + MCP discovery — TODO
+Produce inspectable Match results and expose model-neutral discovery operations: `publish_task`, `search_tasks`, `get_task`, `find_matches`, `get_actor`, `get_capabilities`, `get_credentials` (exact names may be normalized during implementation).
+
+Acceptance: demonstrate one need decomposed into Tasks where different steps can match Agent, Human, Hybrid, and licensed-only Actors without using a profession label as the atomic matching key. T1–T7 tests must remain green.
+
 ## P2 — Agent-to-Agent local loop
-Status: QUEUED
+Status: T6–T7 DONE; T8 PAUSED behind Matching Core
 
 ### T6 Minimal API/MCP extension — DONE (67ba5e1 + 58fbc3e)
 Status: pure write layer and MCP surface both landed.
@@ -110,7 +133,7 @@ all denied, carry no `data` key, and leave the Market unpoluted
 Audit coverage is enough to assert ordering only; T8 remains the formal
 audit-trail deliverable.
 
-### T8 Append-only audit trail
+### T8 Append-only audit trail — PAUSED
 Every state transition records actor, principal, action, payload reference, timestamp, and evidence reference.
 
 ## Deferred

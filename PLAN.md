@@ -1,6 +1,6 @@
 # 冒險者公會 — 長線計畫（PLAN.md）
 
-> 建立：2026-09-20｜狀態：概念收斂完成，**等第一筆真實交易**
+> 建立：2026-09-20｜2026-10-01 優先級更新：**先證明任務媒合／去中間化／專業解偶，再擴張交易層**
 > 這是一份**可機械檢查驗收**的長線計畫：每個里程碑都有明確的「怎麼算做完」。
 
 ---
@@ -64,6 +64,18 @@
 
 ---
 
+## 3A. 2026-10-01 優先級覆寫：任務媒合／專業解偶
+
+在既有交易閉環繼續擴張前，先完成 Matching Core。職業不是原子單位；需求拆成 Task，職業拆成 Capability + Credential + Responsibility，再媒合 Human / Agent / Hybrid / Organization。
+
+當前順序：`Need → Task → Capability/Credential → Actor → Match`。既有 T5 Delegation、T6 Proposal MCP、T7 雙 Agent E2E 保留為底層能力，但暫不繼續擴張 Bid/Contract/Payment/j1 Worker。T8 Audit 也排在 Matching Core 之後，除非媒合正確性需要它。
+
+正式架構：`docs/architecture/task-matching-professional-decoupling.md`。
+
+驗收：至少一個真實需求能被拆成多個 Task，並因不同 capability/credential 要求分別媒合到 Agent、人類、混合執行者或必要持照者；資格不符者必須 deterministic fail-closed。
+
+---
+
 ## 4. 里程碑（每個都有可機械檢查的驗收條件）
 
 ### M1 — 驗收閉環（最小、優先）
@@ -104,6 +116,8 @@
 ---
 
 ## 6. 決策紀錄
+
+- **2026-10-01**：產品主線收斂為「任務媒合 + 去中間化 + 專業解偶」。Task / Capability / Credential / Actor / Match 成為媒合核心；職業只是一組能力與責任的組合，不作為原子媒合單位。T5–T7 保留為已完成底層交易能力，暫停交易層擴張。
 
 - **2026-09-20**：確認此概念 ＝ 公會的通用化說法。判定 **「方向對、形態要對」**；優先補「驗收」（M1），不以擴張抽象為先。
 - **2026-09-20**：確認不採「通用萬能平台」形態；核心＝**可驗證任務契約 ＋ 人機同一階梯**。

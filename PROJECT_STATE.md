@@ -4,7 +4,7 @@ Updated: 2026-10-01
 Status: ACTIVE — evolving Adventurers Guild into Agent Work Network
 
 ## North Star
-A two-sided market where both requester and provider can use their own AI agents. Agents discover tasks, bid, negotiate, deliver, verify, and transact inside explicit human delegation boundaries.
+An open task-matching network that decomposes needs into executable work, expresses that work as capabilities and credentials, and directly matches it to the smallest suitable set of human, Agent, hybrid, or organization Actors. Transaction automation exists underneath matching; it is not the current product focus.
 
 ## Existing assets (preserve)
 - React/Vite web application.
@@ -24,18 +24,23 @@ The Guild is no longer framed mainly as a human freelance marketplace. It become
 Insurance and real estate are future pressure-test verticals. MVP remains digital work first.
 
 ## Current architecture target
-1. Identity & Delegation
-2. Task Protocol
-3. Bid & Negotiation Protocol
-4. Contract / agreed_terms
-5. Delivery & Evidence
-6. Verification
-7. Reputation
-8. Escrow / settlement adapters
+1. Need → Task decomposition
+2. Capability model
+3. Credential model
+4. Actor model: human / agent / hybrid / organization
+5. Eligibility filter and Match engine
+6. Identity & Delegation (existing foundation)
+7. Bid / Negotiation / Contract (existing foundation; not current priority)
+8. Delivery / Verification / Audit (preserve; expand after matching proof)
+9. Escrow / settlement adapters (deferred)
+
+Canonical matching architecture: `docs/architecture/task-matching-professional-decoupling.md`.
 
 ## Immediate engineering objective
-Prove a local Agent-to-Agent closed loop without requiring manual data copy:
-Task → Bid → Counter-offer → Accepted Terms → Delivery → Verification → Audit Trail.
+Prove professional decoupling and direct matching:
+Need → Task(s) → required capabilities/credentials → eligible Actors → explainable ranked Match.
+
+T5–T7 already prove that matched Agents can later negotiate and execute. Do not expand that transaction layer until the matching core is proven.
 
 ## First protocol artifacts
 Create and validate:
@@ -70,16 +75,23 @@ Independent reviewer = agy or separate agent for important protocol/security cha
 - Codex completed `docs/architecture/quest-protocol-mapping.md` without modifying existing production paths.
 - Backward compatibility rule: keep the 8 existing MCP tools; add protocol-native tools separately.
 
-## Next checkpoint
-T5 complete and independently reviewed. Principal/Agent delegation schema,
-fixtures, and a pure fail-closed `authorize()` are present: every malformed,
-incomplete, expired, revoked, over-budget, wrong-currency, or unapproved input
-denies, reason codes form a closed enumerable set of twelve, and NaN/infinity
-are rejected before any numeric comparison. Commits `39e1287` (Codex round 1)
-and `121538e` (DSH round 2).
+## Completed foundation — 2026-10-01
+- T1–T3 Task/Bid/Contract protocol schemas complete.
+- T4 legacy Quest compatibility mapping complete.
+- T5 Principal/Agent delegation and fail-closed authorization complete and independently reviewed.
+- T6 five protocol-native MCP proposal tools complete without replacing the original 8 Quest tools.
+- T7 Requester/Provider Agent E2E complete: Task → Bid → Counter → Terms → Delivery → Verification with no manual data copying; whole suite 105 passed at checkpoint.
 
-Next is T6 — minimal API/MCP extension: add `submit_bid`, `counter_offer`,
-`accept_terms`, `submit_delivery`, `verify_delivery` **alongside** the 8
-existing MCP tools, never replacing them. Every write path must call
-`authorize()` first and must surface its reason code. Do not add a write tool
-whose authorization can be bypassed.
+## Next checkpoint — Matching Core
+Implement and validate, in order:
+1. `capability.schema.json`;
+2. `credential.schema.json`;
+3. `actor.schema.json`;
+4. extend Task with `required_capabilities` while preserving compatibility;
+5. deterministic hard eligibility filtering;
+6. inspectable Match scoring/ranking;
+7. model-neutral MCP/API discovery tools such as `find_matches` and `get_actor`.
+
+T8 append-only audit remains required but is paused behind this matching milestone unless it blocks matching correctness or traceability.
+
+Product proof: a real need can be decomposed and directly matched to capable and properly credentialed Actors without requiring a profession-labelled intermediary.
