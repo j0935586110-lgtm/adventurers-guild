@@ -35,6 +35,7 @@ Insurance and real estate are future pressure-test verticals. MVP remains digita
 9. Escrow / settlement adapters (deferred)
 
 Canonical matching architecture: `docs/architecture/task-matching-professional-decoupling.md`.
+Canonical UX/discovery architecture: `docs/architecture/user-experience-agent-discovery.md`.
 
 ## Immediate product objective
 Validate that professional decoupling and orchestration solve a real user problem before expanding code:

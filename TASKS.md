@@ -76,6 +76,12 @@ Run 10–20 real complex-needs interviews/tests before treating the architecture
 
 Kill/pivot criteria are defined in `PLAN.md` §7.8. Praise or stated interest does not count as validation; observable action does.
 
+### V1 Minimal human UX prototype — TODO alongside V0
+Build only the five validation screens defined in `docs/architecture/user-experience-agent-discovery.md`: Outcome Input, Workflow Review, Match Comparison, Actor Profile, Project Status. The UX must be outcome-first, not profession-directory-first. Instrument the V0 funnel rather than building a full marketplace dashboard.
+
+### D0 Agent discovery surface — TODO alongside V0
+Prepare a stable read/discovery-oriented Streamable HTTP `/mcp`, a public `/for-agents` page, and packaging plans for the OpenAI universal Plugin Directory and Gemini CLI Extension distribution. Do not depend on custom embedded UI or consumer Gemini Connected App availability for the MVP.
+
 ### M0 Workflow / orchestration model — DESIGN ONLY until V0 signal
 Define the minimum representation of Task dependencies, hand-offs, checkpoints, fallback paths, and coordination responsibility. `project_coordination` must be a capability, not an assumed free system function.
 

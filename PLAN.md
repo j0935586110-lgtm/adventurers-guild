@@ -342,3 +342,54 @@ Agent infrastructure：
 公會應驗證的獨特能力是：**跨專業 outcome orchestration + 可驗證 capability/credential + human/agent 同一媒合介面**。
 
 如果這三者無法在真實案例產生明顯提升，應縮小產品，而不是增加更多協議與 Agent 功能。
+
+## 8. UI、Agent 發現與使用入口（2026-10-01）
+
+產品必須同時服務三種入口，但共享同一套核心資料與規則：
+
+```text
+Human Web ───────┐
+ChatGPT / Codex ─┼→ Guild Matching Core
+Gemini / Agents ─┘   Workflow / Task / Capability / Credential / Actor / Match
+```
+
+完整 UX / Discovery 架構：`docs/architecture/user-experience-agent-discovery.md`。
+
+### 8.1 使用者網站
+
+首頁不是「你要找哪種師傅？」的服務黃頁，而是一個 outcome 輸入：
+
+> 你想完成什麼？
+
+輸入後依序呈現：Workflow → 可編輯 Task → 每個 Task 的資格/能力要求 → Match → 是否需要 Coordinator → Project progress。
+
+MVP 只做五個主要畫面：Outcome Input、Workflow Review、Match Comparison、Actor Profile、Project Status。
+### 8.2 ChatGPT / Codex 如何找到公會
+
+OpenAI 現行公開路徑是 Plugin + MCP：公會提供穩定 HTTPS `/mcp`，先以 developer/personal plugin 測試，再封裝並提交 OpenAI universal Plugin Directory。公開 plugin 核准後，可從支援的 ChatGPT / Codex surface 被發現。
+
+另外保留三個導流入口：
+- 官網 `/for-agents` 一鍵說明如何連 MCP；
+- 公開 Workflow / Capability / Actor 頁面供一般 web search 找到；
+- 可分享的 Plugin/安裝頁面。
+
+ChatGPT 內可以額外使用 MCP Apps UI 呈現 Workflow 圖、Match 比較、確認卡；但所有 tool 必須在沒有 UI 的情況下仍可正確使用。
+
+第一版重點不是漂亮 widget，而是：`preview_workflow`、`find_matches`、`get_actor` 等 read/discovery tool 可穩定運作，再逐步開啟需要授權的寫入操作。
+### 8.3 Gemini 如何找到公會
+
+目前要分三條：
+
+1. **Gemini CLI**：做成 Gemini CLI Extension，或讓使用者直接 `gemini mcp add` 連到公會 Remote MCP；Extensions Gallery 是明確的第三方發現入口。
+2. **Gemini API**：Interactions API 可直接掛公會的 Streamable HTTP MCP URL，讓開發者的 Gemini Agent 呼叫。
+3. **Gemini consumer app**：目前不要假設任意 Remote MCP 會自動成為公開 Connected App。先靠 web/SEO 被找到；若之後做 Android app，再利用 Google Play / Gemini app surface 或合作整合。
+
+因此 Gemini 第一階段的可控策略是：CLI Extension + Remote MCP + 公開網站，而不是等待 consumer Gemini 自動收錄。
+
+### 8.4 如何使用公會
+
+Human：描述 outcome → 看 Workflow → 修改 → 選擇自理或 Coordinator → 看 Match → 聯絡/提案 → Project 頁追蹤。
+
+AI：使用者在 ChatGPT/Gemini/Hermes 說自然語言 → Agent 呼叫公會 MCP → 公會回 Workflow/Match → Agent 解釋並讓使用者確認 → 需要寫入或不可逆操作時走 Delegation/Approval gate。
+
+Provider：建立 Actor profile → 宣告 Capability/Constraint → 提交 Credential/Evidence → 設定地區/價格/可用時間 → 只收到通過 hard eligibility 的任務。
