@@ -1,0 +1,7 @@
+{
+  "delegation_id": "delegation-invalid",
+  "principal": {"id": "human-requester"},
+  "agent": {"id": "requester-agent"},
+  "scope": {"max_spend": {"amount": -1, "currency": "TWD"}},
+  "validity": {"issued_at": "not-a-date", "expires_at": "2027-01-01T00:00:00Z"}
+}

@@ -71,4 +71,4 @@ Independent reviewer = agy or separate agent for important protocol/security cha
 - Backward compatibility rule: keep the 8 existing MCP tools; add protocol-native tools separately.
 
 ## Next checkpoint
-P1/T5: define the Principal/Agent Delegation Model and permission envelope before any protocol write API is added. Then perform independent review before T6 implementation.
+P1/T5 complete locally: Principal/Agent delegation schema, fixtures, pure fail-closed authorization checks, and validator coverage are present. Perform independent review before T6 implementation.

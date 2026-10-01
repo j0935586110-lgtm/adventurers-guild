@@ -47,6 +47,7 @@ Produce `docs/architecture/quest-protocol-mapping.md` describing:
 - cutover risks.
 
 ### T5 Delegation model
+Status: DONE (2026-10-01; local validation green)
 Define Principal/Agent identities and permission envelope:
 - max spend/value;
 - allowed task categories;

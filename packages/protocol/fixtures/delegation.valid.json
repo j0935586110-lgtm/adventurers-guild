@@ -1,0 +1,19 @@
+{
+  "delegation_id": "delegation-demo-001",
+  "principal": {"id": "human-requester", "display_name": "Demo Principal", "role": "requester"},
+  "agent": {"id": "requester-agent", "name": "Requester Agent", "public_key_ref": "key:demo", "operator": "operator-demo"},
+  "scope": {
+    "max_spend": {"amount": 1000, "currency": "TWD"},
+    "allowed_task_categories": ["software_task"],
+    "allowed_tools": ["guild.submit_bid"],
+    "allowed_actions": ["submit_bid"]
+  },
+  "approval_thresholds": {
+    "max_autonomous_spend": {"amount": 1000, "currency": "TWD"},
+    "human_approval_actions": [],
+    "human_approval_categories": []
+  },
+  "validity": {"issued_at": "2026-10-01T00:00:00Z", "expires_at": "2026-12-31T00:00:00Z"},
+  "revocation": {"revocable": true, "revoked_at": null, "revocation_reason": null},
+  "constraints": {}
+}

@@ -1,0 +1,24 @@
+{
+  "delegation_id": "delegation-demo-full",
+  "principal": {"id": "human-licensed", "display_name": "Licensed Principal", "role": "requester"},
+  "agent": {"id": "specialist-agent", "name": "Specialist Agent", "public_key_ref": "key:specialist", "operator": "operator-acme"},
+  "scope": {
+    "max_spend": {"amount": 50000, "currency": "TWD"},
+    "allowed_task_categories": ["software_task", "data_analysis", "regulated_vertical"],
+    "allowed_tools": ["guild.submit_bid", "guild.counter_offer", "guild.accept_terms", "guild.submit_delivery"],
+    "allowed_actions": ["submit_bid", "counter_offer", "accept_terms", "submit_delivery"]
+  },
+  "approval_thresholds": {
+    "max_autonomous_spend": {"amount": 10000, "currency": "TWD"},
+    "human_approval_actions": ["accept_terms"],
+    "human_approval_categories": ["regulated_vertical"]
+  },
+  "validity": {"issued_at": "2026-10-01T00:00:00Z", "expires_at": "2027-10-01T00:00:00Z"},
+  "revocation": {"revocable": true, "revoked_at": null, "revocation_reason": null},
+  "constraints": {
+    "data_handling": "no_personal_data",
+    "jurisdiction": "TW",
+    "require_audit": true,
+    "notes": "Synthetic full fixture"
+  }
+}

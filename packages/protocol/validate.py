@@ -12,6 +12,12 @@ CASES = [
     ("bid.schema.json", "bid.valid.json", True),
     ("contract.schema.json", "contract.valid.json", True),
     ("task.schema.json", "task.invalid.json", False),
+    ("delegation.schema.json", "delegation.valid.json", True),
+    ("delegation.schema.json", "delegation.valid.full.json", True),
+    ("delegation.schema.json", "delegation.expired.json", True),
+    ("delegation.schema.json", "delegation.revoked.json", True),
+    ("delegation.schema.json", "delegation.exceeds-spend.json", True),
+    ("delegation.schema.json", "delegation.invalid.json", False),
 ]
 
 

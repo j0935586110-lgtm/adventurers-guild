@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adventurers-guild.dev/protocol/delegation.schema.json",
+  "title": "Agent Work Network Principal-Agent Delegation v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "delegation_id", "principal", "agent", "scope", "approval_thresholds",
+    "validity", "revocation", "constraints"
+  ],
+  "properties": {
+    "delegation_id": {"type": "string", "minLength": 1},
+    "principal": {"$ref": "#/$defs/principal"},
+    "agent": {"$ref": "#/$defs/agent"},
+    "scope": {"$ref": "#/$defs/scope"},
+    "approval_thresholds": {"$ref": "#/$defs/approvalThresholds"},
+    "validity": {"$ref": "#/$defs/validity"},
+    "revocation": {"$ref": "#/$defs/revocation"},
+    "constraints": {"type": "object", "additionalProperties": true}
+  },
+  "$defs": {
+    "principal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "display_name", "role"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "display_name": {"type": "string", "minLength": 1},
+        "role": {"type": "string", "minLength": 1}
+      }
+    },
+    "agent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "public_key_ref", "operator"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "public_key_ref": {"type": "string", "minLength": 1},
+        "operator": {"type": "string", "minLength": 1}
+      }
+    },
+    "moneyLimit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["amount", "currency"],
+      "properties": {
+        "amount": {"type": "number", "minimum": 0},
+        "currency": {"type": "string", "minLength": 1}
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_spend", "allowed_task_categories", "allowed_tools", "allowed_actions"],
+      "properties": {
+        "max_spend": {"$ref": "#/$defs/moneyLimit"},
+        "allowed_task_categories": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "allowed_tools": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "allowed_actions": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "approvalThresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_autonomous_spend", "human_approval_actions", "human_approval_categories"],
+      "properties": {
+        "max_autonomous_spend": {"$ref": "#/$defs/moneyLimit"},
+        "human_approval_actions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "human_approval_categories": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "validity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["issued_at", "expires_at"],
+      "properties": {
+        "issued_at": {"type": "string", "format": "date-time"},
+        "expires_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "revocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revocable", "revoked_at", "revocation_reason"],
+      "properties": {
+        "revocable": {"type": "boolean"},
+        "revoked_at": {"type": ["string", "null"], "format": "date-time"},
+        "revocation_reason": {"type": ["string", "null"]}
+      }
+    }
+  }
+}
