@@ -55,6 +55,14 @@ Define Principal/Agent identities and permission envelope:
 - approval thresholds;
 - expiration and revocation.
 No real signing/payment integration yet.
+Round 1 (Codex, `39e1287`) then round 2 (DSH, `121538e`) after independent
+review by agy. Three gaps the review surfaced were closed in round 2:
+currency was declared in the schema but never validated by `authorize()`;
+`REASON_CODES` was not exported so downstream could not enumerate reason
+codes; `amount == 0` semantics were undefined. `_amount()` also now rejects
+NaN and infinity — `nan > cap` is False, so an unguarded NaN would have been
+a catastrophic fail-open. Verified independently: `validate.py` 11 PASS,
+`pytest packages/protocol/` 32 passed, `REASON_CODES` == 12 exact set.
 
 ## P2 — Agent-to-Agent local loop
 Status: QUEUED

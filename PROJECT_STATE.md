@@ -71,4 +71,15 @@ Independent reviewer = agy or separate agent for important protocol/security cha
 - Backward compatibility rule: keep the 8 existing MCP tools; add protocol-native tools separately.
 
 ## Next checkpoint
-P1/T5 complete locally: Principal/Agent delegation schema, fixtures, pure fail-closed authorization checks, and validator coverage are present. Perform independent review before T6 implementation.
+T5 complete and independently reviewed. Principal/Agent delegation schema,
+fixtures, and a pure fail-closed `authorize()` are present: every malformed,
+incomplete, expired, revoked, over-budget, wrong-currency, or unapproved input
+denies, reason codes form a closed enumerable set of twelve, and NaN/infinity
+are rejected before any numeric comparison. Commits `39e1287` (Codex round 1)
+and `121538e` (DSH round 2).
+
+Next is T6 — minimal API/MCP extension: add `submit_bid`, `counter_offer`,
+`accept_terms`, `submit_delivery`, `verify_delivery` **alongside** the 8
+existing MCP tools, never replacing them. Every write path must call
+`authorize()` first and must surface its reason code. Do not add a write tool
+whose authorization can be bypassed.
