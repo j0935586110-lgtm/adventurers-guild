@@ -44,18 +44,21 @@ export const GuildProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Fetch guild profile from users table
   const fetchProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', userId)
-      .maybeSingle();
+    const [profileResult, walletResult] = await Promise.all([
+      supabase.from('users')
+        .select('id,display_name,avatar_url,bio,skill_tags,reputation_points')
+        .eq('id', userId).maybeSingle(),
+      supabase.rpc('guild_my_wallet'),
+    ]);
+    const data = profileResult.data;
+    const wallet = walletResult.data?.[0];
     if (data) {
       setProfile({
         id: data.id,
         display_name: data.display_name,
         avatar_url: data.avatar_url || '',
-        balance_g_coin: data.balance_g_coin,
-        frozen_g_coin: data.frozen_g_coin,
+        balance_g_coin: wallet ? Number(wallet.balance_g_coin) : 0,
+        frozen_g_coin: wallet ? Number(wallet.frozen_g_coin) : 0,
         reputation_points: data.reputation_points,
         rank: repToRank(data.reputation_points),
         bio: data.bio || '',
@@ -71,15 +74,19 @@ export const GuildProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: AuthChangeEvent, session: Session | null) => {
+      (_event: AuthChangeEvent, session: Session | null) => {
         const currentUser = session?.user ?? null;
         setUser(currentUser);
         if (currentUser) {
-          await fetchProfile(currentUser.id);
+          // Don't await a Supabase database call inside the auth callback.
+          // It can deadlock while the auth client's internal lock is held.
+          setTimeout(() => {
+            void fetchProfile(currentUser.id).finally(() => setLoading(false));
+          }, 0);
         } else {
           setProfile(null);
+          setLoading(false);
         }
-        setLoading(false);
       }
     );
 
@@ -130,7 +137,8 @@ export const GuildProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin }
+      // Preserve OAuth consent URL and its authorization_id on social sign-in.
+      options: { redirectTo: window.location.href }
     });
     return error ? { error: error.message } : {};
   };

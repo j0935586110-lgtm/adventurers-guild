@@ -1,0 +1,48 @@
+# 冒險者公會 × GPT/Claude MCP｜2026-10-28 上線檢查
+
+## 目前已落地（每項均有實際證據）
+- 主 Supabase 專案 wrwsjlydozfzejixofwm: `guild_services`、`guild_inquiries`、`guild_reviews` 已建立，RLS 已啟用。
+- 個人新註冊 trigger: `public.handle_new_user()` 改用安全 search_path、暱稱（不預設外洩 Email），並保留原本 G-Coin 初始設定；但真人 Google/Email 註冊仍未測。
+- `public.users` 讀取僅允許公開欄位，Email/餘額對 anon 不可讀；一般會員不能改動 G-Coin 餘額。
+- 八個原有 SECURITY DEFINER 託管／交易 RPC 已收回 PUBLIC/anon/authenticated EXECUTE，service_role 繼續可用。
+- 以上三項主資料庫變更均透過 Supabase apply_migration 執行並立即讀回確認。
+- 可匿名存取的公開唯讀 MCP 已部署，HTTPS:
+  https://wrwsjlydozfzejixofwm.supabase.co/functions/v1/guild-discovery
+  實測 MCP initialize、tools/list、search_services HTTP 200；目前 0 筆刊登。
+- 僅供 OAuth 使用者的受保護 MCP 已部署，HTTPS:
+  https://wrwsjlydozfzejixofwm.supabase.co/functions/v1/guild-mcp-beta
+  實測無 token 的 initialize HTTP 401，返回正確 WWW-Authenticate 與 OAuth 資源 metadata。
+- 本地 PostgreSQL docker 測試通過：註冊兩位模擬會員、刊登、詢價、報價、確認完成、單筆評價與負面權限測試。
+- Deno 靜態 check 兩個 Edge Functions 都通過。Vite build 通過；Python 合約測試通過。
+- 使用者首次連接同意頁 `/oauth/consent` 已寫入 src/components/OAuthConsent.tsx，並建立 vercel.json 路由。尚未以公開網址驗證。
+
+## 真正阻礙（必須分辨）
+1. **OAuth 2.1 Server 尚未啟用**：2026-10-28 對
+   https://wrwsjlydozfzejixofwm.supabase.co/.well-known/oauth-authorization-server/auth/v1
+   GET 回 404 `feature_disabled`。請在 Supabase Dashboard 的 Authentication > OAuth Server 啟用，
+   Authorization Path 設 `/oauth/consent`；若要支援 ChatGPT/Claude 自動註冊 client，啟用 Dynamic Client Registration，注意開啟使用者同意。
+2. Supabase 目前 ES256 JWKS 已存在，可供 @supabase/server 驗證 access token；但未實際完成 OAuth flow，請勿宣稱可由 GPT 自動登入。
+3. **OAuth Consent 頁需要公開且正確的 HTTPS 網站原點**。Vercel 現有 preview 受 Team Authentication 保護，
+   新頁程式尚未發布到正式域名。需確認 Vercel 團隊授權、完成前端部署、確認直接進入 /oauth/consent 可載入。
+4. Google OAuth Provider 啟用及 redirect URI 未經驗證。正式 Auth 使用者仍為 0 人。
+5. 未實測兩個真正的 Supabase Auth 使用者 + ChatGPT 私人插件接入；未提交 Plugin Directory；J1 不在本次範圍。
+6. 既有正式站仍是舊版。資料庫已加固，但舊版 Web Profile 的 `select('*')` 可能不再支援，必須先上線新版
+   使用 explicit public columns + `guild_my_wallet()` 的 GuildProvider，才建議讓新會員註冊使用。
+7. 尚未解決舊 Firebase 未使用 TypeScript 路徑與缺少 React 型別造成的全域 `tsc --noEmit` 基線失敗。
+8. Supabase security advisors 還有舊專案 definer search_path 和 PostGIS public schema 等警告，需另案處理，不能宣稱全面完成安全驗收。
+
+## 使用者下一個需要完成的授權
+- Supabase Dashboard：https://supabase.com/dashboard/project/wrwsjlydozfzejixofwm
+  Authentication > OAuth Server：啟用 OAuth 2.1；授權路徑 `/oauth/consent`；批准 Dynamic Client Registration。
+- 讓我們有能力部署可供 OAuth 回呼的公開新站（Vercel team 目前曾回 403）。
+- 完成一次真正的 Google/Email 登入、同意與 MCP Inspector/ChatGPT custom MCP 連接後，才能宣稱「GPT 自動註冊/刊登」。
+
+## 安全範圍
+- guild-discovery 只讀並受 service_status 和 RLS 雙重限制；不持有 service-role key。
+- guild-mcp-beta 全部工具受 @supabase/server OAuth token 驗證與 RLS；不操作 J1、不付款、不授權任意 Shell。
+- 交易評價只代表買家手動確認詢價完成，不代表第三方已驗證付款／實際履約。
+
+## 最新預覽驗證（2026-10-28）
+- Vercel 新版隔離預覽已部署：`https://adventurers-guild-7ntphz63e-johnfu.vercel.app/`，部署狀態 READY。
+- Vercel 已成功產生暫時分享連結；在同一瀏覽器開啟分享連結後，`/oauth/consent?authorization_id=test` 實際 HTTP 200，HTML 屬於新版冒險者公會。
+- 這僅證明 SPA consent route 可載入，**不代表 OAuth Server 已啟用或實際授權完成**。正式網站仍未覆蓋。

@@ -117,3 +117,15 @@ Product proof: a real need can be decomposed and directly matched to capable and
 ## Visual redesign 2026-10-28
 - Light jade/coral responsive design, new public marketplace landing and modals, mobile navigation. Legacy Quest board lazy preserved.
 - Browser verified desktop/tablet/mobile, 51 Python tests and Vite build PASS. Real DB Auth transactions not run. Preview only; no production promotion.
+
+## M0–M2 actual execution checkpoint — 2026-10-28 (source of truth: MCP_RELEASE_GATES.md)
+- Main Supabase RLS and personal signup privacy migrations NOW APPLIED (previous 'not applied' statements above are superseded); 3 guild_* marketplace tables exist.
+- Emergency lock-down: 8 old SECURITY DEFINER G-Coin/escrow RPCs revoked from anon/authenticated; service_role kept working, grants read back.
+- Live anonymous /rest/v1 test: services HTTP 200 empty, users.email HTTP 401 denied, safe public user name HTTP 200.
+- Disposable local PostgreSQL simulation passed 2-user inquiry/quote/confirm/review and unauthorized action negatives; no real Google/Email Auth users were created.
+- Supabase Edge guild-discovery remote MCP ACTIVE; live initialize/tools/list/search_services 200, 3 read-only tools.
+- Supabase Edge guild-mcp-beta remote MCP ACTIVE; OAuth-middleware-protected, unauthenticated initialize 401 with metadata.
+- OAuth 2.1 server remains DISABLED (metadata GET 404 feature_disabled). Consent UI implemented but requires public website release and OAuth Server dashboard action. No public plugin submitted.
+- Latest independent Vercel preview: https://adventurers-guild-7ntphz63e-johnfu.vercel.app/ READY but deployment protection applies; main production domain unchanged.
+
+- 2026-10-28 final check: independent Vercel protected preview share works; root and /oauth/consent 200 via authenticated share cookie; Google/Email OAuth still not exercised; main production website unchanged.

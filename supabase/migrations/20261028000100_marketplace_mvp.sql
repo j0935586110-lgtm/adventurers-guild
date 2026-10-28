@@ -1,5 +1,5 @@
 -- Guild MVP: separate service catalog/inquiries/verified-by-buyer reviews.
--- Prepared locally only; legacy Quest/Escrow/G-Coin never modified.
+-- Applied to the main Supabase project on 2026-10-28; Quest/Escrow/G-Coin tables were not changed.
 begin;
 create table if not exists public.guild_services (
  id uuid primary key default gen_random_uuid(),

@@ -1,0 +1,12 @@
+# Proposed configuration; do not push to the project until the consent UI
+# is available on a public HTTPS origin. Requires project-owner action.
+[auth]
+site_url = "https://adventurers-guild-tan.vercel.app"
+
+[auth.oauth_server]
+enabled = true
+authorization_url_path = "/oauth/consent"
+allow_dynamic_registration = true
+
+[functions.guild-mcp-beta]
+verify_jwt = false # Function's withSupabase OAuth middleware checks the JWT.

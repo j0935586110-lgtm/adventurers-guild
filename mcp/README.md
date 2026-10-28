@@ -67,3 +67,17 @@ Buyers and merchants must authenticate through the web app to send inquiries,
 publish services, quote, complete and review. All authorization is in database RLS.
 The SQL migration at supabase/migrations/20261028000100_marketplace_mvp.sql
 must be applied to a controlled database before real marketplace interactions.
+
+## Remote Guild MCP v0.2 (October 2026)
+
+Public read-only discovery (live):
+`https://wrwsjlydozfzejixofwm.supabase.co/functions/v1/guild-discovery`
+Tools: `search_services`, `get_service`, `get_service_reviews`. This is already callable without authorization and returns empty arrays rather than fabricated sample services.
+
+Protected account actions (live, but **OAuth flow not activated**):
+`https://wrwsjlydozfzejixofwm.supabase.co/functions/v1/guild-mcp-beta`
+Requires Supabase OAuth 2.1 Server + user authorization; unauthenticated requests yield 401 with protected-resource metadata. Tools: search, get service, my profile, publish, list my services, request quote, my inquiries, quote, confirm, review. No J1, payments or shell access.
+
+Auth consent UI: `src/components/OAuthConsent.tsx`, served at `/oauth/consent` after public deployment. Supabase needs dashboard OAuth Server enabled, dynamic client registration, correct Site URL, and an accessible consent page. The project already exposes asymmetric ES256 JWKS, but **do not claim end-to-end ChatGPT linking** before real login and OAuth approval tests.
+
+See `MCP_RELEASE_GATES.md` for security and release acceptance. The original `mcp/server.py` is privileged for internal Quest/G-Coin; do not expose it as a public MCP.

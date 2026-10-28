@@ -202,3 +202,15 @@ Status: LOCAL IMPLEMENTED / NOT RELEASED. See MVP_HANDOFF.md.
 - [x] Browser smoke test desktop 1440 and mobile 390/320 incl categories and auth gate; build and Python tests.
 - [ ] Invite one user to evaluate new independent preview and collect actionable visual feedback.
 - [ ] Do not production deploy until privacy/RLS/registration business E2E gates pass.
+
+## MCP launch next gated steps (2026-10-28)
+- [x] Apply RLS marketplace & secure signup/privacy to main Supabase.
+- [x] Block legacy anonymous/member direct money/escrow RPCs; verify service_role access persists.
+- [x] Deploy read-only public guild-discovery MCP and verify JSON-RPC over HTTPS.
+- [x] Deploy OAuth-protected guild-mcp-beta and verify 401 challenge/metadata.
+- [x] Build SPA /oauth/consent page and protected preview.
+- [ ] User-side OAuth Server setting: enable OAuth 2.1, DCR, Authorization Path /oauth/consent.
+- [ ] Authorize Vercel team preview/production release and make consent path publicly reachable.
+- [ ] Verify live Auth Google/Email, two-account complete trade with real JWTs and MCP client.
+- [ ] Apply Plugin creation + private ChatGPT connection; submit public plugin only after reviewer cases.
+- [ ] J1 quotas remain out of scope.

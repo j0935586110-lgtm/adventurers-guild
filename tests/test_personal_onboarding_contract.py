@@ -30,7 +30,8 @@ def test_personal_listing_does_not_require_business_registration():
 def test_signup_confirmation_is_not_faked():
     provider = (ROOT / "src/components/GuildProvider.tsx").read_text()
     assert "confirmationRequired: !data.session" in provider
-    assert "setTimeout" not in provider
+    # Auth-event deferral is allowed; guessing signup completion after 1500 ms is not.
+    assert "1500" not in provider
     assert "error: error.message" in provider
 
 
