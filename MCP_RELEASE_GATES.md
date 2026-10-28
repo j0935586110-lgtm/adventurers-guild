@@ -82,3 +82,6 @@
 - DCR still OFF. Official Supabase security warning: enabling it lets anyone register OAuth clients and can lead to phishing/spam. Keep OFF until the real consent/login+token workflow and client-specific authorization are tested; decide with user whether DCR risks are acceptable.
 - Rollback for global Site URL: Supabase Dashboard > Authentication > URL Configuration, prior value `http://localhost:3000`. To preserve functioning production identity flows, prefer deliberate v2 choice rather than blindly reverting.
 - No changes to the old production Vercel project, original GitHub main branch, J1 privileges, or G-Coin. Frontend code source remains in isolated local checkout.
+
+### Browser E2E of genuine authorization request (unauthenticated stage)
+With a manual Public OAuth client, a PKCE S256 code challenge and a registered exact redirect URI, `/auth/v1/oauth/authorize` returned HTTP 302 to the public v2 consent URL with a valid `authorization_id`. Puppeteer then opened that **actual Location** (without logging the identifier or code verifier): consent returned HTTP 200, login form present, Google button hidden, no browser JS errors, no horizontal overflow at 390px. This validates the browser-facing unauthenticated half of the flow. No credentials, grant approval, or token exchange occurred.
