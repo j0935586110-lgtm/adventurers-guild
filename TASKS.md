@@ -195,3 +195,10 @@ Status: LOCAL IMPLEMENTED / NOT RELEASED. See MVP_HANDOFF.md.
 - [ ] Apply migrations to staging and test real signup + business flow with two non-production Auth accounts, including denied money edits.
 - [ ] Check Google provider is enabled and redirect URLs are correct.
 - [ ] Do not grant J1 execution credits or allow live device access as part of low-friction registration.
+
+## UI makeover milestone (2026-10-28)
+- [x] New mobile-first light UI, user-centered copy, search, categories and empty state.
+- [x] Preserve original quest workflows behind separate lazy navigation.
+- [x] Browser smoke test desktop 1440 and mobile 390/320 incl categories and auth gate; build and Python tests.
+- [ ] Invite one user to evaluate new independent preview and collect actionable visual feedback.
+- [ ] Do not production deploy until privacy/RLS/registration business E2E gates pass.

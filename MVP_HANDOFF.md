@@ -53,3 +53,11 @@ Merchant profiles are self-declared, not company-verified. A review is only mark
 - An agy read-only security audit was attempted but its headless CLI refused a required command permission; **no independent final security pass is claimed** for this new signup migration. Dangerous permission bypass was not enabled.
 - Live Supabase project stays unchanged; project has no Auth users yet. No real registration, Google OAuth, J1 quota, or two-account end-to-end test has run.
 - Public users table currently grants broad SELECT on email/balances due legacy Quest compatibility. Privacy-safe public profile and private account balances must be separated before open signup.
+
+## UI visual redesign checkpoint — 2026-10-28
+- Replaced dark fantasy home with light jade-and-coral editorial personal skills marketplace. Purpose: search, free listing, simple inquiry. CSS-only original graphics, no invented merchants/reviews.
+- New src/components/GuildHome.tsx and guild-home.css; App.tsx now uses GuildHome; prior Quest/G-Coin UI preserved in lazy-loaded src/LegacyGuild.tsx.
+- Updated index.css and index.html favicon/SEO, new public/guild-mark.svg and DESIGN.md. No data layer, RLS, money or J1 permissions changed.
+- Build PASS, 51 Python tests PASS (updated contract to match new UI), browser PASS at 1440/390/320 (no overflow, no page exceptions); category filtering, guest login gate, auth switch/close, mobile menu PASS.
+- Current Supabase tables guild_services/guild_inquiries/guild_reviews are absent; UI correctly shows friendly '服務市場正在準備中', not fake service cards or successful real transactions. Google Auth and merchant/buyer E2E not verified. This is VISUAL PREVIEW ONLY.
+- Full npx tsc --noEmit remains blocked by baseline missing React JSX types and old Firebase references; no unique new semantic errors found. Deployment preview only; production and GitHub main unchanged.

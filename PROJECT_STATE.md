@@ -113,3 +113,7 @@ Product proof: a real need can be decomposed and directly matched to capable and
 - Hardened signup function and removed dangerous users-table privileges in a **local-only migration**. Not yet applied or tested in live Supabase.
 - 51 local Python tests pass, build passes. Release gate: identity/public-profile privacy split; verified Supabase Auth with two users; provider/buyer transaction test; explicit approval before production deploy.
 - J1 no free remote execution credits upon signup; only separate sandbox policy planned after marketplace proves demand.
+
+## Visual redesign 2026-10-28
+- Light jade/coral responsive design, new public marketplace landing and modals, mobile navigation. Legacy Quest board lazy preserved.
+- Browser verified desktop/tablet/mobile, 51 Python tests and Vite build PASS. Real DB Auth transactions not run. Preview only; no production promotion.
