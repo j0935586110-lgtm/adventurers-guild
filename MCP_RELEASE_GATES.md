@@ -59,3 +59,26 @@
 - **Critical pending**: Supabase `Site URL` currently `http://localhost:3000`. OAuth authorization redirect would therefore not reach an internet-accessible consent UI. The existing production guild website is still the older build; only a Vercel protected preview carries consent UI. Do not change Site URL before deploying consent UI on an authorized accessible origin.
 - Next: deploy working consent page to a stable public HTTPS URL, change Supabase `Authentication > URL Configuration > Site URL` to that origin, verify consent route with real `authorization_id`, then evaluate enabling DCR and ChatGPT/Claude end-to-end OAuth.
 - **Do not claim** GPT-based automatic signup until a real authorized OAuth flow and two-account publish tests succeed.
+
+## 2026-10-28 Public OAuth v2 website and real authorization preflight
+
+- Created separate **Vercel project** `adventurers-guild-v2` ID `prj_4iEFPpejnYumqIxFuuD9HqqgGPUD` with NO Git connection and NO SSO protection. Published reviewed static Vite build to production alias:
+  `https://adventurers-guild-v2.vercel.app/`
+  The original `adventurers-guild-tan.vercel.app` remains unchanged (HTTP 200, older title).
+- Confirmed from an unauthenticated HTTP client: `/` and `/oauth/consent?authorization_id=preflight` both HTTP 200, public and HTTPS.
+- Changed **global Supabase Auth Site URL** from `http://localhost:3000` to `https://adventurers-guild-v2.vercel.app` via authorized J1 GUI; opened URL Config in a NEW Chrome tab and independently re-read persisted value.
+- Added and confirmed 3 Supabase Auth redirect URL patterns:
+  `https://adventurers-guild-v2.vercel.app/**`,
+  `https://adventurers-guild-tan.vercel.app/**`, `http://localhost:3000/**`.
+  These preserve existing old-site and local-development return paths; reset-password and default email confirmation links now target v2 (intentional reversible impact).
+- Supabase provider settings: `Allow new users to sign up` ON; Email ENABLED; Google DISABLED. Google sign-in requires separate Google Cloud client ID/secret and authorized redirect URI. Do NOT claim one-click Google login is active.
+- Created a single manual PUBLIC OAuth development client in Supabase OAuth Apps:
+  `Guild OAuth Development Test`; client ID `b1e1367d-26d6-413d-9d56-2e24f4aa3017`; registered callback `https://adventurers-guild-v2.vercel.app/oauth/test-return`; no confidential client secret.
+- Real, server-validated authorization request (code PKCE S256, client_id, redirect_uri, response_type=code, openid/email/profile) returned **302** to `https://adventurers-guild-v2.vercel.app/oauth/consent` with a true `authorization_id`. Response contained NO OAuth error. Authorization identifier and code verifier were not exposed in logs.
+- UI bug fix: `GuildProvider.signUp` now sets `emailRedirectTo: window.location.href` so email verification links can return to the original consent URL with its authorization_id; Google button hidden on both homepage and consent unless `VITE_GUILD_GOOGLE_OAUTH=true`.
+- Rebuilt and deployed v2; latest production deployment `dpl_HuDBcxskBkZbDgiARRmyBepd4Ry6` READY; Vite build and 56 Python contract tests passed before final new regression.
+- Real browser smoke test from external machine: root and consent HTTP 200 at 390px; consent displays Email login form and NO Google button, neither page has JS exceptions/horizontal overflow.
+- Attempted to set up an independently verifiable test inbox and synthetic QA Auth account, but outbound automated signup script invocation was BLOCKED by platform security controls; did not circumvent. Test mailbox was empty and deleted. Live `auth.users` count remains **0**; therefore approval, token exchange, and GPT publish cannot be declared passed.
+- DCR still OFF. Official Supabase security warning: enabling it lets anyone register OAuth clients and can lead to phishing/spam. Keep OFF until the real consent/login+token workflow and client-specific authorization are tested; decide with user whether DCR risks are acceptable.
+- Rollback for global Site URL: Supabase Dashboard > Authentication > URL Configuration, prior value `http://localhost:3000`. To preserve functioning production identity flows, prefer deliberate v2 choice rather than blindly reverting.
+- No changes to the old production Vercel project, original GitHub main branch, J1 privileges, or G-Coin. Frontend code source remains in isolated local checkout.

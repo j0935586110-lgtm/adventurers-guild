@@ -120,7 +120,9 @@ export const GuildProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { name, guild_nickname: name } }
+      // Preserve authorization_id across the email verification roundtrip.
+      // Site origin/path must be in the Supabase Redirect URLs allow list.
+      options: { data: { name, guild_nickname: name }, emailRedirectTo: window.location.href }
     });
     if (error) return { error: error.message };
     // Hosted projects commonly require email confirmation: do not

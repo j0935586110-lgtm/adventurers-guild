@@ -45,3 +45,13 @@ def test_public_discovery_has_exactly_three_read_only_tools():
     assert "readOnlyHint:true" in source
     assert '.insert(' not in source and '.update(' not in source and '.delete(' not in source
     assert 'SUPABASE_SERVICE_ROLE_KEY' not in source
+
+
+def test_signup_preserves_oauth_consent_after_email_confirmation():
+    auth=(ROOT/'src/components/GuildProvider.tsx').read_text()
+    assert 'emailRedirectTo: window.location.href' in auth
+    assert 'redirectTo: window.location.href' in auth
+    home=(ROOT/'src/components/GuildHome.tsx').read_text()
+    consent=(ROOT/'src/components/OAuthConsent.tsx').read_text()
+    assert "import.meta.env.VITE_GUILD_GOOGLE_OAUTH === 'true'" in home
+    assert "import.meta.env.VITE_GUILD_GOOGLE_OAUTH === 'true'" in consent

@@ -70,11 +70,13 @@ function AuthDialog({onClose}:{onClose:()=>void}) {
     <div className="gh-dialog-eyebrow">WELCOME TO GUILD</div>
     <h2 className="gh-dialog-title">{mode==='signup'?'免費加入，開始你的下一個機會。':'歡迎回來！'}</h2>
     <p className="gh-dialog-sub">不需公司、不需統編。每個人都能分享自己的技能。</p>
-    <button className="gh-google" type="button" onClick={async()=>{
-      setMessage('');try{const result=await signInWithGoogle();if(result.error)setMessage(result.error);}
-      catch(err){setMessage(err instanceof Error?err.message:'Google 登入暫時無法使用');}
-    }}><Globe2 size={18}/> 使用 Google 繼續</button>
-    <div className="gh-separator"><span>或使用 Email</span></div>
+    {import.meta.env.VITE_GUILD_GOOGLE_OAUTH === 'true' && <>
+      <button className="gh-google" type="button" onClick={async()=>{
+        setMessage('');try{const result=await signInWithGoogle();if(result.error)setMessage(result.error);}
+        catch(err){setMessage(err instanceof Error?err.message:'Google 登入暫時無法使用');}
+      }}><Globe2 size={18}/> 使用 Google 繼續</button>
+      <div className="gh-separator"><span>或使用 Email</span></div>
+    </>}
     <form className="gh-form" onSubmit={submit}>
       {mode==='signup'&&<label>你的暱稱（選填）<input value={alias} maxLength={80} onChange={e=>setAlias(e.target.value)} placeholder="例如：小安設計師"/></label>}
       <label>電子信箱<input type="email" required autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"/></label>

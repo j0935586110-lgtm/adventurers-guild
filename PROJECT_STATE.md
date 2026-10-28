@@ -129,3 +129,10 @@ Product proof: a real need can be decomposed and directly matched to capable and
 - Latest independent Vercel preview: https://adventurers-guild-7ntphz63e-johnfu.vercel.app/ READY but deployment protection applies; main production domain unchanged.
 
 - 2026-10-28 final check: independent Vercel protected preview share works; root and /oauth/consent 200 via authenticated share cookie; Google/Email OAuth still not exercised; main production website unchanged.
+
+## Current v2 OAuth public site 2026-10-28
+- `https://adventurers-guild-v2.vercel.app` is deployed, public, with working `/oauth/consent` route.
+- Supabase global Site URL set to v2; 3 redirect allowlist entries confirmed, old site preserved.
+- Real OAuth manually registered client PKCE request returns 302 with authorization_id to correct v2 consent path.
+- Google provider DISABLED, Email ENABLED; DCR OFF; actual logged-in consent/token exchange NOT TESTED (no Auth users).
+- See MCP_RELEASE_GATES.md for detailed audit and rollback.

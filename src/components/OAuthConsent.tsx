@@ -85,11 +85,13 @@ export default function OAuthConsent() {
         ? <p>正在確認登入狀態…</p>
         : !user
         ? <>
-          <button type="button" className="gh-google" onClick={async()=>{
-            const result=await signInWithGoogle();
-            if(result.error)setError(result.error);
-          }}>用 Google 登入／加入</button>
-          <div className="gh-separator"><span>或用 Email</span></div>
+          {import.meta.env.VITE_GUILD_GOOGLE_OAUTH === 'true' && <>
+            <button type="button" className="gh-google" onClick={async()=>{
+              const result=await signInWithGoogle();
+              if(result.error)setError(result.error);
+            }}>用 Google 登入／加入</button>
+            <div className="gh-separator"><span>或用 Email</span></div>
+          </>}
           <form className="gh-form" onSubmit={authenticate}>
             {mode === 'signup' && <label>個人暱稱（選填）<input maxLength={80} value={nickname} onChange={e=>setNickname(e.target.value)}/></label>}
             <label>Email<input type="email" required value={email} onChange={e=>setEmail(e.target.value)} autoComplete="email"/></label>
