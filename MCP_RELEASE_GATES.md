@@ -46,3 +46,16 @@
 - Vercel 新版隔離預覽已部署：`https://adventurers-guild-7ntphz63e-johnfu.vercel.app/`，部署狀態 READY。
 - Vercel 已成功產生暫時分享連結；在同一瀏覽器開啟分享連結後，`/oauth/consent?authorization_id=test` 實際 HTTP 200，HTML 屬於新版冒險者公會。
 - 這僅證明 SPA consent route 可載入，**不代表 OAuth Server 已啟用或實際授權完成**。正式網站仍未覆蓋。
+
+## OAuth Server activation from J1 Windows 11 — 2026-10-28
+
+- User explicitly authorized Windows 11 J1 remote GUI administration.
+- On agent `desktop-jne4fna-bdb6` Chrome, opened `https://supabase.com/dashboard/project/wrwsjlydozfzejixofwm/auth/oauth-server`.
+- Browser initially had no Supabase session. Used existing ChatGPT account through Supabase "Continue with ChatGPT" UI; Supabase project dashboard authentication succeeded.
+- Switched `Enable the Supabase OAuth Server` ON and saved. Independently read UIA toggle `On`.
+- Authorization Path displays `/oauth/consent` (configured).
+- Discovery `https://wrwsjlydozfzejixofwm.supabase.co/.well-known/oauth-authorization-server/auth/v1` returned **HTTP 200**, verified from J1 on Windows, issuer and authorization endpoint correct (previously `404 feature_disabled`).
+- `Allow Dynamic OAuth Apps` remains OFF, independently verified. Dashboard warning stated public registration invites phishing/spam; postponed until actual reachable consent UI and permission workflow can be verified.
+- **Critical pending**: Supabase `Site URL` currently `http://localhost:3000`. OAuth authorization redirect would therefore not reach an internet-accessible consent UI. The existing production guild website is still the older build; only a Vercel protected preview carries consent UI. Do not change Site URL before deploying consent UI on an authorized accessible origin.
+- Next: deploy working consent page to a stable public HTTPS URL, change Supabase `Authentication > URL Configuration > Site URL` to that origin, verify consent route with real `authorization_id`, then evaluate enabling DCR and ChatGPT/Claude end-to-end OAuth.
+- **Do not claim** GPT-based automatic signup until a real authorized OAuth flow and two-account publish tests succeed.
