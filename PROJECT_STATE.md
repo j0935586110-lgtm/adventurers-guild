@@ -97,3 +97,12 @@ Independent reviewer = agy or separate agent for important protocol/security cha
 T8 append-only audit remains required but is paused behind this matching milestone unless it blocks matching correctness or traceability.
 
 Product proof: a real need can be decomposed and directly matched to capable and properly credentialed Actors without requiring a profession-labelled intermediary.
+
+## Local build checkpoint — 2026-10-28 (not deployed)
+- Taiwan merchant services, inquiries, buyer-confirmed transaction reviews implemented in isolated worktree guild-mvp-20261028 (no new Git branch).
+- Existing Quest/G-Coin untouched; public read-only MCP separated from admin service-role server.
+- Supabase wrwsjlydozfzejixofwm resumed to ACTIVE_HEALTHY; production schema unchanged (migration not applied).
+- npm run build EXIT=0; 46 Python tests PASS in isolated venv; Hermes 28 Supabase client request-shape checks PASS.
+- agy review found three blockers: optional comments, unpublish blocking review, truncated MCP scan; local fixes applied; re-audit pending at this checkpoint.
+- DSH backend generation failed to land; its security review identified NULL-in-CHECK risk, now corrected. No real DB/RLS E2E yet.
+- Release gate: staging SQL apply/negative RLS tests, two-account end-to-end, owner approval for push/deploy.

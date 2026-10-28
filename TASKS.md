@@ -174,3 +174,14 @@ Every state transition records actor, principal, action, payload reference, time
 - Real-estate title/closing
 - DAO/token design
 - Production migration until protocol v0.1 is reviewed
+
+## LOCAL MVP — Taiwan services market (2026-10-28)
+Status: LOCAL IMPLEMENTED / NOT RELEASED. See MVP_HANDOFF.md.
+- [x] Service catalog UI with guest search, merchant publish and TWD prices.
+- [x] Inquiry → quote → buyer confirm → one review after completed.
+- [x] RLS migration source with immutable provider ID, identity checks and public read-only MCP.
+- [x] Build, SDK import and local protocol/unit tests.
+- [ ] Execute migration in authorized staging DB and test allow/deny policies using distinct users.
+- [ ] Verify UI on phone and complete live two-account business flow.
+- [ ] Public ChatGPT/Gemini discoverability: hosting/auth/Registry only after local business transaction proven.
+- [ ] Production Git push / deployment / payments require explicit approval.

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTranslation } from 'react-i18next';
-import { Sword, Coins, Award, Plus, Map as MapIcon, User as UserIcon, CheckCircle2, Clock, AlertCircle, FileText, LogOut, ChevronRight, ShieldCheck, Star, Globe } from 'lucide-react';
+import { Sword, Coins, Award, Plus, Map as MapIcon, User as UserIcon, CheckCircle2, Clock, AlertCircle, FileText, LogOut, ChevronRight, ShieldCheck, Star, Globe, Store } from 'lucide-react';
 import { supabase } from './lib/supabase';
 import { GuildProvider, useGuild } from './components/GuildProvider';
+import MarketplaceMVP from './components/MarketplaceMVP';
 
 // --- Types ---
 interface Quest {
@@ -355,7 +356,7 @@ function MainApp() {
   const [quests, setQuests] = useState<Quest[]>([]);
   const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
   const [isPosting, setIsPosting] = useState(false);
-  const [activeTab, setActiveTab] = useState<'board' | 'my-quests' | 'my-jobs'>('board');
+  const [activeTab, setActiveTab] = useState<'board' | 'my-quests' | 'my-jobs' | 'services'>('board');
   const [isGuest, setIsGuest] = useState(false);
 
   const loadQuests = useCallback(async () => {
@@ -400,13 +401,14 @@ function MainApp() {
           </div>
         </nav>
       )}
-      <main className="flex-1 max-w-7xl w-full mx-auto flex gap-12 p-12">
-        <aside className="w-80 space-y-8 shrink-0">
+      <main className="flex-1 max-w-7xl w-full mx-auto flex flex-col lg:flex-row gap-8 lg:gap-12 p-4 sm:p-6 lg:p-12">
+        <aside className="w-full lg:w-80 space-y-6 lg:space-y-8 shrink-0">
           <div className="p-6 border border-[#3d3428] bg-[#1a1612]/40 rounded-sm">
             <h2 className="font-serif text-[#d4af37] text-sm tracking-[0.3em] mb-6 glow-gold">{t('guild_board')}</h2>
             <nav className="space-y-2">
               {[
                 { id: 'board', label: t('the_market'), icon: <MapIcon size={16} />, show: true },
+                { id: 'services', label: '服務市場', icon: <Store size={16} />, show: true },
                 { id: 'my-quests', label: t('commissions'), icon: <FileText size={16} />, show: !!profile },
                 { id: 'my-jobs', label: t('current_jobs'), icon: <Sword size={16} />, show: !!profile },
               ].filter(tab => tab.show).map(tab => (
@@ -428,14 +430,20 @@ function MainApp() {
           </div>
           )}
         </aside>
-        <section className="flex-1">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <AnimatePresence>
-              {filtered.map(q => <QuestCard key={q.id} quest={q} onSelect={setSelectedQuest} />)}
-            </AnimatePresence>
-          </div>
-          {filtered.length === 0 && (
-            <div className="text-center py-20 text-[#e0d5c1]/30 font-serif text-lg tracking-widest">{t('no_quests')}</div>
+        <section className="flex-1 min-w-0">
+          {activeTab === 'services' ? (
+            <MarketplaceMVP />
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <AnimatePresence>
+                  {filtered.map(q => <QuestCard key={q.id} quest={q} onSelect={setSelectedQuest} />)}
+                </AnimatePresence>
+              </div>
+              {filtered.length === 0 && (
+                <div className="text-center py-20 text-[#e0d5c1]/30 font-serif text-lg tracking-widest">{t('no_quests')}</div>
+              )}
+            </>
           )}
         </section>
       </main>
