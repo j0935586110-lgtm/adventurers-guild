@@ -38,3 +38,18 @@ Status: LOCAL MVP IMPLEMENTED, PRODUCTION NOT DEPLOYED. No public listing or mon
 
 ## Safety
 Merchant profiles are self-declared, not company-verified. A review is only marked as buyer-confirmed after a quoted inquiry is marked complete by its requester, not as independent proof of paid delivery. Do not claim broad external AI discovery until the MCP server is hosted and connected/listed.
+
+## Personal-first simplification checkpoint (2026-10-28)
+- Public service market is the first page; visitors browse without authentication.
+- Register as an individual with Google OAuth (provider configuration still unverified) or email/password. Nickname optional on email registration (blank generates a neutral alias rather than exposing email); explicit email-confirmation feedback when signup creates no session.
+- Listings automatically use the signed-in member's display name; mandatory fields: title, description, service area. Optional category and TWD price moved to collapsed advanced settings. No corporate ID or identity document required.
+- New local SQL migration 20261028000200_personal_member_onboarding.sql fixes unqualified system_config in the SECURITY DEFINER signup trigger (search_path='') and removes dangerous default table privileges; authenticated member profile updates limited to harmless fields.
+- This migration has NOT been applied to live Supabase. Existing public.users SELECT permissions still expose email/wallet columns under current open read policy: **privacy blocker before opening signup to strangers**. Existing Quest joins and private wallet reads need a safe separation.
+- Current local test run: 51 Python tests passed; SQL migration parsed successfully with pglast; npm run build exits 0; full npx tsc --noEmit still fails on pre-existing Firebase and React typings.
+- Not implemented: real user/Agent registration, sign-in incentive credits, J1 paid/free quota, corporate verification, public MCP OAuth, production deployment. None should be claimed live.
+
+### This checkpoint verification note
+- 2026-10-28 personal onboarding changes: npm run build PASS; 51 existing and new Python tests PASS; PostgreSQL DDL parses with pglast.
+- An agy read-only security audit was attempted but its headless CLI refused a required command permission; **no independent final security pass is claimed** for this new signup migration. Dangerous permission bypass was not enabled.
+- Live Supabase project stays unchanged; project has no Auth users yet. No real registration, Google OAuth, J1 quota, or two-account end-to-end test has run.
+- Public users table currently grants broad SELECT on email/balances due legacy Quest compatibility. Privacy-safe public profile and private account balances must be separated before open signup.

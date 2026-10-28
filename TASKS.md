@@ -185,3 +185,13 @@ Status: LOCAL IMPLEMENTED / NOT RELEASED. See MVP_HANDOFF.md.
 - [ ] Verify UI on phone and complete live two-account business flow.
 - [ ] Public ChatGPT/Gemini discoverability: hosting/auth/Registry only after local business transaction proven.
 - [ ] Production Git push / deployment / payments require explicit approval.
+
+## Personal-first onboarding gates (2026-10-28)
+- [x] Make public service search the first screen; no login required to browse.
+- [x] Remove corporate business-name requirement; individual nickname for listing; three core fields.
+- [x] Handle email confirmation feedback instead of assumed instant registration.
+- [x] Prepare secure signup trigger repair + restricted member UPDATE privilege SQL migration, locally only.
+- [ ] Privacy: redact public users email, balances and authentication IDs; preserve legacy Quest display names and owner wallet via separated public/private reads.
+- [ ] Apply migrations to staging and test real signup + business flow with two non-production Auth accounts, including denied money edits.
+- [ ] Check Google provider is enabled and redirect URLs are correct.
+- [ ] Do not grant J1 execution credits or allow live device access as part of low-friction registration.

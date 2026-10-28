@@ -192,13 +192,13 @@ function InquiryModal({
 // ---------------------------------------------------------------------------
 
 function PublishServiceForm({ onPublished }: { onPublished: () => void }) {
-  const { user } = useGuild();
+  const { user, profile } = useGuild();
+  const displayName = (profile?.display_name || user?.user_metadata?.guild_nickname || `冒險者-${user?.id.slice(0, 6) ?? '個人'}`).toString().trim();
   const [form, setForm] = useState({
-    businessName: '',
     title: '',
     description: '',
-    category: SERVICE_CATEGORIES[0],
-    city: TAIWAN_CITIES[0],
+    category: '其他',
+    city: '',
     price: '',
   });
   const [submitting, setSubmitting] = useState(false);
@@ -220,7 +220,7 @@ function PublishServiceForm({ onPublished }: { onPublished: () => void }) {
         throw new Error('起始價必須是 0 或正整數（TWD）。');
       }
       await publishService(user.id, {
-        businessName: form.businessName,
+        businessName: displayName,
         title: form.title,
         description: form.description,
         category: form.category,
@@ -228,11 +228,10 @@ function PublishServiceForm({ onPublished }: { onPublished: () => void }) {
         priceFromTwd: parsed === null ? null : Math.round(parsed),
       });
       setForm({
-        businessName: '',
         title: '',
         description: '',
-        category: SERVICE_CATEGORIES[0],
-        city: TAIWAN_CITIES[0],
+        category: '其他',
+        city: '',
         price: '',
       });
       setDone(true);
@@ -247,22 +246,15 @@ function PublishServiceForm({ onPublished }: { onPublished: () => void }) {
   return (
     <form onSubmit={submit} className="border border-[#3d3428] bg-[#1a1612]/60 p-5 sm:p-6 space-y-5">
       <h3 className="font-serif text-[#d4af37] tracking-widest text-sm glow-gold flex items-center gap-2">
-        <Plus size={16} /> 發布新服務
+        <Plus size={16} /> 刊登我的能力／服務
       </h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <FieldLabel>商家／工作室名稱</FieldLabel>
-          <input
-            required
-            maxLength={80}
-            value={form.businessName}
-            onChange={e => setForm({ ...form, businessName: e.target.value })}
-            className={inputClass}
-            placeholder="例如：小光居家清潔"
-          />
+          <FieldLabel>我的顯示名稱</FieldLabel>
+          <p className="p-3 text-sm text-[#d4af37] border border-[#3d3428]">{displayName}</p>
         </div>
         <div>
-          <FieldLabel>服務標題</FieldLabel>
+          <FieldLabel>我能提供什麼服務？</FieldLabel>
           <input
             required
             maxLength={120}
@@ -272,27 +264,14 @@ function PublishServiceForm({ onPublished }: { onPublished: () => void }) {
             placeholder="例如：雙北兩房深層清潔"
           />
         </div>
-        <div>
-          <FieldLabel>分類</FieldLabel>
-          <select
-            value={form.category}
-            onChange={e => setForm({ ...form, category: e.target.value })}
-            className={inputClass + ' appearance-none'}
-          >
-            {SERVICE_CATEGORIES.map(c => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
+         <div>
           <FieldLabel>服務地區</FieldLabel>
-          <select
+          <select required
             value={form.city}
             onChange={e => setForm({ ...form, city: e.target.value })}
             className={inputClass + ' appearance-none'}
           >
+            <option value="" disabled>請選擇地區</option>
             {TAIWAN_CITIES.map(c => (
               <option key={c} value={c}>
                 {c}
@@ -302,7 +281,7 @@ function PublishServiceForm({ onPublished }: { onPublished: () => void }) {
         </div>
       </div>
       <div>
-        <FieldLabel>服務說明</FieldLabel>
+        <FieldLabel>簡單說明（服務內容與限制）</FieldLabel>
         <textarea
           required
           rows={4}
@@ -313,23 +292,26 @@ function PublishServiceForm({ onPublished }: { onPublished: () => void }) {
           placeholder="服務內容、作業時間、含哪些項目、不含哪些項目…"
         />
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
-        <div>
-          <FieldLabel>起始價（TWD，可留空）</FieldLabel>
-          <input
-            type="number"
-            min="0"
-            step="1"
-            value={form.price}
-            onChange={e => setForm({ ...form, price: e.target.value })}
-            className={inputClass + ' font-mono'}
-            placeholder="例如：2500"
-          />
+      <details className="border border-[#3d3428] p-3 text-sm text-[#e0d5c1]/80">
+        <summary className="cursor-pointer">更多設定（選填：分類、價格）</summary>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+          <div>
+            <FieldLabel>服務分類</FieldLabel>
+            <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} className={inputClass}>
+              {SERVICE_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+          <div>
+            <FieldLabel>參考起始價（新台幣）</FieldLabel>
+            <input type="number" min="0" step="1" value={form.price}
+              onChange={e => setForm({ ...form, price: e.target.value })}
+              className={inputClass} placeholder="留空表示另議" />
+          </div>
         </div>
-        <button type="submit" disabled={submitting} className="fantasy-button py-3">
-          {submitting ? '發布中…' : '發布服務'}
-        </button>
-      </div>
+      </details>
+      <button type="submit" disabled={submitting} className="w-full fantasy-button py-3">
+        {submitting ? '發布中…' : '免費刊登'}
+      </button>
       {error && <ErrorBox message={error} />}
       {done && (
         <div className="flex items-center gap-2 text-xs text-emerald-300 border border-emerald-500/40 bg-emerald-500/5 p-3">
@@ -719,7 +701,7 @@ export default function MarketplaceMVP() {
           <Tag size={22} /> 服務市場
         </h2>
         <p className="text-xs text-[#e0d5c1]/50 mt-2">
-          台灣在地服務詢價 · 價格以新台幣（TWD）計價 · 訪客可搜尋，登入後可發布與詢價
+          不需要公司或統編 · 每個人都能刊登自己的技能與服務 · 訪客可直接搜尋
         </p>
       </header>
 
@@ -845,7 +827,7 @@ export default function MarketplaceMVP() {
         <section className="space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-xs text-[#e0d5c1]/50">
-              以 {profile?.display_name ?? '你的帳號'} 名義發布，送出後狀態為 published（公開可搜尋）。
+              以個人暱稱「{profile?.display_name ?? user?.user_metadata?.guild_nickname ?? `冒險者-${user?.id.slice(0, 6) ?? '個人'}`}」刊登，免費公開可搜尋。
             </p>
             <button
               onClick={() => setShowPublish(v => !v)}

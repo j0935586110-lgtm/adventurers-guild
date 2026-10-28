@@ -19,8 +19,8 @@ interface GuildContextType {
   profile: GuildProfile | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
-  signUp: (email: string, password: string, name: string) => Promise<{ error?: string }>;
-  signInWithGoogle: () => Promise<void>;
+  signUp: (email: string, password: string, name: string) => Promise<{ error?: string; confirmationRequired?: boolean }>;
+  signInWithGoogle: () => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
 }
 
@@ -48,7 +48,7 @@ export const GuildProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       .from('users')
       .select('*')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
     if (data) {
       setProfile({
         id: data.id,
@@ -61,6 +61,10 @@ export const GuildProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         bio: data.bio || '',
         skill_tags: data.skill_tags || [],
       });
+    } else {
+      // An Auth session is sufficient for the personal marketplace, but
+      // never fabricate balances/permissions if the legacy profile is absent.
+      setProfile(null);
     }
   };
 
@@ -106,15 +110,15 @@ export const GuildProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const signUp = async (email: string, password: string, name: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { name } }
+      options: { data: { name, guild_nickname: name } }
     });
     if (error) return { error: error.message };
-    // Wait for trigger to create users row
-    await new Promise(r => setTimeout(r, 1500));
-    return {};
+    // Hosted projects commonly require email confirmation: do not
+    // tell users they are signed in when the provider returned no session.
+    return { confirmationRequired: !data.session };
   };
 
   const signOut = async () => {
@@ -124,10 +128,11 @@ export const GuildProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const signInWithGoogle = async () => {
-    await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: window.location.origin }
     });
+    return error ? { error: error.message } : {};
   };
 
   return (

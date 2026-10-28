@@ -106,3 +106,10 @@ Product proof: a real need can be decomposed and directly matched to capable and
 - agy review found three blockers: optional comments, unpublish blocking review, truncated MCP scan; local fixes applied; re-audit pending at this checkpoint.
 - DSH backend generation failed to land; its security review identified NULL-in-CHECK risk, now corrected. No real DB/RLS E2E yet.
 - Release gate: staging SQL apply/negative RLS tests, two-account end-to-end, owner approval for push/deploy.
+
+## Personal-first MVP adjustment — 2026-10-28
+- First public users are individuals, not registered companies; anonymous browsing free and direct; optional nickname/email or Google sign-in; no mandatory real-name documents.
+- Personal service listing simplified to title, description, city; display name derived from Guild/Auth profile; category/price optional.
+- Hardened signup function and removed dangerous users-table privileges in a **local-only migration**. Not yet applied or tested in live Supabase.
+- 51 local Python tests pass, build passes. Release gate: identity/public-profile privacy split; verified Supabase Auth with two users; provider/buyer transaction test; explicit approval before production deploy.
+- J1 no free remote execution credits upon signup; only separate sandbox policy planned after marketplace proves demand.
