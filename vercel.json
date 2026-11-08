@@ -4,5 +4,16 @@
       "source": "/oauth/consent",
       "destination": "/index.html"
     }
+  ],
+  "headers": [
+    {
+      "source": "/oauth/consent",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    }
   ]
 }
