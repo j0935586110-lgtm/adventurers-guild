@@ -15,6 +15,8 @@ import {
 } from '../lib/marketplace';
 import './guild-home.css';
 
+const GOOGLE_OAUTH_ENABLED = import.meta.env.VITE_GUILD_GOOGLE_OAUTH === 'true';
+
 type Pane = 'discover' | 'mine' | 'inbox' | 'guild';
 type IconComp = React.ComponentType<{size?: number; strokeWidth?: number; className?: string}>;
 const CATEGORIES: {name: string; description: string; icon: IconComp; shade: string}[] = [
@@ -70,7 +72,7 @@ function AuthDialog({onClose}:{onClose:()=>void}) {
     <div className="gh-dialog-eyebrow">WELCOME TO GUILD</div>
     <h2 className="gh-dialog-title">{mode==='signup'?'免費加入，開始你的下一個機會。':'歡迎回來！'}</h2>
     <p className="gh-dialog-sub">不需公司、不需統編。每個人都能分享自己的技能。</p>
-    {import.meta.env.VITE_GUILD_GOOGLE_OAUTH === 'true' && <>
+    {GOOGLE_OAUTH_ENABLED && <>
       <button className="gh-google" type="button" onClick={async()=>{
         setMessage('');try{const result=await signInWithGoogle();if(result.error)setMessage(result.error);}
         catch(err){setMessage(err instanceof Error?err.message:'Google 登入暫時無法使用');}
@@ -323,7 +325,7 @@ export default function GuildHome() {
           <div>
             <span className="gh-kicker">OPEN WORKS · 02</span>
             <h2 id="gh-openworks-title">先看真實作品，再動手試試。</h2>
-            <p>借鏡技能書的方式：看用途、原始碼與練習步驟，不需要先登入。</p>
+            <p>每個案例列出用途、原始碼與練習步驟，不需要先登入。</p>
           </div>
           <a className="gh-secondary-link" href="/works.html">全部實戰技能書 <ArrowUpRight size={17}/></a>
         </div>
@@ -351,7 +353,7 @@ export default function GuildHome() {
       </section>
 
       <section className="gh-listings-section" ref={resultsRef}>
-        <div className="gh-container"><div className="gh-section-heading gh-listings-heading"><div><span className="gh-kicker">DISCOVER SERVICES · 02</span><h2>探索服務與合作機會<span className="gh-title-dot">.</span></h2><p>這裡展示會員真實刊登的服務，沒有假店家或虛構評價。</p></div><div className="gh-listing-meta">{!loading&&!error?('目前 '+activeCount+' 筆公開服務'):'持續開放刊登中'}</div></div>
+        <div className="gh-container"><div className="gh-section-heading gh-listings-heading"><div><span className="gh-kicker">DISCOVER SERVICES · 03</span><h2>探索服務與合作機會<span className="gh-title-dot">.</span></h2><p>這裡展示會員真實刊登的服務，沒有假店家或虛構評價。</p></div><div className="gh-listing-meta">{!loading&&!error?('目前 '+activeCount+' 筆公開服務'):'持續開放刊登中'}</div></div>
           <div className="gh-filters"><label className="gh-filter-search"><Search size={19}/><input aria-label="篩選服務關鍵字" value={keyword} onChange={e=>setKeyword(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')doSearch(e);}} placeholder="搜尋技能、服務或提供者…"/></label><label className="gh-filter-city"><MapPin size={17}/><select aria-label="選擇地區" value={city} onChange={e=>doSearch(undefined,{keyword,city:e.target.value})}><option value="">全部地區</option>{TAIWAN_CITIES.map(c=><option key={c} value={c}>{c}</option>)}</select><ChevronDown size={15}/></label><button type="button" className="gh-filter-go" onClick={()=>doSearch(undefined,{keyword,city})}>搜尋 <ArrowRight size={16}/></button>{(filters.keyword||filters.city)&&<button type="button" className="gh-reset" onClick={()=>doSearch(undefined,{keyword:'',city:''})}>清除篩選</button>}</div>
           {loading?<div className="gh-card-grid" aria-label="讀取中">{[1,2,3].map(n=><div key={n} className="gh-skeleton gh-skill-card"><div/><div/><div/></div>)}</div>
           :error?<div className="gh-empty"><span className="gh-empty-mark"><CircleHelp size={32}/></span><h3>服務目錄暫時無法載入</h3><p>{error}</p><button type="button" className="gh-outline" onClick={()=>void load(filters)}>重新整理 <ArrowRight size={16}/></button></div>
@@ -361,7 +363,7 @@ export default function GuildHome() {
       </section>
 
       <section className="gh-cta gh-container"><div className="gh-cta-left"><span className="gh-cta-icon"><HeartHandshake size={31}/></span><span>YOU HAVE SOMETHING TO OFFER</span><h2>下一個合作，<br/>從你的專長開始。</h2><p>無論是專業技能、生活服務或一個好點子，<br/>都值得讓更多人知道。</p><button type="button" className="gh-cta-button" onClick={startPost}>免費刊登我的服務 <ArrowUpRight size={20}/></button></div><div className="gh-cta-art" aria-hidden="true"><div className="gh-cta-disc"/><span>GOOD<br/>THINGS<br/>START<br/>HERE.</span><span className="gh-cta-hand">✳</span></div></section>
-      <section className="gh-how gh-container"><div className="gh-section-heading"><div><span className="gh-kicker">HOW IT WORKS · 03</span><h2>簡單三步，讓合作發生。</h2></div></div><div className="gh-how-grid">{[['01','加入公會',import.meta.env.VITE_GUILD_GOOGLE_OAUTH === 'true'?'用 Google 或 Email 免費加入，不需要公司資格。':'用 Email 免費加入，不需要公司資格。'],['02','分享或探索','刊登你的能力，或搜尋別人的專業服務。'],['03','開始合作','提出詢價、討論內容，完成後留下交易評價。']].map(([num,title,desc])=><div key={num} className="gh-how-card"><span>{num}</span><h3>{title}</h3><p>{desc}</p></div>)}</div></section>
+      <section className="gh-how gh-container"><div className="gh-section-heading"><div><span className="gh-kicker">HOW IT WORKS · 04</span><h2>簡單三步，讓合作發生。</h2></div></div><div className="gh-how-grid">{[['01','加入公會',GOOGLE_OAUTH_ENABLED?'用 Google 或 Email 免費加入，不需要公司資格。':'用 Email 免費加入，不需要公司資格。'],['02','分享或探索','刊登你的能力，或搜尋別人的專業服務。'],['03','開始合作','提出詢價、討論內容，完成後留下交易評價。']].map(([num,title,desc])=><div key={num} className="gh-how-card"><span>{num}</span><h3>{title}</h3><p>{desc}</p></div>)}</div></section>
     </>:pane==='guild'?<div className="gh-legacy"><div className="gh-container gh-backline"><button className="gh-outline" onClick={()=>toPane('discover')}>← 回到新版首頁</button><p>舊版任務看板暫時保留，避免影響原有委託流程。</p></div><Suspense fallback={<div className="gh-container gh-loading">載入任務看板中…</div>}><LegacyGuildMain/></Suspense></div>
     :<main className="gh-container gh-dashboard"><button type="button" className="gh-back" onClick={()=>toPane('discover')}>← 回探索服務</button><div className="gh-dashboard-head"><span className="gh-kicker">MY SPACE</span><h1>{pane==='mine'?'我的服務刊登':'我的詢價與合作'}</h1><p>{pane==='mine'?'管理你公開的專長與服務。':'所有詢價進度，都在這裡。'}</p></div>
       {dashboardError&&<Notice type="error" message={dashboardError}/>}
