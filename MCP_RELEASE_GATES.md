@@ -85,3 +85,30 @@
 
 ### Browser E2E of genuine authorization request (unauthenticated stage)
 With a manual Public OAuth client, a PKCE S256 code challenge and a registered exact redirect URI, `/auth/v1/oauth/authorize` returned HTTP 302 to the public v2 consent URL with a valid `authorization_id`. Puppeteer then opened that **actual Location** (without logging the identifier or code verifier): consent returned HTTP 200, login form present, Google button hidden, no browser JS errors, no horizontal overflow at 390px. This validates the browser-facing unauthenticated half of the flow. No credentials, grant approval, or token exchange occurred.
+
+## 2026-11-08 OpenCode 會員 MCP 驗收更新（取代前述舊狀態）
+
+- 正式公會已上線：https://adventurers-guild-v2.vercel.app/ 。公開 OAuth 同意頁及作品頁都能 HTTP 200 存取。
+- OAuth Server 已啟用：well-known metadata HTTP 200；既有公開測試客戶端的 PKCE S256 授權請求成功 HTTP 302 導向正式 /oauth/consent。
+- 實際資料庫：auth.users 0 位、公開 guild_services 0 筆、guild_inquiries 0 筆、guild_reviews 0 筆；尚無真實會員可供登入驗收。
+- OpenCode 1.18.22 在 Hermes j-baa0 用隔離設定已成功連上公開 guild-discovery。免費模型真實呼叫搜尋：台北市網站開發回 0；自然語言搜尋高雄市 AI 課程，模型自動改查四次後正確回報 0。
+- 受保護 guild-mcp-beta 在 OpenCode 收到正確 401、WWW-Authenticate、OAuth resource metadata；OpenCode Debug 隨後確認阻礙為：Incompatible auth server: does not support dynamic client registration。
+- 現有 OAuth client 僅 1 個手動 Guild OAuth Development Test，回呼網址為 /oauth/test-return，不能當作 OpenCode 本機 OAuth 回呼。
+- Supabase 管理者登入仍待完成：本次 Win11 Chrome 和 Hermes Chrome 都導向 Supabase Dashboard 登入頁；沒有繞過或使用管理員憑證修改 Auth 系統表。
+- OpenCode 的私人會員操作及真實發布皆尚未驗證，不能宣稱 OpenCode 已能代表會員發文。
+- 會員 MCP 現有 publish_service 是提供服務的刊登，不等同 post_quest 徵求任務；舊版 Quest privileged RPC 已撤回一般角色權限，不應為了驗收放寬。
+
+### 下次實作的最短路徑
+
+1. Supabase 管理者登入 Authentication > OAuth Server，經風險確認後啟用 Allow Dynamic OAuth Apps；保留正式 Site URL、授權路徑 /oauth/consent、同意及撤銷流程。官方提醒公開動態註冊會允許任意 MCP client 註冊，需要防釣魚及安全審查；不採用動態註冊時，可單獨註冊 OpenCode 並登記精確回呼 URL。
+2. 本人完成一個真實公會會員的合法註冊、Email 確認及登入，不能用 service_role 冒充會員。
+3. 在隔離 OpenCode 測試設定執行 opencode mcp auth guild_member、完成會員同意及確認 connected。
+4. 在確認可撤回測試資料後，執行一筆明確標記的臨時 publish_service，依 ID 從公開搜尋讀回並清理；另行設計合法的 post_quest 路徑，再驗收徵求任務。
+5. 最後以同一會員權限測試 OpenCode 搜尋、授權、發布、讀回、撤權，才標記完整 E2E 通過。
+
+參考官方：
+- https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication
+- https://supabase.com/docs/guides/ai-tools/byo-mcp
+- https://opencode.ai/docs/mcp-servers
+
+本次未建立帳號、未刊登測試服務、未發送公開訊息、未擴權或改動正式 OAuth 設定。
