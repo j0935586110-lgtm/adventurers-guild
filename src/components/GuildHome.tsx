@@ -272,6 +272,7 @@ export default function GuildHome() {
       <button type="button" className="gh-brand" onClick={()=>toPane('discover')} aria-label="冒險者公會首頁"><span className="gh-brand-symbol"><span>G</span><i/></span><span className="gh-brand-name">冒險者公會<small>ADVENTURERS GUILD</small></span></button>
       <nav className={'gh-nav-links '+(menu?'gh-nav-links-open':'')} aria-label="主要導覽">
         <button type="button" className={pane==='discover'?'active':''} onClick={()=>toPane('discover')}>探索服務</button>
+        <a href="/works.html">作品與技能</a>
         <button type="button" className={pane==='mine'?'active':''} onClick={()=>toPane('mine')}>我的刊登</button>
         <button type="button" className={pane==='inbox'?'active':''} onClick={()=>toPane('inbox')}>我的訊息</button>
         <button type="button" className={pane==='guild'?'active':''} onClick={()=>toPane('guild')}>任務看板</button>
@@ -317,25 +318,57 @@ export default function GuildHome() {
         <div className="gh-category-grid">{CATEGORIES.map(cat=>{const Icon=cat.icon;return <button type="button" key={cat.name} className={'gh-category gh-cat-'+cat.shade} onClick={()=>doSearch(undefined,{keyword:cat.name,city:''})}><span className="gh-category-icon"><Icon size={27} strokeWidth={1.7}/></span><span className="gh-category-name">{cat.name}</span><span className="gh-category-desc">{cat.description}</span><ArrowUpRight className="gh-category-arrow" size={18}/></button>;})}</div>
       </section>
 
+      <section className="gh-openworks gh-container" aria-labelledby="gh-openworks-title">
+        <div className="gh-section-heading">
+          <div>
+            <span className="gh-kicker">OPEN WORKS · 02</span>
+            <h2 id="gh-openworks-title">先看真實作品，再動手試試。</h2>
+            <p>借鏡技能書的方式：看用途、原始碼與練習步驟，不需要先登入。</p>
+          </div>
+          <a className="gh-secondary-link" href="/works.html">全部實戰技能書 <ArrowUpRight size={17}/></a>
+        </div>
+        <div className="gh-openworks-grid">
+          <article className="gh-openwork-card">
+            <span className="gh-openwork-label">開源作品 · PR 驗證</span>
+            <h3>PR Evidence Gate</h3>
+            <p>檢查 AI 協作時的 GitHub PR、工作樹與驗收證據，避免把「自稱通過」誤當正式核准。</p>
+            <a href="/works.html#pr-evidence-gate">查看工具與練習步驟 <ArrowUpRight size={16}/></a>
+          </article>
+          <article className="gh-openwork-card">
+            <span className="gh-openwork-label">開源作品 · 網站檢查</span>
+            <h3>Page Parity</h3>
+            <p>比對靜態網站多個頁面的標題、導覽與版面，協助找出不一致及溢出問題。</p>
+            <a href="/works.html#page-parity">查看工具與練習步驟 <ArrowUpRight size={16}/></a>
+          </article>
+          <article className="gh-openwork-card gh-openwork-community">
+            <span className="gh-openwork-label">社群入口 · 經驗交流</span>
+            <h3>台灣 AI 實戰論壇</h3>
+            <p>看 Agent、MCP 與開源協作的真實紀錄，也能提出問題、分享自己的作品。</p>
+            <a href="https://forum.928174.xyz/" rel="noopener noreferrer">閱讀討論與交流 <ArrowUpRight size={16}/></a>
+          </article>
+        </div>
+        <p className="gh-openworks-note">上方是可公開核對的開源作品與討論入口，不是付費服務、會員評價或平台履約保證。</p>
+      </section>
+
       <section className="gh-listings-section" ref={resultsRef}>
         <div className="gh-container"><div className="gh-section-heading gh-listings-heading"><div><span className="gh-kicker">DISCOVER SERVICES · 02</span><h2>探索服務與合作機會<span className="gh-title-dot">.</span></h2><p>這裡展示會員真實刊登的服務，沒有假店家或虛構評價。</p></div><div className="gh-listing-meta">{!loading&&!error?('目前 '+activeCount+' 筆公開服務'):'持續開放刊登中'}</div></div>
           <div className="gh-filters"><label className="gh-filter-search"><Search size={19}/><input aria-label="篩選服務關鍵字" value={keyword} onChange={e=>setKeyword(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')doSearch(e);}} placeholder="搜尋技能、服務或提供者…"/></label><label className="gh-filter-city"><MapPin size={17}/><select aria-label="選擇地區" value={city} onChange={e=>doSearch(undefined,{keyword,city:e.target.value})}><option value="">全部地區</option>{TAIWAN_CITIES.map(c=><option key={c} value={c}>{c}</option>)}</select><ChevronDown size={15}/></label><button type="button" className="gh-filter-go" onClick={()=>doSearch(undefined,{keyword,city})}>搜尋 <ArrowRight size={16}/></button>{(filters.keyword||filters.city)&&<button type="button" className="gh-reset" onClick={()=>doSearch(undefined,{keyword:'',city:''})}>清除篩選</button>}</div>
           {loading?<div className="gh-card-grid" aria-label="讀取中">{[1,2,3].map(n=><div key={n} className="gh-skeleton gh-skill-card"><div/><div/><div/></div>)}</div>
           :error?<div className="gh-empty"><span className="gh-empty-mark"><CircleHelp size={32}/></span><h3>服務目錄暫時無法載入</h3><p>{error}</p><button type="button" className="gh-outline" onClick={()=>void load(filters)}>重新整理 <ArrowRight size={16}/></button></div>
-          :services.length===0?<div className="gh-empty gh-empty-beautiful"><div className="gh-empty-illustration"><span>✳</span><span>✦</span><span>✳</span></div><h3>{setupPending?'服務市場正在準備中':filters.keyword||filters.city?'還沒有符合的服務':'第一個機會，等你來創造。'}</h3><p>{setupPending?'新版目前提供介面預覽，服務資料庫尚待啟用；刊登與詢價功能尚不能正式使用。':filters.keyword||filters.city?'試試其他關鍵字，或成為第一個提供者。':'現在還沒有公開服務。把你的專長放上來，讓需要的人找得到你。'}</p><button type="button" className="gh-primary" onClick={startPost}>{setupPending?'預覽免費刊登流程':'搶先免費刊登'} <ArrowRight size={17}/></button></div>
+          :services.length===0?<div className="gh-empty gh-empty-beautiful"><div className="gh-empty-illustration"><span>✳</span><span>✦</span><span>✳</span></div><h3>{setupPending?'服務市場正在準備中':filters.keyword||filters.city?'還沒有符合的服務':'第一個機會，等你來創造。'}</h3><p>{setupPending?'新版目前提供介面預覽，服務資料庫尚待啟用；刊登與詢價功能尚不能正式使用。':filters.keyword||filters.city?'試試其他關鍵字，或成為第一個提供者。':'現在還沒有公開服務。把你的專長放上來，讓需要的人找得到你。'}</p><button type="button" className="gh-primary" onClick={startPost}>{setupPending?'預覽免費刊登流程':'搶先免費刊登'} <ArrowRight size={17}/></button><a href="/works.html" className="gh-empty-works">先看看開源實戰案例 →</a></div>
           :<div className="gh-card-grid">{services.map(s=><SkillCard key={s.id} service={s} stats={stats[s.id]} isOwn={s.owner_id===user?.id} onInquire={()=>{if(s.owner_id===user?.id){setNotice('這是你刊登的服務。');return;}if(!user){setAuth(true);return;}setInquiry(s);}}/>)}</div>}
         </div>
       </section>
 
       <section className="gh-cta gh-container"><div className="gh-cta-left"><span className="gh-cta-icon"><HeartHandshake size={31}/></span><span>YOU HAVE SOMETHING TO OFFER</span><h2>下一個合作，<br/>從你的專長開始。</h2><p>無論是專業技能、生活服務或一個好點子，<br/>都值得讓更多人知道。</p><button type="button" className="gh-cta-button" onClick={startPost}>免費刊登我的服務 <ArrowUpRight size={20}/></button></div><div className="gh-cta-art" aria-hidden="true"><div className="gh-cta-disc"/><span>GOOD<br/>THINGS<br/>START<br/>HERE.</span><span className="gh-cta-hand">✳</span></div></section>
-      <section className="gh-how gh-container"><div className="gh-section-heading"><div><span className="gh-kicker">HOW IT WORKS · 03</span><h2>簡單三步，讓合作發生。</h2></div></div><div className="gh-how-grid">{[['01','加入公會','用 Google 或 Email 免費加入，不需要公司資格。'],['02','分享或探索','刊登你的能力，或搜尋別人的專業服務。'],['03','開始合作','提出詢價、討論內容，完成後留下交易評價。']].map(([num,title,desc])=><div key={num} className="gh-how-card"><span>{num}</span><h3>{title}</h3><p>{desc}</p></div>)}</div></section>
+      <section className="gh-how gh-container"><div className="gh-section-heading"><div><span className="gh-kicker">HOW IT WORKS · 03</span><h2>簡單三步，讓合作發生。</h2></div></div><div className="gh-how-grid">{[['01','加入公會',import.meta.env.VITE_GUILD_GOOGLE_OAUTH === 'true'?'用 Google 或 Email 免費加入，不需要公司資格。':'用 Email 免費加入，不需要公司資格。'],['02','分享或探索','刊登你的能力，或搜尋別人的專業服務。'],['03','開始合作','提出詢價、討論內容，完成後留下交易評價。']].map(([num,title,desc])=><div key={num} className="gh-how-card"><span>{num}</span><h3>{title}</h3><p>{desc}</p></div>)}</div></section>
     </>:pane==='guild'?<div className="gh-legacy"><div className="gh-container gh-backline"><button className="gh-outline" onClick={()=>toPane('discover')}>← 回到新版首頁</button><p>舊版任務看板暫時保留，避免影響原有委託流程。</p></div><Suspense fallback={<div className="gh-container gh-loading">載入任務看板中…</div>}><LegacyGuildMain/></Suspense></div>
     :<main className="gh-container gh-dashboard"><button type="button" className="gh-back" onClick={()=>toPane('discover')}>← 回探索服務</button><div className="gh-dashboard-head"><span className="gh-kicker">MY SPACE</span><h1>{pane==='mine'?'我的服務刊登':'我的詢價與合作'}</h1><p>{pane==='mine'?'管理你公開的專長與服務。':'所有詢價進度，都在這裡。'}</p></div>
       {dashboardError&&<Notice type="error" message={dashboardError}/>}
       {dashboardLoading?<div className="gh-loading">載入中…</div>:pane==='mine'?<><div className="gh-dashboard-toolbar"><span>已刊登 {mine.length} 項服務</span><button className="gh-primary" onClick={startPost}><Plus size={18}/> 再刊登一項</button></div>{mine.length?<div className="gh-card-grid">{mine.map(s=><SkillCard key={s.id} service={s} isOwn onInquire={()=>setNotice('這是你的服務')}/>)}</div>:<div className="gh-empty"><h3>還沒有刊登過服務</h3><p>從分享一個你擅長的技能開始。</p><button className="gh-primary" onClick={startPost}>免費刊登 <ArrowRight size={16}/></button></div>}</>
         :<div className="gh-inbox-grid"><section><h2>收到的詢價 <small>{incoming.length}</small></h2>{incoming.length?incoming.map(i=><TaskCard key={i.id} item={i} received refresh={reloadDashboard}/>):<div className="gh-inbox-empty">目前還沒有收到詢價。</div>}</section><section><h2>我送出的詢價 <small>{outgoing.length}</small></h2>{outgoing.length?outgoing.map(i=><TaskCard key={i.id} item={i} received={false} refresh={reloadDashboard}/>):<div className="gh-inbox-empty">還沒有送出過詢價，去探索看看吧。</div>}</section></div>}
     </main>}
-    <footer className="gh-footer"><div className="gh-container gh-footer-grid"><div><span className="gh-footer-brand"><span>G</span> 冒險者公會</span><p>讓人與人的專長相遇。<br/>讓 AI 成為合作的橋樑。</p></div><div className="gh-footer-links"><button onClick={()=>toPane('discover')}>探索服務</button><button onClick={startPost}>免費刊登</button><button onClick={()=>toPane('guild')}>任務看板</button><a href="/discover.html" style={{color:"inherit",textDecoration:"underline"}}>關於公會</a><a href="https://forum.928174.xyz/" style={{color:"inherit",textDecoration:"underline"}}>台灣 AI 論壇</a></div><div className="gh-footer-end"><span>ADVENTURERS GUILD</span><small>每個人都值得一個機會。</small></div></div><div className="gh-container gh-footer-note">© 2026 冒險者公會 · 神瑋科技 <span>資料依會員刊登提供，交易前請自行確認內容與資格。</span></div></footer>
+    <footer className="gh-footer"><div className="gh-container gh-footer-grid"><div><span className="gh-footer-brand"><span>G</span> 冒險者公會</span><p>讓人與人的專長相遇。<br/>讓 AI 成為合作的橋樑。</p></div><div className="gh-footer-links"><button onClick={()=>toPane('discover')}>探索服務</button><button onClick={startPost}>免費刊登</button><button onClick={()=>toPane('guild')}>任務看板</button><a href="/works.html">作品與技能</a><a href="/discover.html" style={{color:"inherit",textDecoration:"underline"}}>關於公會</a><a href="https://forum.928174.xyz/" style={{color:"inherit",textDecoration:"underline"}}>台灣 AI 論壇</a></div><div className="gh-footer-end"><span>ADVENTURERS GUILD</span><small>每個人都值得一個機會。</small></div></div><div className="gh-container gh-footer-note">© 2026 冒險者公會 · 神瑋科技 <span>資料依會員刊登提供，交易前請自行確認內容與資格。</span></div></footer>
     {auth&&<AuthDialog onClose={()=>setAuth(false)}/>}
     {post&&<PostDialog onClose={()=>setPost(false)} onPosted={()=>{setNotice('刊登成功！你的服務已提交。');setPane('mine');void reloadDashboard();void load({keyword:'',city:''});}}/>}
     {inquiry&&<InquiryDialog service={inquiry} close={()=>setInquiry(null)} onSent={()=>{setNotice('詢價已送出，請到「我的訊息」追蹤進度。');void reloadDashboard();}}/>}

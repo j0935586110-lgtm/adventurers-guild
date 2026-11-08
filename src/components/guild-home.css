@@ -10,8 +10,8 @@
 .gh-brand-name {display:flex;flex-direction:column;font-size:18px;font-weight:900;letter-spacing:.035em;line-height:1.3;white-space:nowrap;}
 .gh-brand-name small {font-family:"DM Sans",sans-serif;font-size:8px;font-weight:800;letter-spacing:.24em;color:#6C8A81;margin-top:4px;}
 .gh-nav-links {display:flex;align-items:center;gap:31px;margin-left:auto;}
-.gh-nav-links button {border:0;background:none;color:#5E706B;white-space:nowrap;font-size:14px;font-weight:600;padding:29px 0;position:relative;}
-.gh-nav-links button:hover,.gh-nav-links button.active {color:#164E47;}
+.gh-nav-links button,.gh-nav-links a {text-decoration:none;border:0;background:none;color:#5E706B;white-space:nowrap;font-size:14px;font-weight:600;padding:29px 0;position:relative;}
+.gh-nav-links button:hover,.gh-nav-links a:hover,.gh-nav-links button.active {color:#164E47;}
 .gh-nav-links button.active:after {content:"";height:3px;background:#FF9882;position:absolute;bottom:20px;left:0;right:0;border-radius:4px;}
 .gh-nav-actions {display:flex;gap:18px;align-items:center;margin-left:15px;}
 .gh-login-link {border:0;background:none;color:#31524B;white-space:nowrap;font-weight:700;font-size:13px;}
@@ -81,6 +81,21 @@
 .gh-category-desc {font-size:12px;color:#72857A;}
 .gh-category-arrow {position:absolute;right:24px;top:22px;color:#7F9890;transition:transform .2s;}
 .gh-category:hover .gh-category-arrow {transform:translate(3px,-3px);}
+/* Reuse existing forum and public GitHub releases; do not invent a new posting backend. */
+.gh-openworks {padding-bottom:88px;}
+.gh-openworks-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px;}
+.gh-openwork-card {display:flex;flex-direction:column;min-height:257px;padding:25px;border:1px solid #DEEAE3;border-radius:16px;background:#F5FAF7;}
+.gh-openwork-card:nth-child(2) {background:#FFF7F0;border-color:#F5E2D6;}
+.gh-openwork-community {background:#F3F4FB;border-color:#E2E5F5;}
+.gh-openwork-label {font-size:11px;color:#46877C;font-weight:800;letter-spacing:.04em;}
+.gh-openwork-card h3 {font-size:20px;color:#234D43;margin:13px 0 9px;line-height:1.4;font-weight:850;}
+.gh-openwork-card p {font-size:13px;color:#607B70;line-height:1.85;margin:0 0 17px;flex:1;}
+.gh-openwork-card>a {display:inline-flex;align-items:center;gap:9px;width:max-content;max-width:100%;font-size:13px;font-weight:800;color:#1B6A5D;text-decoration:underline;text-underline-offset:4px;}
+.gh-openwork-card>a:hover {color:#10483E;}
+.gh-openworks-note {color:#81958A;font-size:11px;line-height:1.9;margin:14px 0 0;}
+.gh-empty-works {display:inline-block;margin:16px 0 0;color:#2B776B;font-size:13px;font-weight:800;text-underline-offset:4px;}
+@media(max-width:930px){.gh-openworks-grid{grid-template-columns:1fr 1fr;}.gh-nav-links a{font-size:12px;}}
+@media(max-width:720px){.gh-openworks-grid{grid-template-columns:1fr;gap:12px;}.gh-openworks{padding-bottom:65px;}.gh-openwork-card{min-height:0;padding:21px;}.gh-openworks .gh-section-heading{display:block;}.gh-openworks .gh-secondary-link{margin-top:9px;}.gh-nav-links a{padding:13px 8px;text-align:left;font-size:14px;}}
 .gh-listings-section {background:#F8F9F6;padding:87px 0 100px;scroll-margin-top:90px;}
 .gh-listings-heading {margin-bottom:29px;}
 .gh-title-dot {color:#EE9076;}

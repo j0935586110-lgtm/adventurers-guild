@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#174B46">
+  <title>實戰技能書與開源作品｜冒險者公會</title>
+  <meta name="description" content="從真實問題開始學習 AI Agent、GitHub PR 驗證與網站檢查：公開原始碼、操作步驟、限制和討論入口，不必先加入會員。">
+  <link rel="canonical" href="https://adventurers-guild-v2.vercel.app/works.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="zh_TW">
+  <meta property="og:title" content="實戰技能書與開源作品｜冒險者公會">
+  <meta property="og:description" content="看懂用途、照著操作、核對結果，從公開的 GitHub 專案開始。">
+  <meta property="og:url" content="https://adventurers-guild-v2.vercel.app/works.html">
+  <style>
+    :root{color-scheme:light}*{box-sizing:border-box}
+    body{margin:0;background:#f8f9f6;color:#183f3a;font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;line-height:1.85}
+    a{color:#12695f;text-underline-offset:4px}a:hover{color:#0c4940}
+    .wrap{max-width:1050px;padding:0 24px;margin:auto}
+    nav{background:white;border-bottom:1px solid #dfebe4}
+    nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:18px;padding-top:15px;padding-bottom:15px}
+    nav a{font-size:14px}nav strong{font-size:17px}
+    header{background:#f2f6ef;padding:52px 0 48px}
+    h1{font-size:clamp(32px,5vw,49px);line-height:1.35;letter-spacing:-.035em;margin:12px 0 15px}
+    h2{font-size:clamp(23px,3vw,30px);line-height:1.4;margin:0 0 14px}
+    h3{font-size:18px;margin:24px 0 9px}
+    header p{max-width:720px;color:#5b7770;margin:0}
+    .eyebrow{font-size:12px;font-weight:800;letter-spacing:.14em;color:#448d7b}
+    main{padding-top:44px;padding-bottom:64px}
+    .intro{color:#5b7770;font-size:15px;margin-top:0}
+    .cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:19px}
+    article{background:white;border:1px solid #dfeae2;border-radius:17px;padding:30px}
+    article:nth-child(2){border-color:#f0e2d3;background:#fffaf6}
+    article p,article li{font-size:14px;color:#54736b}
+    article ul,article ol{padding-left:23px}
+    .tag{display:inline-block;border-radius:100px;background:#e6f2eb;padding:4px 11px;font-size:11px;color:#39786b;font-weight:800}
+    .primary{display:inline-block;background:#17574e;color:white;text-decoration:none;border-radius:10px;padding:10px 16px;font-weight:800;font-size:14px}
+    .primary:hover{background:#0d4038;color:white}
+    .links{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:22px}
+    .secondary{margin-top:28px;padding:30px;background:#edf3ee;border-radius:16px}
+    .secondary p{margin-bottom:10px;color:#567469}
+    .caution{font-size:13px;color:#6e8378;margin-top:22px}
+    footer{border-top:1px solid #dce7df;background:white;padding:22px 0;font-size:13px}
+    footer .wrap{display:flex;gap:16px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+    @media(max-width:760px){.cards{grid-template-columns:1fr}header{padding:36px 0}main{padding-top:26px}article{padding:23px}nav .wrap{flex-wrap:wrap}}
+  </style>
+</head>
+<body>
+  <nav><div class="wrap"><strong>冒險者公會 · 實戰技能</strong><div><a href="/">返回公會</a>　<a href="https://forum.928174.xyz/">台灣 AI 論壇</a></div></div></nav>
+  <header><div class="wrap">
+    <div class="eyebrow">OPEN WORKS · LEARN BY DOING</div>
+    <h1>從一個真實問題開始，<br>看懂工具、練習、再合作。</h1>
+    <p>這裡整理有公開原始碼的實戰工具，不用先登入或加入公會。每份介紹都說明用途、準備、練習與限制；遇到問題，可以到論壇交流。</p>
+  </div></header>
+  <main class="wrap">
+    <p class="intro">公開開源作品不等於平台內已刊登的付費服務，也不代表作者承諾提供技術支援。請依原作的授權、版本與文件自行確認。</p>
+    <div class="cards">
+      <article id="pr-evidence-gate">
+        <span class="tag">AI Agent · GitHub PR · 開源</span>
+        <h2>PR Evidence Gate</h2>
+        <p>AI 幫忙修改程式後，怎麼確認 PR 版本、工作樹與測試紀錄是否一致？這個輕量 Python CLI 協助核對證據，讓結果可以重跑檢查。</p>
+        <h3>適合誰</h3>
+        <p>維護 GitHub 專案、使用 Codex、Hermes 或其他 Agent 協作的開發者。</p>
+        <h3>準備</h3>
+        <p>Python 3.10+、Git、GitHub CLI，以及要核對的 PR 本地工作樹。</p>
+        <h3>三步練習</h3>
+        <ol>
+          <li>依專案安裝文件安裝 CLI，執行 <code>pr-evidence-gate doctor</code> 檢查環境。</li>
+          <li>指定自己的 PR 與本地工作樹，執行一致性檢查。</li>
+          <li>對照輸出與真正的 CI 測試；版本不一致時，先處理差異，不直接發佈。</li>
+        </ol>
+        <h3>能得到什麼</h3>
+        <p>可供核對的狀態與 JSON 輸出。<strong>檢查通過不代表已授權 Push、Merge 或正式發布。</strong></p>
+        <div class="links">
+          <a class="primary" href="https://github.com/j0935586110-lgtm/pr-evidence-gate">原始碼與 README</a>
+          <a href="https://github.com/j0935586110-lgtm/pr-evidence-gate/blob/main/docs/INSTALL.md">安裝步驟</a>
+        </div>
+      </article>
+      <article id="page-parity">
+        <span class="tag">網站品質 · 靜態頁面 · 開源</span>
+        <h2>Page Parity</h2>
+        <p>網站改版後，怎麼快速看出哪些頁面漏了導覽、頁尾、標籤，或畫面超出螢幕？這個工具檢查多頁一致性與版面溢出。</p>
+        <h3>適合誰</h3>
+        <p>維護靜態網站、建立多個 HTML 頁面，或想避免發布前漏檢的開發者。</p>
+        <h3>準備</h3>
+        <p>Python 與要檢查的靜態 HTML 網站。版面溢出檢測還需要 Playwright。</p>
+        <h3>三步練習</h3>
+        <ol>
+          <li>按照原始專案 README 安裝 <code>page-parity</code>。</li>
+          <li>對自己的靜態網站執行 <code>page-parity check --dir ./my-site</code>。</li>
+          <li>閱讀不一致報告，修正後重跑並比對結果。</li>
+        </ol>
+        <h3>能得到什麼</h3>
+        <p>找出標籤或版面異常的診斷結果。它不是像素級視覺比對，也不能直接取代動態網站的端到端測試。</p>
+        <div class="links">
+          <a class="primary" href="https://github.com/j0935586110-lgtm/page-parity">原始碼與 README</a>
+          <a href="https://forum.928174.xyz/">到論壇交流</a>
+        </div>
+      </article>
+    </div>
+    <section class="secondary" id="community">
+      <div class="eyebrow">COMMUNITY · SHARE WHAT WORKED</div>
+      <h2>做完練習，可以分享你的成果。</h2>
+      <p>借鏡自由工坊的技能交流方式，但不另外建投稿後端。先使用既有台灣 AI 論壇，分享「問題、做法、驗證結果、原始碼」；公開討論可被其他人引用與找到。</p>
+      <a class="primary" href="https://forum.928174.xyz/category/5/agent-%E5%AF%A6%E6%88%B0">前往 Agent 實戰討論區</a>
+    </section>
+    <p class="caution">說明以所連結的公開專案文件為準。需要合作或刊登服務，請返回<a href="/">冒險者公會</a>，使用既有刊登及詢價流程。</p>
+  </main>
+  <footer><div class="wrap"><span>© 2026 冒險者公會 · 神瑋科技</span><span><a href="/discover.html">了解公會</a>　<a href="/">探索服務</a>　<a href="https://forum.928174.xyz/">社群討論</a></span></div></footer>
+</body></html>
