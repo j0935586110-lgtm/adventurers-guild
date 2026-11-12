@@ -6,6 +6,7 @@ import {
   Sparkles, Star, WandSparkles, Wrench, X
 } from 'lucide-react';
 import { useGuild } from './GuildProvider';
+import { isGoogleSignInReady } from '../lib/supabase';
 const LegacyGuildMain = lazy(() => import('../LegacyGuild').then(m => ({default: m.LegacyGuildMain})));
 import {
   SERVICE_CATEGORIES, TAIWAN_CITIES, searchServices, listMyServices,
@@ -16,7 +17,7 @@ import {
 import GuildNeeds from './GuildNeeds';
 import './guild-home.css';
 
-const GOOGLE_OAUTH_ENABLED = import.meta.env.VITE_GUILD_GOOGLE_OAUTH === 'true';
+/* Google login availability is checked against the actual Supabase Auth configuration. */
 
 type Pane = 'discover' | 'mine' | 'inbox' | 'guild';
 type IconComp = React.ComponentType<{size?: number; strokeWidth?: number; className?: string}>;
@@ -64,7 +65,7 @@ function Notice({message, type='info'}: {message:string;type?:'info'|'error'|'su
 }
 function AuthDialog({onClose}:{onClose:()=>void}) {
   const tx=useTx();
-  const {signIn, signUp, signInWithGoogle} = useGuild();
+  const {signIn, signUp, signInWithGoogle, sendEmailLoginLink} = useGuild();
   const [mode,setMode] = useState<'signup'|'login'>('signup');
   const [alias,setAlias] = useState('');
   const [email,setEmail] = useState('');
@@ -72,6 +73,18 @@ function AuthDialog({onClose}:{onClose:()=>void}) {
   const [busy,setBusy] = useState(false);
   const [message,setMessage] = useState('');
   const [confirmed,setConfirmed] = useState(false);
+  const [googleReady,setGoogleReady] = useState(false);
+  useEffect(()=>{ let live=true; void isGoogleSignInReady().then(ready=>{ if(live)setGoogleReady(ready); }); return ()=>{live=false;}; },[]);
+  async function sendLoginLink() {
+    if(!email.trim()){setMessage(tx('請先填寫電子信箱。','Enter your email address first.'));return;}
+    setBusy(true);setMessage('');setConfirmed(false);
+    try {
+      const result=await sendEmailLoginLink(email.trim());
+      if(result.error)setMessage(result.error);
+      else {setConfirmed(true);setMessage(tx('已寄送登入連結。請在同一台裝置開啟信件完成登入。','Login link sent. Open the email on this device to sign in.'));}
+    } catch(e) {setMessage(e instanceof Error?e.message:tx('寄送失敗','Unable to send link'));}
+    finally {setBusy(false);}
+  }
   async function submit(e:React.FormEvent) {
     e.preventDefault(); setBusy(true);setMessage('');setConfirmed(false);
     try {
@@ -88,16 +101,20 @@ function AuthDialog({onClose}:{onClose:()=>void}) {
     <div className="gh-dialog-eyebrow">WELCOME TO GUILD</div>
     <h2 className="gh-dialog-title">{mode==='signup'?tx('免費加入，開始你的下一個機會。','Join for free and get started.'):tx('歡迎回來！','Welcome back!')}</h2>
     <p className="gh-dialog-sub">{tx("不需公司、不需統編。每個人都能分享自己的技能。","No company needed. Everyone can share their skills.")}</p>
-    {GOOGLE_OAUTH_ENABLED && <>
-      <button className="gh-google" type="button" onClick={async()=>{
-        setMessage('');try{const result=await signInWithGoogle();if(result.error)setMessage(result.error);}
-        catch(err){setMessage(err instanceof Error?err.message:'Google 登入暫時無法使用');}
-      }}><Globe2 size={18}/> {tx("使用 Google 繼續","Continue with Google")}</button>
-      <div className="gh-separator"><span>{tx("或使用 Email","Or use email")}</span></div>
-    </>}
+    {googleReady ? <>
+      <button className="gh-google" type="button" disabled={busy} onClick={async()=>{
+        setMessage('');setBusy(true);
+        try{const result=await signInWithGoogle();if(result.error)setMessage(result.error);}
+        catch(err){setMessage(err instanceof Error?err.message:tx('Google 登入暫時無法使用','Google sign-in is temporarily unavailable'));}
+        finally{setBusy(false);}
+      }}><Globe2 size={18}/> {tx('Google 一鍵登入','Continue with Google')}</button>
+      <div className="gh-separator"><span>{tx('或使用 Email','Or use email')}</span></div>
+    </> : <p className="gh-oauth-pending">{tx('Google 登入尚待官方授權設定，現在可使用 Email 登入連結。','Google sign-in is not configured yet. Use an email login link for now.')}</p>}
     <form className="gh-form" onSubmit={submit}>
       {mode==='signup'&&<label>{tx("你的暱稱（選填）","Your name (optional)")}<input value={alias} maxLength={80} onChange={e=>setAlias(e.target.value)} placeholder={tx("例如：小安設計師","e.g. Alex the designer")}/></label>}
       <label>{tx("電子信箱","Email address")}<input type="email" required autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"/></label>
+      <button type="button" className="gh-email-link-btn" disabled={busy} onClick={()=>void sendLoginLink()}>{tx('寄送 Email 一鍵登入連結','Email me a sign-in link')} <ArrowRight size={16}/></button>
+      <div className="gh-separator"><span>{tx('或使用密碼','Or sign in with password')}</span></div>
       <label>{tx("密碼","Password")}<input type="password" required minLength={6} autoComplete={mode==='signup'?'new-password':'current-password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder={tx("至少 6 個字元","At least 6 characters")}/></label>
       {message&&<Notice type={confirmed?'success':'error'} message={message}/>}
       <button className="gh-primary gh-wide" disabled={busy} type="submit">{busy?tx('處理中…','Working…'):mode==='signup'?tx('建立免費帳號','Create a free account'):tx('登入公會','Sign in')}<ArrowRight size={17}/></button>
@@ -236,7 +253,12 @@ export default function GuildHome() {
   useEffect(()=>{ document.documentElement.lang=lang==='en'?'en':'zh-TW'; try{localStorage.setItem('guild-language',lang);}catch{} },[lang]);
   const [pane,setPane]=useState<Pane>('discover');
   const [menu,setMenu]=useState(false);
-  const [auth,setAuth]=useState(false);
+  const [auth,setAuth]=useState(()=>new URLSearchParams(window.location.search).get('auth')==='1');
+  useEffect(()=>{if(user&&auth)setAuth(false);},[user?.id,auth]);
+  useEffect(()=>{
+    if(user && new URLSearchParams(window.location.search).get('next')==='community')
+      window.location.replace('/community');
+  },[user?.id]);
   const [post,setPost]=useState(false);
   const [inquiry,setInquiry]=useState<GuildService|null>(null);
   const [oneLine,setOneLine]=useState('');
@@ -324,6 +346,7 @@ export default function GuildHome() {
         <a href="/works.html">{tx("作品與技能","Work & skills")}</a>
         <a href="/me">{tx("個人面板","My profile")}</a>
         <a href="/community">{tx("社群論壇","Community forum")}</a>
+        <a href="/ai">{tx("AI / MCP","AI / MCP")}</a>
         <button type="button" className={pane==='mine'?'active':''} onClick={()=>toPane('mine')}>{tx("我的刊登","My listings")}</button>
         <button type="button" className={pane==='inbox'?'active':''} onClick={()=>toPane('inbox')}>{tx("我的訊息","Messages")}</button>
         <button type="button" className={pane==='guild'?'active':''} onClick={()=>toPane('guild')}>{tx("任務看板","Tasks")}</button>
@@ -356,6 +379,7 @@ export default function GuildHome() {
               <a href="/community"><MessageCircle size={17}/>{tx("逛社群論壇","Explore community")} <ArrowUpRight size={14}/></a>
               <button type="button" onClick={()=>toPane('guild')}><BriefcaseBusiness size={17}/>{tx("看任務與報酬","Browse quests")} <ArrowUpRight size={14}/></button>
               <a href="/me"><Compass size={17}/>{tx("我的冒險者","My profile")} <ArrowUpRight size={14}/></a>
+              {!user&&<button type="button" className="gh-join-cta" onClick={()=>setAuth(true)}>{tx('免費註冊／登入','Join / Sign in')} <ArrowRight size={14}/></button>}
             </div>
             <small className="gh-first-privacy">{tx("你的話不會自動公開。刊登、接案和獎勵需要登入並經過確認。","Requests are private until you explicitly publish them. Joining tasks and earning rewards require consent.")}</small>
           </div>
@@ -451,7 +475,7 @@ export default function GuildHome() {
       </section>
 
       <section className="gh-cta gh-container"><div className="gh-cta-left"><span className="gh-cta-icon"><HeartHandshake size={31}/></span><span>YOU HAVE SOMETHING TO OFFER</span><h2>下一個合作，<br/>從你的專長開始。</h2><p>無論是專業技能、生活服務或一個好點子，<br/>都值得讓更多人知道。</p><button type="button" className="gh-cta-button" onClick={startPost}>免費刊登我的服務 <ArrowUpRight size={20}/></button></div><div className="gh-cta-art" aria-hidden="true"><div className="gh-cta-disc"/><span>GOOD<br/>THINGS<br/>START<br/>HERE.</span><span className="gh-cta-hand">✳</span></div></section>
-      <section className="gh-how gh-container"><div className="gh-section-heading"><div><span className="gh-kicker">HOW IT WORKS · 04</span><h2>{tx("簡單三步，讓合作發生。","Three simple steps.")}</h2></div></div><div className="gh-how-grid">{[['01','加入公會',GOOGLE_OAUTH_ENABLED?'用 Google 或 Email 免費加入，不需要公司資格。':'用 Email 免費加入，不需要公司資格。'],['02','分享或探索','刊登你的能力，或搜尋別人的專業服務。'],['03','開始合作','提出詢價、討論內容，完成後留下交易評價。']].map(([num,title,desc])=><div key={num} className="gh-how-card"><span>{num}</span><h3>{title}</h3><p>{desc}</p></div>)}</div></section>
+      <section className="gh-how gh-container"><div className="gh-section-heading"><div><span className="gh-kicker">HOW IT WORKS · 04</span><h2>{tx("簡單三步，讓合作發生。","Three simple steps.")}</h2></div></div><div className="gh-how-grid">{[['01','加入公會','用 Email 免費加入，不需要公司資格。'],['02','分享或探索','刊登你的能力，或搜尋別人的專業服務。'],['03','開始合作','提出詢價、討論內容，完成後留下交易評價。']].map(([num,title,desc])=><div key={num} className="gh-how-card"><span>{num}</span><h3>{title}</h3><p>{desc}</p></div>)}</div></section>
     </>:pane==='guild'?<div className="gh-legacy"><div className="gh-container gh-backline"><button className="gh-outline" onClick={()=>toPane('discover')}>← 回到新版首頁</button><p>舊版任務看板暫時保留，避免影響原有委託流程。</p></div><Suspense fallback={<div className="gh-container gh-loading">載入任務看板中…</div>}><LegacyGuildMain/></Suspense></div>
     :<main className="gh-container gh-dashboard"><button type="button" className="gh-back" onClick={()=>toPane('discover')}>← 回探索服務</button><div className="gh-dashboard-head"><span className="gh-kicker">MY SPACE</span><h1>{pane==='mine'?'我的服務刊登':'我的詢價與合作'}</h1><p>{pane==='mine'?'管理你公開的專長與服務。':'所有詢價進度，都在這裡。'}</p></div>
       {dashboardError&&<Notice type="error" message={dashboardError}/>}

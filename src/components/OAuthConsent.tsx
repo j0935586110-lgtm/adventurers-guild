@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { ArrowRight, LockKeyhole, ShieldCheck, X } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { supabase, isGoogleSignInReady } from '../lib/supabase';
 import { useGuild } from './GuildProvider';
 import './guild-home.css';
 
@@ -12,7 +12,7 @@ type AuthorizationDetails = {
 };
 
 export default function OAuthConsent() {
-  const { user, loading: sessionLoading, signIn, signUp, signInWithGoogle } = useGuild();
+  const { user, loading: sessionLoading, signIn, signUp, signInWithGoogle, sendEmailLoginLink } = useGuild();
   const authorizationId = new URLSearchParams(window.location.search).get('authorization_id') || '';
   const [details, setDetails] = useState<AuthorizationDetails | null>(null);
   const [error, setError] = useState('');
@@ -21,6 +21,18 @@ export default function OAuthConsent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [nickname, setNickname] = useState('');
+  const [googleReady, setGoogleReady] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  useEffect(() => { let active=true;void isGoogleSignInReady().then(ready=>{if(active)setGoogleReady(ready);});return ()=>{active=false;}; },[]);
+  async function sendLink() {
+    if(!email.trim()){setError('請先填寫 Email。');return;}
+    setBusy(true);setError('');setEmailSent(false);
+    try {
+      const result=await sendEmailLoginLink(email.trim());
+      if(result.error)setError(result.error);
+      else setEmailSent(true);
+    } finally {setBusy(false);}
+  }
 
   const retrieve = useCallback(async () => {
     if (!authorizationId || !user) return;
@@ -85,16 +97,20 @@ export default function OAuthConsent() {
         ? <p>正在確認登入狀態…</p>
         : !user
         ? <>
-          {import.meta.env.VITE_GUILD_GOOGLE_OAUTH === 'true' && <>
+          {googleReady && <>
             <button type="button" className="gh-google" onClick={async()=>{
               const result=await signInWithGoogle();
               if(result.error)setError(result.error);
             }}>用 Google 登入／加入</button>
             <div className="gh-separator"><span>或用 Email</span></div>
           </>}
+          {!googleReady && <p className="gh-oauth-pending">Google 登入目前尚未在公會啟用，可用 Email 登入連結或密碼繼續。</p>}
           <form className="gh-form" onSubmit={authenticate}>
             {mode === 'signup' && <label>個人暱稱（選填）<input maxLength={80} value={nickname} onChange={e=>setNickname(e.target.value)}/></label>}
             <label>Email<input type="email" required value={email} onChange={e=>setEmail(e.target.value)} autoComplete="email"/></label>
+            <button type="button" className="gh-email-link-btn" disabled={busy} onClick={()=>void sendLink()}>寄送 Email 一鍵登入連結 <ArrowRight size={16}/></button>
+            {emailSent&&<p className="gh-notice gh-notice-success">登入連結已寄出。請在同一台裝置開啟信件，回到這個授權畫面繼續。</p>}
+            <div className="gh-separator"><span>或使用密碼</span></div>
             <label>密碼<input type="password" minLength={6} required value={password} onChange={e=>setPassword(e.target.value)} autoComplete={mode==='login'?'current-password':'new-password'}/></label>
             {error && <p className="gh-notice gh-notice-error" role="alert">{error}</p>}
             <button type="submit" disabled={busy} className="gh-primary gh-wide">{busy?'處理中…':mode==='login'?'登入後繼續':'免費加入後繼續'}<ArrowRight size={16}/></button>

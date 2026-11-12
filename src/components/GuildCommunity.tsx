@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowLeft, ArrowRight, ExternalLink, MessageCircle, MessageSquareText, RefreshCw, Search, UsersRound } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ExternalLink, MessageCircle, MessageSquareText, RefreshCw, Search, UsersRound, Menu, X } from 'lucide-react';
+import { useGuild } from './GuildProvider';
 import './guild-community.css';
 
 type Category = {cid:number;name:string;description:string;totalTopicCount:number};
@@ -24,6 +25,8 @@ const date=(n:number)=>n ? new Date(n).toLocaleDateString('zh-TW') : '';
 const external=(t:Topic|Detail['topic'])=>'https://forum.928174.xyz/topic/'+t.tid;
 
 export default function GuildCommunity(){
+  const {user}=useGuild();
+  const [menu,setMenu]=useState(false);
   const [en,setEn]=useState(()=>new URLSearchParams(location.search).get('lang')==='en');
   const initial=location.pathname.match(/^\/community\/topic\/(\d{1,8})\/?$/);
   const [topicId,setTopicId]=useState<number|null>(initial?Number(initial[1]):null);
@@ -64,7 +67,17 @@ export default function GuildCommunity(){
   return <main className="gc-root">
     <header className="gc-header"><div className="gc-shell gc-nav">
       <a href="/" className="gc-brand"><span>G</span> {tx('冒險者公會','Adventurers Guild')}</a>
-      <nav><a href="/">{tx('找人與機會','Find opportunities')}</a><a href="/me">{tx('我的冒險者','My profile')}</a><a className="gc-active" href="/community">{tx('論壇','Community')}</a><button type="button" onClick={()=>setEn(!en)}>{en?'中文':'EN'}</button></nav>
+      <nav className={'gc-links '+(menu?'gc-links-open':'')} aria-label={tx('導覽選單','Navigation')} id="gc-nav-links">
+        <a href="/">{tx('找人與機會','Find opportunities')}</a>
+        <a href="/me">{tx('我的冒險者','My profile')}</a>
+        <a className="gc-active" href="/community">{tx('論壇','Community')}</a>
+        <a href="/ai">{tx('AI 與 MCP','AI / MCP')}</a>
+      </nav>
+      <div className="gc-actions">
+        {user?<a href="/me" className="gc-signin">{tx('我的會員','Account')}</a>:<a href="/?auth=1&next=community" className="gc-signin">{tx('登入／註冊','Sign in')}</a>}
+        <button type="button" className="gc-lang" onClick={()=>setEn(!en)}>{en?'中文':'EN'}</button>
+        <button type="button" className="gc-menu-toggle" onClick={()=>setMenu(!menu)} aria-label={tx('開關選單','Toggle menu')} aria-controls="gc-nav-links" aria-expanded={menu}>{menu?<X size={22}/>:<Menu size={22}/>}</button>
+      </div>
     </div></header>
     <div className="gc-shell gc-body">
       <div className="gc-intro">

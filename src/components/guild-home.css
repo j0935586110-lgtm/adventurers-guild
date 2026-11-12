@@ -307,7 +307,7 @@
 .gh-need-card>span:not(.gh-need-icon){font-size:12px;line-height:1.55;color:#55736c}
 .gh-need-arrow{position:absolute;right:16px;top:22px}
 @media(max-width:1020px){.gh-needs-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:720px){.gh-needs{padding-top:34px;padding-bottom:26px}.gh-needs-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.gh-need-card{min-height:145px;padding:16px}.gh-need-card strong{font-size:16px}.gh-need-arrow{right:12px;top:16px}.gh-lang-toggle{margin-left:auto}.gh-nav-actions{display:none}}
+@media(max-width:720px){.gh-needs{padding-top:34px;padding-bottom:26px}.gh-needs-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.gh-need-card{min-height:145px;padding:16px}.gh-need-card strong{font-size:16px}.gh-need-arrow{right:12px;top:16px}.gh-lang-toggle{margin-left:0}.gh-nav-actions{display:flex;margin-left:auto;flex-shrink:0}}
 @media(max-width:370px){.gh-needs-grid{grid-template-columns:1fr}.gh-need-card{min-height:112px}}
 
 /* One-sentence, non-public request routing. */
@@ -341,3 +341,31 @@
 .gh-first-privacy{display:block;color:#79968a;margin-top:12px;font-size:11px;line-height:1.7}
 @media(max-width:930px){.gh-hero-first .gh-hero-grid{grid-template-columns:minmax(0,1fr) minmax(230px,.55fr)}.gh-hero-first .gh-hero-visual{min-height:365px}.gh-hero-first h1{font-size:clamp(37px,4.7vw,49px)}}
 @media(max-width:720px){.gh-hero-first .gh-hero-grid{display:block;min-height:unset}.gh-hero-first .gh-hero-content{padding:29px 0 26px}.gh-hero-first h1{font-size:clamp(34px,8.4vw,49px);margin:15px 0 11px}.gh-hero-first .gh-hero-description{font-size:13px;line-height:1.7;margin-bottom:16px}.gh-hero-first .gh-hero-visual{display:none}.gh-hero-first .gh-first-links{margin-top:16px;gap:7px}.gh-first-links a,.gh-first-links button{font-size:11px;padding:9px 10px}.gh-hero-first .gh-hero-bottom{padding:10px 0 16px}}
+
+/* Visible sign-in CTA in mobile header instead of the old display:none rule. */
+.gh-oauth-pending{font-size:12px;color:#667b70;line-height:1.7;margin:5px 0 13px;}
+.gh-email-link-btn{width:100%;border:1px solid #aacfc0;background:#ebf5ee;color:#174b46;border-radius:9px;font-size:13px;font-weight:800;min-height:43px;display:flex;align-items:center;justify-content:center;gap:10px;margin:-3px 0 5px;cursor:pointer;}
+.gh-join-cta{background:#174b46!important;color:white!important;}
+@media(max-width:720px){
+ .gh-header .gh-nav{gap:7px;min-height:68px;}
+ .gh-header{height:68px}
+ .gh-brand{min-width:0;gap:6px}.gh-brand-symbol{width:35px;height:35px;flex:none;border-radius:10px 3px 10px 3px;font-size:22px}
+ .gh-brand-name{font-size:clamp(12px,3.6vw,16px);white-space:nowrap}
+ .gh-brand-name small{font-size:6px;letter-spacing:.13em}
+ .gh-nav-actions{display:flex!important;flex-shrink:0;margin-left:auto;gap:0}
+ .gh-nav-actions .gh-login-link{font-size:11px;font-weight:850;color:#174b46;background:#e7f3ea;border:1px solid #a8c7b7;border-radius:8px;padding:8px 7px;white-space:nowrap}
+ .gh-nav-actions .gh-user-chip{display:none}
+ .gh-lang-toggle{margin:0;font-size:11px;padding:7px 8px}
+ .gh-menu-toggle{width:32px;flex-shrink:0}
+ .gh-nav-links{top:68px}
+}
+@media(max-width:375px){
+ .gh-header .gh-container{padding-left:9px;padding-right:9px}
+ .gh-brand-name{font-size:12px}
+ .gh-brand-name small{display:none}
+ .gh-brand-symbol{width:30px;height:30px;font-size:19px}
+ .gh-header .gh-nav{gap:4px}
+ .gh-nav-actions .gh-login-link{font-size:10px;padding:7px 5px}
+ .gh-lang-toggle{font-size:10px;padding:6px 7px}
+ .gh-menu-toggle{width:28px}
+}

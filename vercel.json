@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/mcp",
+      "destination": "https://wrwsjlydozfzejixofwm.supabase.co/functions/v1/guild-community-mcp-v1"
+    },
+    {
       "source": "/oauth/consent",
       "destination": "/index.html"
     },
@@ -10,6 +14,10 @@
     },
     {
       "source": "/community",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/ai",
       "destination": "/index.html"
     },
     {

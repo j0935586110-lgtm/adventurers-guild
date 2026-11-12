@@ -21,6 +21,7 @@ interface GuildContextType {
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
   signUp: (email: string, password: string, name: string) => Promise<{ error?: string; confirmationRequired?: boolean }>;
   signInWithGoogle: () => Promise<{ error?: string }>;
+  sendEmailLoginLink: (email: string) => Promise<{ error?: string; sent?: boolean }>;
   signOut: () => Promise<void>;
 }
 
@@ -136,6 +137,14 @@ export const GuildProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setProfile(null);
   };
 
+  const sendEmailLoginLink = async (email: string) => {
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: { emailRedirectTo: window.location.href }
+    });
+    return error ? { error: error.message } : { sent: true };
+  };
+
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -146,7 +155,7 @@ export const GuildProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   return (
-    <GuildContext.Provider value={{ user, profile, loading, signIn, signUp, signInWithGoogle, signOut }}>
+    <GuildContext.Provider value={{ user, profile, loading, signIn, signUp, signInWithGoogle, sendEmailLoginLink, signOut }}>
       {children}
     </GuildContext.Provider>
   );
