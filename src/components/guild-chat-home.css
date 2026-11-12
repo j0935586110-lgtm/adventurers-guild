@@ -1,0 +1,93 @@
+/* Guild chat-first experience — replaces the old marketing homepage and legacy quest shell. */
+.ch-site{--green:#174b46;--deep:#143d37;--ink:#243f35;--muted:#71847a;--line:#e4ebe3;--cream:#fafbf8;min-height:100dvh;display:flex;flex-direction:column;background:var(--cream);color:var(--ink);font:15px/1.6 "DM Sans","Noto Sans TC",system-ui,sans-serif}
+.ch-site *{box-sizing:border-box}
+.ch-header{background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:24px;justify-content:space-between;height:74px;padding:0 clamp(17px,4vw,45px);position:sticky;top:0;z-index:50}
+.ch-brand{color:var(--green);display:flex;align-items:center;gap:10px;font-size:17px;letter-spacing:.03em;font-weight:900;text-decoration:none;white-space:nowrap}
+.ch-brand:hover{text-decoration:none}
+.ch-mark{width:39px;height:39px;display:grid;place-items:center;background:var(--green);color:white;border-radius:13px 4px 13px 4px;font-size:23px;font-weight:900}
+.ch-nav{margin-left:auto;display:flex;gap:22px;align-items:center}
+.ch-nav a{color:#496f62;text-decoration:none;font-weight:700;font-size:13px;white-space:nowrap}
+.ch-nav a:hover{color:var(--green)}
+.ch-actions{display:flex;align-items:center;gap:10px}
+.ch-actions button,.ch-actions a{font-size:12px;font-weight:850;white-space:nowrap;text-decoration:none;cursor:pointer}
+.ch-login{display:inline-flex;align-items:center;justify-content:center;gap:5px;background:#e8f2e8;color:#174b46;border:1px solid #b7d0c0;padding:9px 13px;border-radius:9px;min-height:39px}
+.ch-language{background:white;color:#335f50;border:1px solid #bdd0c1;border-radius:100px;min-width:42px;height:39px}
+.ch-menu{display:none;color:var(--green);border:0;background:transparent;width:34px;height:40px;align-items:center;justify-content:center}
+.ch-main{flex:1;display:flex;justify-content:center;align-items:center;padding:25px 20px 52px}
+.ch-center{width:min(100%,770px);margin:0 auto;display:flex;flex-direction:column;align-items:stretch;gap:16px}
+.ch-greeting{text-align:center;margin:0 auto 11px}
+.ch-avatar{display:grid;place-items:center;height:55px;width:55px;margin:0 auto 18px;background:#e7f2e9;color:#286b59;border:1px solid #d4e6d9;border-radius:20px 7px 20px 7px}
+.ch-greeting h1{font-weight:900;font-size:clamp(32px,4.9vw,48px);line-height:1.25;color:#174b46;margin:0 0 13px;letter-spacing:-.03em}
+.ch-greeting p{margin:0;color:#667f73;font-size:14px;line-height:1.75}
+.ch-composer{display:flex;gap:12px;align-items:end;background:white;border:1px solid #b8cec1;border-radius:19px;padding:14px 13px 14px 21px;box-shadow:0 13px 45px #1b48390c}
+.ch-composer:focus-within{border-color:#4a9b7b;box-shadow:0 0 0 3px #2f987c16,0 13px 45px #1b48390c}
+.ch-composer textarea{flex:1;min-width:0;border:0;outline:0;box-shadow:none;background:none;font:inherit;font-size:16px;color:#174b46;line-height:1.65;resize:none;max-height:180px;min-height:49px;padding:8px 0 0}
+.ch-composer textarea::placeholder{color:#8fa59b}
+.ch-composer button{width:46px;height:46px;flex:none;border-radius:14px;display:grid;place-items:center;border:0;color:#fff;background:var(--green);cursor:pointer}
+.ch-composer button:hover:not(:disabled){background:#2f7968}
+.ch-composer button:disabled{opacity:.4;cursor:not-allowed}
+.ch-starters{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.ch-starters button{font-size:12px;color:#3b695a;background:white;border:1px solid #d7e4d9;border-radius:100px;padding:9px 13px;cursor:pointer}
+.ch-starters button:hover{background:#eaf4ec}
+.ch-footnote{text-align:center;color:#9aa99e;font-size:11px;line-height:1.5;margin:2px 0 0}
+.ch-footer{border-top:1px solid var(--line);display:flex;align-items:center;gap:23px;padding:14px clamp(18px,4vw,45px);color:#9aaa9e;font-size:11px;flex-wrap:wrap}
+.ch-footer a{color:#6b8b77;text-decoration:none;font-size:11px;font-weight:750}
+.ch-footer span{margin-left:auto}
+.ch-in-conversation{align-items:flex-start;padding-top:24px}
+.ch-in-conversation .ch-center{max-width:770px;min-height:calc(100dvh - 190px)}
+.ch-thread{display:flex;flex-direction:column;gap:22px;flex:1;padding:5px 0 25px}
+.ch-message{display:flex;gap:10px;max-width:100%;align-items:flex-start}
+.ch-me{justify-content:flex-end}
+.ch-me .ch-bubble{background:#e7f0e9;border-radius:17px 17px 5px 17px;max-width:85%;padding:12px 16px}
+.ch-message .ch-bubble>p{margin:0;overflow-wrap:anywhere;white-space:pre-wrap;line-height:1.75}
+.ch-guild .ch-bubble{flex:1;min-width:0}
+.ch-small-mark{flex:none;color:#367d66;background:#e4efe7;display:grid;place-items:center;width:31px;height:31px;border-radius:10px}
+.ch-guild .ch-bubble>p{padding:1px 0 10px}
+.ch-thinking{padding:7px 0 17px 40px;color:#7e9786;font-size:13px;display:flex;align-items:center;gap:9px}
+.ch-results{display:flex;flex-direction:column;gap:9px}
+.ch-result{padding:14px 16px;border:1px solid #dfe8df;border-radius:13px;background:white;display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+.ch-result strong{color:#174b46;font-size:14px;line-height:1.6;font-weight:850}
+.ch-result small{font-size:11px;color:#84998d}
+.ch-result p{font-size:12px;color:#60796b;margin:3px 0;line-height:1.7;white-space:pre-wrap}
+.ch-result a,.ch-result button,.ch-text-action{font-size:12px;font-weight:850;display:inline-flex;align-items:center;gap:8px;padding:8px 0;margin-top:3px;text-decoration:none;border:0;background:none;color:#25705b;cursor:pointer}
+.ch-text-action{padding:11px 13px;border-radius:11px;background:#e6f2e8;border:1px solid #bcd6c4}
+.ch-draft{background:white;border:1px solid #dbe6dc;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.ch-draft-heading{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.ch-draft-heading h2{font-size:19px;color:#184b40;margin:0}
+.ch-draft-heading button{border:0;background:transparent;cursor:pointer;color:#668172}
+.ch-draft>p{font-size:12px;color:#688172;margin:0}
+.ch-draft label{font-size:12px;color:#4c715d;display:flex;flex-direction:column;gap:5px;font-weight:750}
+.ch-draft input:not([type=checkbox]),.ch-draft textarea{width:100%;padding:10px 12px;background:#fafcf9;border:1px solid #cbddd0;border-radius:8px;font:inherit;font-size:14px;resize:vertical;color:#143d37}
+.ch-draft .ch-consent{display:flex;flex-direction:row;gap:9px;align-items:start;font-weight:600;line-height:1.6}
+.ch-consent input{flex:none;width:17px;height:17px;accent-color:#174b46;margin-top:2px}
+.ch-submit-draft{align-self:flex-start;background:#174b46;color:white;border:0;border-radius:9px;padding:11px 16px;font-weight:800;font-size:13px;cursor:pointer}
+.ch-submit-draft:disabled{opacity:.4;cursor:not-allowed}
+.ch-saved{color:#28654e;font-size:13px;display:flex;gap:8px;align-items:center;font-weight:800}
+.ch-error{color:#a54836!important;font-size:13px}
+@media(max-width:800px){.ch-nav{display:none}.ch-menu{display:flex}.ch-nav-open{display:flex;position:absolute;top:73px;left:0;right:0;flex-direction:column;align-items:stretch;background:white;padding:12px 21px;gap:0;border-bottom:1px solid #d9e5da;box-shadow:0 13px 25px #174b4618}.ch-nav-open a{padding:12px 5px;font-size:14px}}
+@media(max-width:560px){
+ .ch-header{height:66px;padding:0 13px;gap:6px}
+ .ch-brand{font-size:14px;gap:6px}
+ .ch-mark{height:34px;width:34px;font-size:19px;flex:none}
+ .ch-actions{gap:6px;margin-left:auto}
+ .ch-login{padding:7px 9px;font-size:11px!important;min-height:35px}
+ .ch-language{min-width:37px;height:35px;font-size:11px!important}
+ .ch-menu{width:28px;height:35px}
+ .ch-nav-open{top:65px}
+ .ch-main{padding:20px 16px 38px}
+ .ch-greeting{margin-bottom:6px}
+ .ch-greeting h1{font-size:35px}
+ .ch-greeting p{font-size:13px}
+ .ch-composer{border-radius:16px;padding:10px 10px 10px 14px;gap:6px}
+ .ch-composer textarea{font-size:15px;min-height:46px}
+ .ch-composer button{width:40px;height:40px;border-radius:11px}
+ .ch-starters{gap:7px;justify-content:flex-start}
+ .ch-starters button{font-size:11px;padding:8px 11px}
+ .ch-footer{padding:10px 16px;gap:12px}
+ .ch-footer span{display:none}
+ .ch-in-conversation .ch-center{min-height:calc(100dvh - 150px)}
+ .ch-guild .ch-bubble{font-size:13px}
+ .ch-result{padding:12px}
+}
+@media(max-width:355px){.ch-brand{font-size:12px}.ch-mark{height:29px;width:29px}.ch-login{font-size:10px!important;padding:6px 7px}.ch-header{padding:0 9px;gap:3px}.ch-actions{gap:3px}}
+.ch-site .gh-overlay{color:#1d3b38;--green:#174b46;--ink:#1d3b38}

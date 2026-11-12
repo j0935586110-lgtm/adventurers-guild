@@ -35,7 +35,7 @@ export default function GuildMemberHub() {
   const publicId = window.location.pathname.startsWith('/adventurers/') ? window.location.pathname.split('/')[2] : '';
   const viewingSelf = !publicId || (!!user && publicId === user.id);
   const target = publicId || user?.id || '';
-  const [tab, setTab] = useState<Tab>('quests');
+  const [tab, setTab] = useState<Tab>(()=>new URLSearchParams(window.location.search).get('tab')==='explore'?'explore':'quests');
   const [identity, setIdentity] = useState<PublicProfile | null>(null);
   const [showcase, setShowcase] = useState<Showcase | null>(null);
   const [editing, setEditing] = useState(false);
