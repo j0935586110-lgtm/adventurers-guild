@@ -1,0 +1,23 @@
+/* Adventurers Guild × Taiwan AI Forum: NodeBB Harmony overrides.
+ * ACP > Appearance > Customise > Custom CSS. Append without overwriting existing CSS.
+ */
+:root {
+  --bs-primary: #174b46;
+  --bs-primary-rgb: 23,75,70;
+  --bs-link-color: #286f65;
+  --bs-link-hover-color: #174b46;
+  --bs-body-color: #1d3b38;
+  --bs-body-bg: #f8f7f2;
+  --bs-border-color: #e0e9e0;
+}
+body { font-family: "DM Sans","Noto Sans TC",system-ui,sans-serif; }
+a { text-underline-offset: 3px; }
+.navbar, .navbar-light, .navbar.bg-light, .header { border-bottom-color: #e0e9e0 !important; }
+.navbar .navbar-brand, .navbar .nav-link, .navbar .navbar-nav .nav-link { color:#174b46; }
+.btn-primary, .bg-primary { background-color:#174b46!important; border-color:#174b46!important; }
+.btn-primary:hover, .btn-primary:focus { background-color:#286f65!important;border-color:#286f65!important; }
+.topic-list, .categories, .topic, .card { border-radius: 14px; }
+.card, .topic-list, .categories { border-color:#e0e9e0; }
+.badge.bg-primary { color:#fff; }
+a:focus-visible,button:focus-visible { outline:2px solid #286f65; outline-offset:3px; }
+@media(max-width:640px){ .card { border-radius:10px; } }

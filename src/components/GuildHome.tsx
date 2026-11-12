@@ -322,6 +322,7 @@ export default function GuildHome() {
       <nav className={'gh-nav-links '+(menu?'gh-nav-links-open':'')} aria-label={tx('主要導覽','Main navigation')}>
         <button type="button" className={pane==='discover'?'active':''} onClick={()=>toPane('discover')}>{tx("探索服務","Find services")}</button>
         <a href="/works.html">{tx("作品與技能","Work & skills")}</a>
+        <a href="/me">{tx("個人面板","My profile")}</a>
         <button type="button" className={pane==='mine'?'active':''} onClick={()=>toPane('mine')}>{tx("我的刊登","My listings")}</button>
         <button type="button" className={pane==='inbox'?'active':''} onClick={()=>toPane('inbox')}>{tx("我的訊息","Messages")}</button>
         <button type="button" className={pane==='guild'?'active':''} onClick={()=>toPane('guild')}>{tx("任務看板","Tasks")}</button>

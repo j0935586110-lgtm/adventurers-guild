@@ -3,6 +3,14 @@
     {
       "source": "/oauth/consent",
       "destination": "/index.html"
+    },
+    {
+      "source": "/me",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/adventurers/:id",
+      "destination": "/index.html"
     }
   ],
   "headers": [
