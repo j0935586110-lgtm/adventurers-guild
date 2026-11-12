@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Award, Bookmark, Coins, ExternalLink, Github, HeartHandshake, LoaderCircle, MessageSquareText, RefreshCw, Save, ShieldCheck, UserRound, Wrench } from 'lucide-react';
 import { useGuild } from './GuildProvider';
 import { supabase } from '../lib/supabase';
+import { LEGACY_DEMO_CLIENT_ID } from '../lib/quest-visibility';
 import './guild-home.css';
 import './guild-member-hub.css';
 
@@ -99,7 +100,7 @@ export default function GuildMemberHub() {
 
   const loadExplore = useCallback(async () => {
     const [q, n] = await Promise.all([
-      supabase.from('quests').select('id,title,status,client_id,adventurer_id,reward_g_coin,created_at').eq('status','posted').order('created_at',{ascending:false}).limit(30),
+      supabase.from('quests').select('id,title,status,client_id,adventurer_id,reward_g_coin,created_at').eq('status','posted').neq('client_id',LEGACY_DEMO_CLIENT_ID).order('created_at',{ascending:false}).limit(30),
       supabase.from('guild_needs').select('id,owner_id,title,kind,status,created_at').eq('status','published').order('created_at',{ascending:false}).limit(30),
     ]);
     if(q.error || n.error) setError((q.error || n.error)?.message || 'Unable to load open tasks');

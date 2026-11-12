@@ -29,3 +29,6 @@ Supabase Google provider currently external.google=false. No evidence that the G
 NodeBB member-level SSO and forum posts through member-scoped AI authorizations are not complete.
 The public MCP is usable, but merely pasting a website URL does not grant write permission or bypass client connector support.
 This UI worktree is isolated, not production promotion.
+
+## QA: legacy sample quest segregation
+2026-11-12 verification: the only posted quest was sample '清理史萊姆' 100 G by '阿爾薩斯' (demo client a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11). A posted status alone does not prove genuine demand. Public chat, bulletin and dashboard explore now filter this known demo owner at query level; no database test row was deleted. Future user quests require independent abuse prevention and moderation.

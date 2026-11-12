@@ -5,6 +5,7 @@ import {AuthLanguageContext, GuildAuthDialog} from './GuildAuthDialog';
 import {listPublishedNeeds, createNeedDraft, publishNeed, replyToNeed, type GuildNeed, type NeedKind} from '../lib/needs';
 import {searchServices, type GuildService} from '../lib/marketplace';
 import {supabase} from '../lib/supabase';
+import {LEGACY_DEMO_CLIENT_ID} from '../lib/quest-visibility';
 import './guild-chat-home.css';
 
 type Lang='zh'|'en';
@@ -43,7 +44,7 @@ export default function GuildChatHome(){
   useEffect(()=>{
     let active=true;
     void supabase.from('quests').select('id,title,reward_g_coin,status,created_at',{count:'exact'})
-      .eq('status','posted').order('created_at',{ascending:false}).limit(3)
+      .eq('status','posted').neq('client_id',LEGACY_DEMO_CLIENT_ID).order('created_at',{ascending:false}).limit(3)
       .then(({data,error,count})=>{
         if(!active)return;
         if(error){setBoardError(error.message);setBoardTasks([]);}
@@ -90,7 +91,7 @@ export default function GuildChatHome(){
         newEntry.text=newEntry.results.length?t('以下是論壇目前真正公開的最新文章。','These are the latest public forum discussions.'):t('論壇目前沒有公開文章。','No public forum posts found.');
       }else if(filter.type==='quests'){
         const {data,error}=await supabase.from('quests')
-          .select('id,title,reward_g_coin,status,created_at').eq('status','posted')
+          .select('id,title,reward_g_coin,status,created_at').eq('status','posted').neq('client_id',LEGACY_DEMO_CLIENT_ID)
           .order('created_at',{ascending:false}).limit(8);
         if(error)throw error;
         newEntry.results=(data||[]).map(item=>({kind:'quest',item}));
