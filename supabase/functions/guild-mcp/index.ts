@@ -130,6 +130,101 @@ Deno.serve(pipeline(
           ...args,reviewer_id:await uid(),service_id:null
         }).select('id,service_id,rating,comment').single())
       })));
+      const kinds=['cooperation','support','resources','events','jobs','hiring','clubs','friends','sports','dating'] as const;
+      const publicNeeds='id,owner_id,kind,title,description,city,status,created_at';
+      const replyCols='id,need_id,sender_id,message,status,created_at';
+      server.registerTool('search_public_needs',{
+        title:'搜尋公會公開需求 / Search public requests',
+        description:'搜尋會員真實公開的徵才、求職、合作、活動、社團、玩伴與運動需求。AI 不能捏造人選或職缺。',
+        annotations:{readOnlyHint:true},
+        inputSchema:z.object({kind:z.enum(kinds).optional(),city:z.string().trim().max(80).default(''),limit:z.number().int().min(1).max(30).default(15)})
+      },({kind,city,limit})=>run(async()=>{
+        if(kind==='dating')return {needs:[],limitation:'Dating matching not available'};
+        let q=supabase.from('guild_needs').select(publicNeeds).eq('status','published');
+        if(kind)q=q.eq('kind',kind);if(city)q=q.eq('city',city);
+        return {needs:await checked(q.order('created_at',{ascending:false}).limit(limit))};
+      }));
+      server.registerTool('create_need_draft',{
+        title:'草擬找人找機會需求 / Draft a request',
+        description:'只幫使用者建立私人草稿，不會發布。必須告知會員草稿標題、內容、地區和類型；發布需另外確認呼叫 publish_need。',
+        annotations:{readOnlyHint:false,destructiveHint:false},
+        inputSchema:z.object({
+          kind:z.enum(kinds),title:z.string().trim().min(3).max(140),
+          description:z.string().trim().min(6).max(1500),
+          city:z.string().trim().min(1).max(80).default('線上服務')
+        })
+      },args=>run(async()=>{
+        const owner_id=await uid();
+        const need=await checked(supabase.from('guild_needs').insert({...args,owner_id,status:'draft'})
+          .select(publicNeeds).single());
+        return {need,public:false,next_action:'Obtain explicit user approval of all public fields before calling publish_need'};
+      }));
+      server.registerTool('publish_need',{
+        title:'經會員確認後發布需求 / Publish approved request',
+        description:'對外發布已存在的私人草稿。只有會員明確確認標題、內容、城市、需求類型及隱私警告後才能呼叫；禁止自動發布交友及約會私密資訊。',
+        annotations:{readOnlyHint:false,destructiveHint:false},
+        inputSchema:z.object({need_id:z.string().uuid(),confirmed:z.literal(true)})
+      },({need_id})=>run(async()=>{
+        const owner=await uid();
+        const row=await checked(supabase.from('guild_needs').update({status:'published'})
+          .eq('id',need_id).eq('owner_id',owner).eq('status','draft')
+          .select(publicNeeds).maybeSingle());
+        if(!row)throw new Error('草稿不存在、已發布或權限不足');
+        return {need:row,public:true};
+      }));
+      server.registerTool('my_needs',{
+        title:'我的需求 / My requests',
+        description:'只讀取自己建立的草稿和已公開的需求。',
+        annotations:{readOnlyHint:true},inputSchema:z.object({})
+      },()=>run(async()=>{
+        const id=await uid();
+        return {needs:await checked(supabase.from('guild_needs').select(publicNeeds)
+          .eq('owner_id',id).order('created_at',{ascending:false}).limit(60))};
+      }));
+      server.registerTool('reply_to_need',{
+        title:'向需求者表達意願 / Express interest',
+        description:'向公開需求提出合作或交流意願。先向使用者確認傳送的文字，這是私人訊息且不可自動送出。',
+        annotations:{readOnlyHint:false,destructiveHint:false},
+        inputSchema:z.object({need_id:z.string().uuid(),message:z.string().trim().min(6).max(1200)})
+      },({need_id,message})=>run(async()=>{
+        const sender_id=await uid();
+        return {reply:await checked(supabase.from('guild_need_replies').insert({
+          need_id,sender_id,message,status:'sent'
+        }).select(replyCols).single())};
+      }));
+      server.registerTool('my_need_replies',{
+        title:'我的需求互動 / My matching responses',
+        description:'讀取會員自己發出的意願及收到的私人回覆，資料庫會限制只有當事人能看。',
+        annotations:{readOnlyHint:true},inputSchema:z.object({})
+      },()=>run(async()=>{
+        await uid();
+        return {replies:await checked(supabase.from('guild_need_replies').select(replyCols)
+          .order('created_at',{ascending:false}).limit(80))};
+      }));
+      server.registerTool('decide_need_reply',{
+        title:'決定是否願意交流 / Decide on interest',
+        description:'需求發布者對收到的意願選擇接受或婉拒。需要使用者明確確認，接受僅代表有意願，並不公開聯絡資料。',
+        annotations:{readOnlyHint:false,destructiveHint:false},
+        inputSchema:z.object({reply_id:z.string().uuid(),decision:z.enum(['accepted','declined'])})
+      },({reply_id,decision})=>run(async()=>{
+        await uid();
+        const row=await checked(supabase.from('guild_need_replies').update({status:decision})
+          .eq('id',reply_id).eq('status','sent').select(replyCols).maybeSingle());
+        if(!row)throw new Error('未找到可處理的意願或沒有權限');
+        return {reply:row};
+      }));
+      server.registerTool('close_need',{
+        title:'結束我的公開需求 / Close request',
+        description:'將自己的需求從公開搜尋中下架，需要當事人確認。',
+        annotations:{readOnlyHint:false,destructiveHint:false},
+        inputSchema:z.object({need_id:z.string().uuid()})
+      },({need_id})=>run(async()=>{
+        const id=await uid();
+        const row=await checked(supabase.from('guild_needs').update({status:'closed'})
+          .eq('id',need_id).eq('owner_id',id).eq('status','published').select('id,status').maybeSingle());
+        if(!row)throw new Error('需求不存在或狀態不符');
+        return {need:row};
+      }));
       return server;
     });
     return handler.fetch(req);

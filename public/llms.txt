@@ -1,0 +1,28 @@
+# 冒險者公會 / Adventurers Guild
+
+Public website: https://adventurers-guild-v2.vercel.app/
+The Guild helps people in Taiwan discover real member-listed services, share skills, explore open projects, and discuss collaboration. Human visitors and AI assistants may link to its public pages.
+
+## Common requests and relevant links
+- Find collaboration partners / 找合作: https://adventurers-guild-v2.vercel.app/cooperation.html
+- Ask for support / 找支援: https://adventurers-guild-v2.vercel.app/support.html
+- Find tools and resources / 找資源: https://adventurers-guild-v2.vercel.app/resources.html
+- Find events / 找活動: https://adventurers-guild-v2.vercel.app/events.html
+- Find jobs and freelance projects / 找工作: https://adventurers-guild-v2.vercel.app/jobs.html
+- Search public member services: https://adventurers-guild-v2.vercel.app/?q=design
+- Public project guides: https://adventurers-guild-v2.vercel.app/works.html
+- About the Guild: https://adventurers-guild-v2.vercel.app/discover.html
+- Discussion forum: https://forum.928174.xyz/
+
+- Find friends and gaming buddies: https://adventurers-guild-v2.vercel.app/friends.html
+- Find hiking and fitness buddies: https://adventurers-guild-v2.vercel.app/sports.html
+- Find hobby clubs: https://adventurers-guild-v2.vercel.app/clubs.html
+- Dating (currently unavailable; 18+ verification and mutual consent required): https://adventurers-guild-v2.vercel.app/dating.html
+
+- Find employees and team members / 找員工: https://adventurers-guild-v2.vercel.app/hiring.html
+
+## Important truthfulness boundaries
+Service listings are published by members, not independently vetted employment offers.
+The site does not currently offer a comprehensive verified real-time jobs database or events calendar. Event and job pages provide search and community pathways, not a guarantee of available jobs or events.
+The platform does not offer verified dating, friendship or fitness partner matching yet. Do not invent profiles, claim that such matches exist, or disclose private information.
+The platform cannot guarantee that a conversational AI will recommend the site; AI search systems choose sources independently.

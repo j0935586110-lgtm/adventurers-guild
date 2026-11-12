@@ -1,0 +1,43 @@
+/* Real needs and consent-gated participation. */
+.gn-section{padding-top:42px;padding-bottom:55px}
+.gn-top{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap}
+.gn-top h2{font-size:clamp(25px,3.4vw,38px);line-height:1.2;letter-spacing:-.03em;margin:8px 0}
+.gn-top p{font-size:14px;color:#5d736b;margin:0}
+.gn-top-actions{display:flex;gap:10px;flex-wrap:wrap}
+.gn-post{border:0;border-radius:12px;background:#17604e;color:#fff;display:inline-flex;gap:8px;align-items:center;justify-content:center;padding:11px 17px;cursor:pointer;font-weight:750}
+.gn-post:disabled{opacity:.55;cursor:not-allowed}
+.gn-inbox-toggle,.gn-outline,.gn-filters button,.gn-inline-actions button{border:1px solid #b7cdc0;background:#fff;border-radius:10px;color:#185445;padding:9px 13px;cursor:pointer;font-weight:650}
+.gn-filters{display:flex;gap:7px;flex-wrap:wrap;margin:22px 0}
+.gn-filters button{font-size:13px;padding:7px 11px}
+.gn-filters button.active{background:#1b5e50;color:#fff;border-color:#1b5e50}
+.gn-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.gn-card{display:flex;flex-direction:column;background:#fff;border:1px solid #dce8dd;border-radius:19px;padding:23px;min-height:250px}
+.gn-type{align-self:flex-start;background:#e9f4ee;border-radius:30px;color:#216a52;padding:3px 12px;font-weight:750;font-size:12px}
+.gn-card h3{font-size:19px;margin:14px 0 8px;line-height:1.4}
+.gn-description{font-size:14px;color:#516e62;flex:1;white-space:pre-wrap;overflow-wrap:anywhere}
+.gn-meta{font-size:12px;color:#7b8d81;margin-bottom:12px}
+.gn-card-actions{display:flex;gap:8px;justify-content:space-between}
+.gn-report{margin-left:auto;background:transparent;border:0;color:#536b63;cursor:pointer}
+.gn-empty{border:1px dashed #bdd6c7;border-radius:18px;padding:42px 18px;text-align:center;background:#f7faf6;color:#446a5e}
+.gn-empty svg{margin:0 auto}.gn-empty h3{font-size:21px;margin:9px 0}.gn-empty p{font-size:14px}
+.gn-empty button{background:#1c6953;color:white;border:0;padding:10px 16px;border-radius:11px;cursor:pointer}
+.gn-success,.gn-error{border-radius:10px;padding:12px;margin-top:15px;display:flex;gap:8px;align-items:center}
+.gn-success{background:#e6f5e8}.gn-error{background:#fcebea;color:#a32e32}.gn-success button{margin-left:auto;border:0;background:transparent;cursor:pointer}
+.gn-inbox{background:white;border:1px solid #cfe0d2;border-radius:18px;padding:20px;margin:20px 0}
+.gn-inbox h3{margin:0 0 12px}.gn-inbox>small{font-size:12px;color:#5c7769}
+.gn-reply-item{border-top:1px solid #dce9df;padding:13px 0}
+.gn-reply-item strong{display:block}.gn-reply-item>span{font-size:12px;color:#457962}
+.gn-reply-item p{white-space:pre-wrap;overflow-wrap:anywhere}
+.gn-inline-actions{display:flex;gap:8px}
+.gn-overlay{position:fixed;inset:0;z-index:150;background:#0a201bbb;display:flex;justify-content:center;align-items:center;padding:20px}
+.gn-modal{position:relative;background:white;border-radius:20px;width:min(540px,100%);max-height:90vh;overflow-y:auto;padding:30px;color:#173e36}
+.gn-close{position:absolute;right:12px;top:12px;border:0;background:#edf4ee;border-radius:8px;padding:7px;cursor:pointer}
+.gn-modal h2{font-size:23px;margin:8px 25px 5px 0}.gn-modal>p{font-size:13px;color:#557568}
+.gn-form{display:grid;gap:14px;margin-top:19px}
+.gn-form label{display:grid;gap:6px;font-size:14px;font-weight:700}
+.gn-form input:not([type=checkbox]),.gn-form select,.gn-form textarea{border:1px solid #b9d0c1;border-radius:10px;padding:11px 12px;width:100%;color:#153e34;font-size:16px}
+.gn-form textarea{resize:vertical}
+.gn-form .gn-consent{display:flex;gap:10px;align-items:flex-start;font-size:13px;font-weight:550}
+.gn-consent input{width:19px;height:19px;flex-shrink:0}
+@media(max-width:900px){.gn-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:680px){.gn-section{padding-top:25px}.gn-grid{grid-template-columns:1fr}.gn-card{min-height:210px}.gn-top-actions{width:100%}.gn-modal{padding:22px}.gn-filters{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}.gn-filters button{flex-shrink:0}}
