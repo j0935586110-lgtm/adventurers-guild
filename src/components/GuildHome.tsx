@@ -417,7 +417,7 @@ export default function GuildHome() {
       <section className="gh-openworks gh-container" aria-labelledby="gh-openworks-title">
         <div className="gh-section-heading">
           <div>
-            <span className="gh-kicker">OPEN WORKS · 02</span>
+            <span className="gh-kicker">{tx("公開作品與教學 · 02","PROJECTS & GUIDES · 02")}</span>
             <h2 id="gh-openworks-title">{tx("先看真實作品，再動手試試。","Explore real projects and learn by doing.")}</h2>
             <p>{tx("公開作品附有說明與練習方式，不必登入。","Browse open projects and practical examples without signing in.")}</p>
           </div>
@@ -425,25 +425,25 @@ export default function GuildHome() {
         </div>
         <div className="gh-openworks-grid">
           <article className="gh-openwork-card">
-            <span className="gh-openwork-label">開源作品 · PR 驗證</span>
-            <h3>PR Evidence Gate</h3>
-            <p>檢查 AI 協作時的 GitHub PR、工作樹與驗收證據，避免把「自稱通過」誤當正式核准。</p>
-            <a href="/works.html#pr-evidence-gate">查看工具與練習步驟 <ArrowUpRight size={16}/></a>
+            <span className="gh-openwork-label">{tx("免費工具 · 合作成果","Free tool · Teamwork")}</span>
+            <h3>{tx("合作成果檢查工具","Teamwork result checker")}</h3>
+            <p>{tx("幫你確認合作任務是否真的完成，而不是只看口頭回報。","Check that a shared task really got done instead of trusting a status message.")}</p>
+            <a href="/works.html#pr-evidence-gate">{tx("查看工具和使用方法","See how it works")} <ArrowUpRight size={16}/></a>
           </article>
           <article className="gh-openwork-card">
-            <span className="gh-openwork-label">開源作品 · 網站檢查</span>
-            <h3>Page Parity</h3>
-            <p>比對靜態網站多個頁面的標題、導覽與版面，協助找出不一致及溢出問題。</p>
+            <span className="gh-openwork-label">{tx("免費工具 · 網站檢查","Free tool · Website check")}</span>
+            <h3>{tx("網站畫面檢查工具","Website consistency checker")}</h3>
+            <p>{tx("自動檢查網站不同頁面的文字與排版有沒有錯誤。","Check whether pages look consistent and catch layout problems.")}</p>
             <a href="/works.html#page-parity">查看工具與練習步驟 <ArrowUpRight size={16}/></a>
           </article>
           <article className="gh-openwork-card gh-openwork-community">
-            <span className="gh-openwork-label">社群入口 · 經驗交流</span>
-            <h3>台灣 AI 實戰論壇</h3>
-            <p>看 Agent、MCP 與開源協作的真實紀錄，也能提出問題、分享自己的作品。</p>
-            <a href="https://forum.928174.xyz/" rel="noopener noreferrer">閱讀討論與交流 <ArrowUpRight size={16}/></a>
+            <span className="gh-openwork-label">{tx("社群交流 · 一起學習","Community · Learn together")}</span>
+            <h3>{tx("交流與求助社群","Community discussions")}</h3>
+            <p>{tx("可以提問、分享作品、認識有相同興趣的人。","Ask questions, share projects and meet others who share your interests.")}</p>
+            <a href="https://forum.928174.xyz/" rel="noopener noreferrer">{tx("前往社群交流","Visit community")} <ArrowUpRight size={16}/></a>
           </article>
         </div>
-        <p className="gh-openworks-note">上方是可公開核對的開源作品與討論入口，不是付費服務、會員評價或平台履約保證。</p>
+        <p className="gh-openworks-note">{tx("這些是公開學習資源，與會員刊登的工作、評價或服務保證不同。","These are public learning resources, not verified jobs, member reviews or service guarantees.")}</p>
       </section>
 
       <section className="gh-listings-section" ref={resultsRef}>

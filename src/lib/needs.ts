@@ -67,3 +67,30 @@ export async function reportNeed(needId:string,reporterId:string,reason:string):
  const {error}=await supabase.from('guild_need_reports').insert({need_id:needId,reporter_id:reporterId,reason});
  if(error)throw err(error);
 }
+
+export interface NeedChatMessage {
+ id:string; reply_id:string; sender_id:string; content:string; created_at:string;
+}
+export async function listNeedMessages(replyId:string):Promise<NeedChatMessage[]>{
+ const {data,error}=await supabase.from('guild_need_messages')
+  .select('id,reply_id,sender_id,content,created_at').eq('reply_id',replyId)
+  .order('created_at',{ascending:true}).limit(100);
+ if(error)throw err(error);return(data||[]) as NeedChatMessage[];
+}
+export async function sendNeedMessage(replyId:string,senderId:string,content:string):Promise<void>{
+ const {error}=await supabase.from('guild_need_messages').insert({
+  reply_id:replyId,sender_id:senderId,content
+ });
+ if(error)throw err(error);
+}
+export async function blockNeedChat(replyId:string,userId:string):Promise<void>{
+ const {error}=await supabase.from('guild_need_chat_blocks').insert({
+  reply_id:replyId,blocker_id:userId
+ });
+ if(error)throw err(error);
+}
+export async function isNeedChatBlocked(replyId:string):Promise<boolean>{
+ const {data,error}=await supabase.from('guild_need_chat_blocks').select('reply_id')
+  .eq('reply_id',replyId).maybeSingle();
+ if(error)throw err(error);return !!data;
+}

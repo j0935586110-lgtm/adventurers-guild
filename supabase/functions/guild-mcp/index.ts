@@ -225,6 +225,44 @@ Deno.serve(pipeline(
         if(!row)throw new Error('需求不存在或狀態不符');
         return {need:row};
       }));
+      server.registerTool('read_private_chat',{
+        title:'讀取已雙方同意的私訊 / Read private chat',
+        description:'只有需求發布者接受合作意願後的兩位當事人可以讀取。資料庫 RLS 防止其他會員讀到。',
+        annotations:{readOnlyHint:true},
+        inputSchema:z.object({reply_id:z.string().uuid()})
+      },({reply_id})=>run(async()=>{
+        await uid();
+        const [messages,blocked]=await Promise.all([
+          checked(supabase.from('guild_need_messages')
+            .select('id,reply_id,sender_id,content,created_at').eq('reply_id',reply_id)
+            .order('created_at',{ascending:true}).limit(100)),
+          checked(supabase.from('guild_need_chat_blocks').select('reply_id')
+            .eq('reply_id',reply_id).maybeSingle())
+        ]);
+        return {messages,blocked:!!blocked};
+      }));
+      server.registerTool('send_private_chat',{
+        title:'發送已同意的私訊 / Send private message',
+        description:'必須經會員確認文字後才能發送；僅限已互相同意且未被封鎖的當事人。',
+        annotations:{readOnlyHint:false,destructiveHint:false},
+        inputSchema:z.object({reply_id:z.string().uuid(),
+          content:z.string().trim().min(1).max(1500),confirmed:z.literal(true)})
+      },({reply_id,content})=>run(async()=>{
+        const sender_id=await uid();
+        return {message:await checked(supabase.from('guild_need_messages')
+          .insert({reply_id,sender_id,content})
+          .select('id,reply_id,created_at').single())};
+      }));
+      server.registerTool('block_private_chat',{
+        title:'封鎖對話 / Block private chat',
+        description:'會員明確確認後封鎖對話，雙方都不能再發送新訊息；操作不可透過 AI 自動執行。',
+        annotations:{readOnlyHint:false,destructiveHint:false},
+        inputSchema:z.object({reply_id:z.string().uuid(),confirmed:z.literal(true)})
+      },({reply_id})=>run(async()=>{
+        const blocker_id=await uid();
+        return {blocked:await checked(supabase.from('guild_need_chat_blocks')
+          .insert({reply_id,blocker_id}).select('reply_id,created_at').single())};
+      }));
       return server;
     });
     return handler.fetch(req);

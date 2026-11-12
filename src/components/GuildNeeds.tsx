@@ -3,7 +3,7 @@ import {ArrowRight,Check,MessageCircle,Plus,Send,ShieldAlert,X} from 'lucide-rea
 import {useGuild} from './GuildProvider';
 import {TAIWAN_CITIES} from '../lib/marketplace';
 import {NEED_CATEGORIES,listPublishedNeeds,createNeedDraft,publishNeed,closeNeed,
- replyToNeed,listMyReplies,decideReply,reportNeed,type GuildNeed,type GuildNeedReply,type NeedKind} from '../lib/needs';
+ replyToNeed,listMyReplies,decideReply,reportNeed,listNeedMessages,sendNeedMessage,blockNeedChat,isNeedChatBlocked,type NeedChatMessage,type GuildNeed,type GuildNeedReply,type NeedKind} from '../lib/needs';
 import './guild-needs.css';
 
 type Language='zh'|'en';
@@ -37,6 +37,11 @@ export default function GuildNeeds({lang,onLogin}:{lang:Language;onLogin:()=>voi
  const [agreed,setAgreed]=useState(false);
  const [busy,setBusy]=useState(false);
  const [replyMessage,setReplyMessage]=useState('');
+ const [chatReply,setChatReply]=useState<GuildNeedReply|null>(null);
+ const [chatMessages,setChatMessages]=useState<NeedChatMessage[]>([]);
+ const [chatText,setChatText]=useState('');
+ const [chatBlocked,setChatBlocked]=useState(false);
+
  const [reportReason,setReportReason]=useState('');
  const [myOpen,setMyOpen]=useState(false);
  const selected=useMemo(()=>items.filter(i=>!kind||i.kind===kind),[items,kind]);
@@ -90,6 +95,32 @@ export default function GuildNeeds({lang,onLogin}:{lang:Language;onLogin:()=>voi
   }catch(e){setError(e instanceof Error?e.message:'Could not update');}
   finally{setBusy(false);}
  }
+ async function refreshChat(replyId:string){
+  try{
+   const [messages,blocked]=await Promise.all([listNeedMessages(replyId),isNeedChatBlocked(replyId)]);
+   setChatMessages(messages);setChatBlocked(blocked);
+  }catch(e){setError(e instanceof Error?e.message:'Could not load messages');}
+ }
+ function openChat(reply:GuildNeedReply){
+  if(reply.status!=='accepted')return;
+  setChatReply(reply);setChatText('');setChatMessages([]);setChatBlocked(false);
+  void refreshChat(reply.id);
+ }
+ async function submitChat(e:React.FormEvent){
+  e.preventDefault();if(!user||!chatReply||chatBlocked)return;setBusy(true);setError('');
+  try{await sendNeedMessage(chatReply.id,user.id,chatText.trim());setChatText('');
+   await refreshChat(chatReply.id);
+  }catch(e){setError(e instanceof Error?e.message:'Could not send message');}
+  finally{setBusy(false);}
+ }
+ async function stopChat(){
+  if(!user||!chatReply)return;
+  if(!window.confirm(t('封鎖後雙方都不能再傳新訊息，確定嗎？','Blocking prevents either side from sending more messages. Continue?')))return;
+  setBusy(true);setError('');
+  try{await blockNeedChat(chatReply.id,user.id);await refreshChat(chatReply.id);}
+  catch(e){setError(e instanceof Error?e.message:'Could not block');}
+  finally{setBusy(false);}
+ }
  async function submitReport(e:React.FormEvent){
   e.preventDefault();if(!reporting||!user)return;setBusy(true);setError('');
   try{await reportNeed(reporting.id,user.id,reportReason.trim());
@@ -119,6 +150,7 @@ export default function GuildNeeds({lang,onLogin}:{lang:Language;onLogin:()=>voi
      <strong>{need?.title||t('需求紀錄','Request')}</strong>
      <span>{t('狀態：','Status: ')}{r.status==='sent'?t('等待確認','Pending'):r.status==='accepted'?t('雙方已同意交流','Mutual interest'):t('已婉拒','Declined')}</span>
      <p>{r.message}</p>
+     {r.status==='accepted'&&<button type="button" className="gn-outline" onClick={()=>openChat(r)}>{t('開啟雙方私訊','Open private chat')}</button>}
      {own&&r.status==='sent'&&<div className="gn-inline-actions">
       <button type="button" disabled={busy} onClick={()=>void resolve(r,'accepted')}>{t('願意交流','Interested')}</button>
       <button type="button" disabled={busy} onClick={()=>void resolve(r,'declined')}>{t('婉拒','Decline')}</button>
@@ -171,6 +203,29 @@ export default function GuildNeeds({lang,onLogin}:{lang:Language;onLogin:()=>voi
       <textarea required minLength={6} maxLength={1200} rows={4} value={replyMessage} onChange={e=>setReplyMessage(e.target.value)} placeholder={t('簡單介紹自己與想一起做的事（不需填電話）','Introduce yourself and what you hope to do (no phone number needed)')}/></label>
      <button type="submit" className="gn-post" disabled={busy}>{t('送出意願','Send interest')} <Send size={16}/></button>
     </form>
+   </div></div>}
+  {chatReply&&<div className="gn-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setChatReply(null);}}>
+   <div className="gn-modal" role="dialog" aria-modal="true" aria-label={t('雙方私訊','Private chat')}>
+    <button className="gn-close" type="button" aria-label="Close" onClick={()=>setChatReply(null)}><X size={21}/></button>
+    <h2>{t('雙方私訊','Private chat')}</h2>
+    <p>{t('只有已互相同意的兩位會員能看見。','Only the two members who agreed can view this conversation.')}</p>
+    <div className="gn-chat-messages" aria-live="polite">
+     {chatMessages.length===0?<p>{t('目前還沒有訊息。','No messages yet.')}</p>:
+      chatMessages.map(m=><div key={m.id} className={'gn-chat-line '+(m.sender_id===user?.id?'gn-chat-mine':'')}>
+       <small>{m.sender_id===user?.id?t('我','Me'):t('對方','Other member')}</small>
+       <p>{m.content}</p>
+      </div>)}
+    </div>
+    {chatBlocked?<p className="gn-error">{t('這個對話已封鎖，無法再傳訊息。','This conversation is blocked. New messages are disabled.')}</p>:
+    <form className="gn-form" onSubmit={submitChat}>
+     <label>{t('輸入私人訊息','Private message')}
+      <textarea required minLength={1} maxLength={1500} rows={3} value={chatText} onChange={e=>setChatText(e.target.value)} placeholder={t('請尊重對方意願，不要分享不必要的個資','Be respectful. Avoid unnecessary personal information.')}/></label>
+     <button type="submit" className="gn-post" disabled={busy}>{t('傳送訊息','Send message')} <Send size={16}/></button>
+    </form>}
+    <div className="gn-chat-actions">
+     <button type="button" className="gn-outline" onClick={()=>void refreshChat(chatReply.id)}>{t('重新整理訊息','Refresh messages')}</button>
+     {!chatBlocked&&<button type="button" className="gn-chat-block" disabled={busy} onClick={()=>void stopChat()}>{t('封鎖對話','Block conversation')}</button>}
+    </div>
    </div></div>}
   {reporting&&<div className="gn-overlay"><div className="gn-modal" role="dialog" aria-modal="true" aria-label="Report">
    <button className="gn-close" type="button" onClick={()=>setReporting(null)} aria-label="Close"><X size={21}/></button>
