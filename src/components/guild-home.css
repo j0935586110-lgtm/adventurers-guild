@@ -322,3 +322,22 @@
 .gh-one-line-form button{display:flex;align-items:center;gap:7px;border:0;border-radius:12px;padding:11px 17px;background:#175746;color:white;font-weight:750;cursor:pointer;white-space:nowrap}
 .gh-one-line-content small{display:block;font-size:12px;color:#59736a;margin-top:9px}
 @media(max-width:720px){.gh-one-line{padding-top:20px}.gh-one-line-panel{padding:22px 18px;gap:12px}.gh-one-line-icon{display:none}.gh-one-line-form{flex-direction:column}.gh-one-line-form button{justify-content:center}}
+
+/* Five-second landing: one obvious action, forum and quests inside the same guild. */
+.gh-hero-first .gh-hero-grid{min-height:465px;grid-template-columns:minmax(0,1.17fr) minmax(300px,.83fr)}
+.gh-hero-first .gh-hero-content{padding-top:53px;padding-bottom:42px}
+.gh-hero-first h1{font-size:clamp(39px,4.3vw,60px);margin:17px 0 12px;line-height:1.23}
+.gh-hero-first .gh-hero-description{max-width:640px;line-height:1.75;margin-bottom:20px;font-size:14px}
+.gh-hero-first .gh-hero-visual{min-height:420px;max-height:470px}
+.gh-hero-first .gh-hero-sun{width:345px;height:345px}
+.gh-hero-first .gh-art-center{width:270px;height:272px}
+.gh-hero-first .gh-art-inner strong{font-size:26px;white-space:pre-line}
+.gh-hero-unified{max-width:660px}
+.gh-home-examples{margin-top:11px}
+.gh-home-examples button{font-size:11px}
+.gh-first-links{display:flex;gap:11px;flex-wrap:wrap;margin-top:20px}
+.gh-first-links a,.gh-first-links button{border:1px solid #cbddd1;background:white;border-radius:10px;padding:10px 12px;display:inline-flex;align-items:center;gap:6px;color:#1d5e52;font-weight:800;font-size:12px;text-decoration:none;cursor:pointer}
+.gh-first-links a:hover,.gh-first-links button:hover{background:#e5f1e7}
+.gh-first-privacy{display:block;color:#79968a;margin-top:12px;font-size:11px;line-height:1.7}
+@media(max-width:930px){.gh-hero-first .gh-hero-grid{grid-template-columns:minmax(0,1fr) minmax(230px,.55fr)}.gh-hero-first .gh-hero-visual{min-height:365px}.gh-hero-first h1{font-size:clamp(37px,4.7vw,49px)}}
+@media(max-width:720px){.gh-hero-first .gh-hero-grid{display:block;min-height:unset}.gh-hero-first .gh-hero-content{padding:29px 0 26px}.gh-hero-first h1{font-size:clamp(34px,8.4vw,49px);margin:15px 0 11px}.gh-hero-first .gh-hero-description{font-size:13px;line-height:1.7;margin-bottom:16px}.gh-hero-first .gh-hero-visual{display:none}.gh-hero-first .gh-first-links{margin-top:16px;gap:7px}.gh-first-links a,.gh-first-links button{font-size:11px;padding:9px 10px}.gh-hero-first .gh-hero-bottom{padding:10px 0 16px}}

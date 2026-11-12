@@ -323,6 +323,7 @@ export default function GuildHome() {
         <button type="button" className={pane==='discover'?'active':''} onClick={()=>toPane('discover')}>{tx("探索服務","Find services")}</button>
         <a href="/works.html">{tx("作品與技能","Work & skills")}</a>
         <a href="/me">{tx("個人面板","My profile")}</a>
+        <a href="/community">{tx("社群論壇","Community forum")}</a>
         <button type="button" className={pane==='mine'?'active':''} onClick={()=>toPane('mine')}>{tx("我的刊登","My listings")}</button>
         <button type="button" className={pane==='inbox'?'active':''} onClick={()=>toPane('inbox')}>{tx("我的訊息","Messages")}</button>
         <button type="button" className={pane==='guild'?'active':''} onClick={()=>toPane('guild')}>{tx("任務看板","Tasks")}</button>
@@ -337,49 +338,41 @@ export default function GuildHome() {
     </div></header>
 
     {pane==='discover'?<>
-      <section className="gh-hero">
+      <section className="gh-hero gh-hero-first">
         <div className="gh-container gh-hero-grid">
           <div className="gh-hero-content">
-            <div className="gh-eyebrow"><span className="gh-eyebrow-dot"/> {tx("為每一種才能，找到對的人","People and opportunities, together")}</div>
-            <h1>{tx("你想找人幫忙，","Need a hand?")}<br/>{tx("或找新機會？","Looking for opportunities?")}<span className="gh-highlight">{tx("從這裡開始","Start here") }<span className="gh-highlight-star">✳</span></span></h1>
-            <p className="gh-hero-description">{tx("找合作伙伴、找資源、找活動、找工作，或分享你能提供的幫助。","Find partners, resources, events or work — or share what you can offer.")}</p>
-            <form className="gh-hero-search" onSubmit={e=>doSearch(e)}>
-              <Search size={23} color="#43756D"/><input aria-label={tx("搜尋技能或服務","Search skills or services")} value={keyword} onChange={e=>setKeyword(e.target.value)} placeholder={tx("試著輸入：網站設計、攝影、家教…","Try: website design, photography, tutoring…")}/>
-              <button type="submit">{tx("開始搜尋","Search")} <ArrowRight size={19}/></button>
+            <div className="gh-eyebrow"><span className="gh-eyebrow-dot"/> {tx("一句話找人、找事、找機會","Find people, projects, and opportunities")}</div>
+            <h1>{tx("想找人？找工作？","Find people. Find work.")}<br/><span className="gh-highlight">{tx("找機會？","Find opportunities.")}<span className="gh-highlight-star">✳</span></span></h1>
+            <p className="gh-hero-description">{tx("把你想找的事情說給公會聽：合作夥伴、員工、工作、活動、社團、登山或健身朋友。先看公會內的公開資訊，找不到就幫你整理需求。","Tell the guild what you need: partners, teammates, work, events, clubs or activity buddies. Browse public guild posts, then create a request if needed.")}</p>
+            <form className="gh-hero-search gh-hero-unified" onSubmit={runOneLine}>
+              <MessageCircle size={22} color="#43756D"/>
+              <input aria-label={tx("一句話告訴公會你想找什麼","Tell the guild what you need")} value={oneLine} required maxLength={300} onChange={e=>setOneLine(e.target.value)} placeholder={tx("例如：我想找台北一起創業的夥伴","Example: Find a startup partner in Taipei")}/>
+              <button type="submit">{tx("幫我找","Find it")} <ArrowRight size={19}/></button>
             </form>
-            <div className="gh-popular"><span>{tx("熱門搜尋","Popular")}</span>{['網站開發','設計美編','攝影錄影','清潔打掃'].map(t=><button type="button" key={t} onClick={()=>doSearch(undefined,{keyword:t})}>{t}<ArrowUpRight size={12}/></button>)}</div>
+            <div className="gh-popular gh-home-examples"><span>{tx("試試看","Try")}</span>
+              {([[ "找一起創業的夥伴","Find a startup partner","我想找一起創業的夥伴"],["找工作","Find a job","我想找工作"],["找創業活動","Find events","我想找台北的創業活動"],["找登山朋友","Find hiking buddies","我想找一起登山的朋友"]] as const).map(([zh,enText,sample])=><button key={zh} type="button" onClick={()=>setOneLine(sample)}>{tx(zh,enText)} <ArrowUpRight size={12}/></button>)}
+            </div>
+            <div className="gh-first-links">
+              <a href="/community"><MessageCircle size={17}/>{tx("逛社群論壇","Explore community")} <ArrowUpRight size={14}/></a>
+              <button type="button" onClick={()=>toPane('guild')}><BriefcaseBusiness size={17}/>{tx("看任務與報酬","Browse quests")} <ArrowUpRight size={14}/></button>
+              <a href="/me"><Compass size={17}/>{tx("我的冒險者","My profile")} <ArrowUpRight size={14}/></a>
+            </div>
+            <small className="gh-first-privacy">{tx("你的話不會自動公開。刊登、接案和獎勵需要登入並經過確認。","Requests are private until you explicitly publish them. Joining tasks and earning rewards require consent.")}</small>
           </div>
           <div className="gh-hero-visual" aria-hidden="true">
             <div className="gh-hero-sun"/>
             <div className="gh-art-grid"/>
             <div className="gh-orbit gh-orbit-one"/><div className="gh-orbit gh-orbit-two"/>
-            <div className="gh-art-center"><div className="gh-art-inner"><span>一起</span><strong>把好點子<br/>變成現實。</strong><i>✳</i></div></div>
-            <div className="gh-float gh-float-a"><span><Palette size={19}/></span> 品牌設計</div>
-            <div className="gh-float gh-float-b"><span><Code2 size={19}/></span> 網站開發</div>
-            <div className="gh-float gh-float-c"><span><Camera size={19}/></span> 攝影製作</div>
-            <div className="gh-float gh-float-d"><span><WandSparkles size={18}/></span> 更多可能</div>
-            <div className="gh-art-asterisk">✻</div>
+            <div className="gh-art-center"><div className="gh-art-inner"><span>{tx("一句話","JUST ASK")}</span><strong>{tx("找到人， 一起完成事。","FIND YOUR NEXT TEAM.")}</strong><i>✳</i></div></div>
+            <div className="gh-float gh-float-a"><span><Palette size={19}/></span> {tx("找合作","Collaborate")}</div>
+            <div className="gh-float gh-float-b"><span><Code2 size={19}/></span> {tx("找任務","Find tasks")}</div>
+            <div className="gh-float gh-float-c"><span><MessageCircle size={19}/></span> {tx("論壇交流","Community")}</div>
+            <div className="gh-float gh-float-d"><span><WandSparkles size={18}/></span> {tx("找資源","Resources")}</div>
           </div>
         </div>
-        <div className="gh-container gh-hero-bottom"><span><ShieldCheck size={16}/> 真實服務・透明詢價</span><span>MADE FOR PEOPLE, READY FOR AGENTS <ArrowUpRight size={14}/></span></div>
+        <div className="gh-container gh-hero-bottom"><span><ShieldCheck size={16}/>{tx("真實資源・明確同意後才公開","Real information, publish by consent")}</span><span>FIND · CONNECT · CREATE</span></div>
       </section>
 
-      <section className="gh-one-line gh-container" aria-labelledby="gh-one-line-title">
-        <div className="gh-one-line-panel">
-          <div className="gh-one-line-icon"><MessageCircle size={27}/></div>
-          <div className="gh-one-line-content">
-            <h2 id="gh-one-line-title">{tx("一句話，告訴公會你想找什麼。","Tell us what you need in one sentence.")}</h2>
-            <p>{tx("例如：我想找人一起創業、找台北的創業活動、找一起爬山的朋友。","For example: Find a startup partner, meetups in Taipei, or hiking friends.")}</p>
-            <form className="gh-one-line-form" onSubmit={runOneLine}>
-              <input value={oneLine} onChange={e=>setOneLine(e.target.value)} maxLength={300} required
-                aria-label={tx("一句話說出你的需求","Describe your request")}
-                placeholder={tx("我想找……","I'm looking for…")}/>
-              <button type="submit">{tx("幫我找","Find a way")} <ArrowRight size={18}/></button>
-            </form>
-            <small>{tx("先幫你找到適合的入口，不會自動公開你的話。","Find the right place first. Your message is not published automatically.")}</small>
-          </div>
-        </div>
-      </section>
       <section className="gh-needs gh-container" aria-labelledby="gh-needs-title">
         <div className="gh-section-heading">
           <div><span className="gh-kicker">{tx('你想找什麼？','WHAT DO YOU NEED?')}</span>
@@ -441,7 +434,7 @@ export default function GuildHome() {
             <span className="gh-openwork-label">{tx("社群交流 · 一起學習","Community · Learn together")}</span>
             <h3>{tx("交流與求助社群","Community discussions")}</h3>
             <p>{tx("可以提問、分享作品、認識有相同興趣的人。","Ask questions, share projects and meet others who share your interests.")}</p>
-            <a href="https://forum.928174.xyz/" rel="noopener noreferrer">{tx("前往社群交流","Visit community")} <ArrowUpRight size={16}/></a>
+            <a href="/community">{tx("前往社群交流","Visit community")} <ArrowUpRight size={16}/></a>
           </article>
         </div>
         <p className="gh-openworks-note">{tx("這些是公開學習資源，與會員刊登的工作、評價或服務保證不同。","These are public learning resources, not verified jobs, member reviews or service guarantees.")}</p>

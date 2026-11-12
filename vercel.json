@@ -9,6 +9,14 @@
       "destination": "/index.html"
     },
     {
+      "source": "/community",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/community/topic/:tid",
+      "destination": "/index.html"
+    },
+    {
       "source": "/adventurers/:id",
       "destination": "/index.html"
     }
