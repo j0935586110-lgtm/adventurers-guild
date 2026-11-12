@@ -21,6 +21,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/connect",
+      "destination": "/index.html"
+    },
+    {
       "source": "/community/topic/:tid",
       "destination": "/index.html"
     },

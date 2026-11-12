@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {ArrowRight, Bot, BriefcaseBusiness, CheckCircle2, ChevronDown, Compass, Github, LogIn, Menu, MessageCircle, Send, ShieldCheck, Sparkles, UserRound, X} from 'lucide-react';
+import {ArrowRight, Bot, BriefcaseBusiness, CheckCircle2, ChevronDown, Compass, Github, LogIn, Menu, MessageCircle, Send, ShieldCheck, Sparkles, UserRound, X, Swords, ScrollText, ChevronRight} from 'lucide-react';
 import {useGuild} from './GuildProvider';
 import {AuthLanguageContext, GuildAuthDialog} from './GuildAuthDialog';
 import {listPublishedNeeds, createNeedDraft, publishNeed, replyToNeed, type GuildNeed, type NeedKind} from '../lib/needs';
@@ -35,6 +35,24 @@ export default function GuildChatHome(){
   const [lang,setLang]=useState<Lang>(()=>new URLSearchParams(location.search).get('lang')==='en'?'en':'zh');
   const [auth,setAuth]=useState(()=>new URLSearchParams(location.search).get('auth')==='1');
   const [menu,setMenu]=useState(false);
+  const [boardOpen,setBoardOpen]=useState(false);
+  const [boardTasks,setBoardTasks]=useState<Quest[]>([]);
+  const [boardCount,setBoardCount]=useState(0);
+  const [boardBusy,setBoardBusy]=useState(true);
+  const [boardError,setBoardError]=useState('');
+  useEffect(()=>{
+    let active=true;
+    void supabase.from('quests').select('id,title,reward_g_coin,status,created_at',{count:'exact'})
+      .eq('status','posted').order('created_at',{ascending:false}).limit(3)
+      .then(({data,error,count})=>{
+        if(!active)return;
+        if(error){setBoardError(error.message);setBoardTasks([]);}
+        else {setBoardError('');setBoardTasks((data||[]) as Quest[]);setBoardCount(count??(data||[]).length);}
+        setBoardBusy(false);
+      });
+    return ()=>{active=false;};
+  },[]);
+
   const [input,setInput]=useState('');
   const [busy,setBusy]=useState(false);
   const [thread,setThread]=useState<Entry[]>([]);
@@ -141,8 +159,9 @@ export default function GuildChatHome(){
   const starter=['我想找一起創業的夥伴','我想找工作','我想看看有報酬的任務'];
   return <AuthLanguageContext.Provider value={lang}><div className="ch-site">
     <header className="ch-header">
-      <a className="ch-brand" href="/" aria-label={t('冒險者公會首頁','Guild home')}><span className="ch-mark">G</span><span>{t('冒險者公會','Adventurers Guild')}</span></a>
+      <a className="ch-brand" href="/" aria-label={t('冒險者公會首頁','Guild home')}><span className="ch-mark"><Swords size={22} strokeWidth={1.9}/></span><span>{t('冒險者公會','Adventurers Guild')}</span></a>
       <nav className={'ch-nav '+(menu?'ch-nav-open':'')} aria-label={t('網站選單','Site navigation')}>
+        <button type="button" className="ch-nav-board" onClick={()=>{setBoardOpen(!boardOpen);setMenu(false)}}>{t('任務布告欄','Quest board')}</button>
         <a href="/community">{t('論壇','Forum')}</a><a href="/me">{t('我的任務','My quests')}</a><a href="/ai">AI / MCP</a>
       </nav>
       <div className="ch-actions">
@@ -152,12 +171,36 @@ export default function GuildChatHome(){
         <button className="ch-menu" type="button" aria-expanded={menu} aria-label={t('開啟選單','Open menu')} onClick={()=>setMenu(!menu)}>{menu?<X size={22}/>:<Menu size={22}/>}</button>
       </div>
     </header>
+    <section className="ch-guild-gate" aria-label={t('冒險者公會大廳','Adventurers Guild hall')}>
+      <div className="ch-gate-medallion" aria-hidden="true"><Swords size={28} strokeWidth={1.7}/></div>
+      <div className="ch-gate-text">
+        <small>THE ADVENTURERS GUILD</small>
+        <strong>{t('冒險者公會','Adventurers Guild')}</strong>
+        <span>{t('帶著目標而來，找到並肩完成任務的夥伴。','Come with a quest. Find allies to complete it.')}</span>
+      </div>
+      <div className="ch-gate-actions">
+        <button type="button" className="ch-board-button" onClick={()=>setBoardOpen(!boardOpen)} aria-expanded={boardOpen} aria-controls="guild-quest-board">
+          <ScrollText size={18}/>
+          <span>{t('任務布告欄','Quest board')}</span>
+          <small>{boardBusy?t('載入中','Loading'):boardError?t('暫不可用','Unavailable'):t(boardCount+' 件招募中',boardCount+' open')}</small>
+          <ChevronDown size={16}/>
+        </button>
+      </div>
+    </section>
+    {boardOpen && <section className="ch-board-panel" id="guild-quest-board" aria-label={t('公開任務布告','Open quest postings')}>
+      <div className="ch-board-head"><strong>{t('公會任務布告','Guild quest postings')}</strong><a href="/me?tab=explore">{t('查看全部','See all')} <ArrowRight size={15}/></a></div>
+      {boardBusy ? <p>{t('正在查詢真正公開的任務…','Loading published quests…')}</p>
+        : boardError ? <p role="alert">{t('任務資料暫時無法讀取。','Quest data is temporarily unavailable.')}</p>
+        : boardTasks.length ? <div className="ch-board-items">{boardTasks.map(q=><a key={q.id} href="/me?tab=explore" className="ch-board-item"><ScrollText size={17}/><span>{q.title}</span><small>{Number(q.reward_g_coin).toLocaleString()} G</small><ChevronRight size={16}/></a>)}</div>
+        : <p>{t('目前尚無公開招募任務。布告欄會在新任務發布後更新。','No public quests are open yet. New postings will appear here.')}</p>}
+    </section>}
     <main className={'ch-main '+(thread.length?'ch-in-conversation':'')}>
       <div className="ch-center">
         {!thread.length&&<section className="ch-greeting">
           <div className="ch-avatar"><Sparkles size={23}/></div>
           <h1>{t('你想找什麼？','What are you looking for?')}</h1>
           <p>{t('找人、找工作、找任務、找活動。一句話告訴公會。','Find people, work, quests and events. Start with one sentence.')}</p>
+          <a className="ch-greeting-agent" href="/connect"><Bot size={15}/>{t('想用自己的 GPT、Gemini、Claude 或 OpenCode？','Using your own GPT, Gemini, Claude or OpenCode?')} <ArrowRight size={14}/></a>
         </section>}
         {!!thread.length&&<section className="ch-thread" role="log" aria-label={t('公會搜尋對話','Guild search conversation')}>
           {thread.map(entry=><article key={entry.id} className={'ch-message '+(entry.role==='user'?'ch-me':'ch-guild')}>

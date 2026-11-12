@@ -91,3 +91,73 @@
 }
 @media(max-width:355px){.ch-brand{font-size:12px}.ch-mark{height:29px;width:29px}.ch-login{font-size:10px!important;padding:6px 7px}.ch-header{padding:0 9px;gap:3px}.ch-actions{gap:3px}}
 .ch-site .gh-overlay{color:#1d3b38;--green:#174b46;--ink:#1d3b38}
+
+/* Fantasy guild identity: parchment noticeboard above, conversation below. */
+.ch-header{background:#fffdfa;border-bottom-color:#d5d4c8}
+.ch-brand{font-family:"Noto Serif TC","Noto Serif",Georgia,serif;letter-spacing:.07em}
+.ch-mark{background:linear-gradient(145deg,#254b3c,#153b32);border:2px solid #d8bc7d;box-shadow:0 2px 0 #b89656,0 2px 11px #1e594014}
+.ch-nav-board{background:transparent;border:0;color:#496f62;text-decoration:none;font-weight:700;font-size:13px;white-space:nowrap;cursor:pointer;padding:0}
+.ch-nav-board:hover{color:var(--green)}
+.ch-guild-gate{position:relative;display:flex;align-items:center;gap:18px;padding:20px clamp(20px,4vw,48px);min-height:139px;background:
+  radial-gradient(circle at 95% 10%,#e5d2a65c 0,transparent 27%),
+  repeating-linear-gradient(90deg,transparent 0,transparent 80px,#99723b07 81px),
+  linear-gradient(115deg,#f6f0de,#ebead9 64%,#e2ecdb);
+  border-bottom:2px solid #d9c391;box-shadow:inset 0 2px #fffef3}
+.ch-guild-gate::before,.ch-guild-gate::after{content:"✦";position:absolute;color:#b89e6b;font:24px Georgia,serif;opacity:.42;pointer-events:none}
+.ch-guild-gate::before{left:9px;top:10px}.ch-guild-gate::after{right:9px;bottom:10px}
+.ch-gate-medallion{width:73px;height:73px;display:grid;place-items:center;flex:none;border:2px solid #ad8e58;background:radial-gradient(circle,#f9f0d7 0 55%,#d6c094 56% 60%,#f4ecd5 61%);border-radius:50%;color:#6e582c;box-shadow:inset 0 0 0 5px #eee0bd,0 6px 14px #3c48340b}
+.ch-gate-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ch-gate-text small{font-size:9px;letter-spacing:.2em;font-weight:900;color:#94774a;white-space:nowrap}
+.ch-gate-text strong{font-family:"Noto Serif TC","Noto Serif",Georgia,serif;font-size:clamp(23px,3vw,35px);line-height:1.3;color:#355444;letter-spacing:.13em;text-shadow:0 1px #fff9e8}
+.ch-gate-text span{font-size:12px;color:#607661;line-height:1.6}
+.ch-gate-actions{flex:none;display:flex;align-items:center;gap:10px}
+.ch-board-button{cursor:pointer;background:#fdf9ed;border:1px solid #c7ab75;border-radius:11px;box-shadow:0 3px 0 #cfb985;padding:11px 13px;min-width:186px;color:#524826;display:grid;grid-template-columns:auto 1fr auto;grid-template-rows:auto auto;align-items:center;column-gap:9px;text-align:left;font-weight:850}
+.ch-board-button>svg:first-child{grid-row:span 2;color:#7d6e38}
+.ch-board-button span{font-size:13px;white-space:nowrap}
+.ch-board-button small{font-size:11px;color:#8b7e59;grid-column:2;font-weight:650}
+.ch-board-button>svg:last-child{grid-row:span 2;grid-column:3;color:#81653f}
+.ch-board-button:hover,.ch-board-button[aria-expanded=true]{background:#f8efcf;border-color:#ad8741}
+.ch-board-panel{max-width:1100px;width:calc(100% - 40px);margin:12px auto 0;border:1px solid #d7c49c;box-shadow:0 9px 25px #856b3321;border-radius:12px;padding:16px;background:repeating-linear-gradient(0deg,#f6edd7 0,#f6edd7 35px,#f2e6cc 36px)}
+.ch-board-head{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px dashed #bfa477;padding:0 3px 10px}
+.ch-board-head strong{font-family:"Noto Serif TC",Georgia,serif;color:#5b572e;font-size:18px;letter-spacing:.06em}
+.ch-board-head a{display:flex;align-items:center;gap:5px;text-decoration:none;font-weight:800;font-size:12px;color:#376d52}
+.ch-board-panel>p{color:#7e744d;font-size:12px;line-height:1.8}
+.ch-board-items{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.ch-board-item{display:flex;align-items:center;gap:10px;background:#fff9e8be;border:1px solid #e6d8b7;border-radius:7px;padding:12px 13px;font-size:13px;color:#4d583d;text-decoration:none}
+.ch-board-item:hover{background:#fffbf0}
+.ch-board-item>svg:first-child{flex:none;color:#8d784b}
+.ch-board-item span{flex:1;min-width:0;overflow-wrap:anywhere;font-weight:750}
+.ch-board-item small{color:#795f31;font-weight:800;white-space:nowrap}
+.ch-board-item>svg:last-child{flex:none;color:#867047}
+.ch-greeting-agent{display:inline-flex;align-items:center;justify-content:center;gap:7px;color:#44735d;text-decoration:none;font-size:12px;font-weight:800;margin-top:15px;border-bottom:1px dashed #b0c9b3;padding-bottom:2px}
+.ch-greeting-agent:hover{color:#194f3d}
+.ch-main{padding-top:18px}
+@media(max-width:800px){
+ .ch-nav-open .ch-nav-board{padding:12px 5px;text-align:left;font-size:14px}
+ .ch-guild-gate{min-height:122px;padding:15px 20px;gap:13px}
+ .ch-gate-medallion{width:57px;height:57px}
+ .ch-gate-text strong{font-size:26px}
+ .ch-gate-text span{font-size:11px}
+}
+@media(max-width:560px){
+ .ch-guild-gate{min-height:105px;padding:13px 13px;gap:10px}
+ .ch-gate-medallion{width:42px;height:42px;border-width:1px;box-shadow:inset 0 0 0 3px #eee0bd}
+ .ch-gate-medallion svg{width:22px;height:22px}
+ .ch-gate-text small{font-size:7px;letter-spacing:.09em}
+ .ch-gate-text strong{font-size:19px;letter-spacing:.07em}
+ .ch-gate-text span{font-size:10px;max-width:200px;line-height:1.4}
+ .ch-board-button{min-width:0;grid-template-columns:1fr auto;gap:2px 5px;padding:8px 9px}
+ .ch-board-button>svg:first-child{display:none}
+ .ch-board-button span{font-size:11px}
+ .ch-board-button small{font-size:9px;grid-column:1}
+ .ch-board-button>svg:last-child{grid-column:2;grid-row:1/3;width:12px}
+ .ch-guild-gate::before,.ch-guild-gate::after{display:none}
+ .ch-main{padding-top:14px}
+ .ch-board-panel{width:calc(100% - 22px)}
+ .ch-greeting-agent{font-size:11px;line-height:1.5}
+}
+@media(max-width:370px){
+ .ch-gate-medallion{display:none}
+ .ch-gate-text strong{font-size:18px}
+ .ch-board-button{padding:7px 6px}
+}

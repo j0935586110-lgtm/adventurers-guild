@@ -1,0 +1,33 @@
+/* Onboard external AI clients using the existing Guild identity and MCP services. */
+.ca-site{min-height:100vh;background:#fafbf8;color:#254333;font:15px/1.75 "DM Sans","Noto Sans TC",system-ui,sans-serif}.ca-site *{box-sizing:border-box}
+.ca-header{height:70px;padding:0 clamp(17px,4vw,45px);border-bottom:1px solid #e0e7dd;background:white;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.ca-brand{display:flex;align-items:center;gap:9px;font:900 16px/1.4 "Noto Serif TC",Georgia,serif;color:#174b46;text-decoration:none;white-space:nowrap}
+.ca-brand span{width:37px;height:37px;display:grid;place-items:center;color:#e9d7a7;background:#245241;border:2px solid #c5a96f;border-radius:11px 3px 11px 3px}
+.ca-header nav{display:flex;align-items:center;gap:18px;flex-wrap:wrap}.ca-header nav a,.ca-header nav button{color:#476856;font-size:12px;text-decoration:none;font-weight:800;border:0;background:none;cursor:pointer}
+.ca-intro{padding:37px max(18px,calc((100vw - 1000px)/2)) 31px;background:linear-gradient(110deg,#f2ead6,#e9efe0);border-bottom:2px solid #dcc593}
+.ca-overline{color:#937646;font-size:11px;font-weight:900;display:flex;align-items:center;gap:8px;letter-spacing:.16em}
+.ca-intro h1{font:900 clamp(28px,4vw,43px)/1.4 "Noto Serif TC",Georgia,serif;color:#315344;margin:10px 0}
+.ca-intro p{color:#627565;font-size:13px;max-width:790px;line-height:1.9;margin:0}
+.ca-content{max-width:1000px;margin:auto;padding:25px 20px 60px;display:flex;flex-direction:column;gap:20px}
+.ca-connect-box,.ca-setup,.ca-bottom-note{background:white;border:1px solid #dbe6da;border-radius:18px;padding:23px;box-shadow:0 6px 28px #2b5f4b08}
+.ca-label{color:#315d49;font-size:14px;font-weight:900;margin-bottom:12px}
+.ca-copyline{display:flex;align-items:center;gap:7px;background:#f4f7f1;border:1px solid #dee9db;padding:8px 9px 8px 14px;border-radius:10px}
+.ca-copyline code{min-width:0;overflow-wrap:anywhere;flex:1;font-size:13px;color:#315746}
+.ca-copyline button,.ca-prompt-copy,.ca-setup-actions button{cursor:pointer;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:7px;border:0;border-radius:8px;font-size:12px;font-weight:850;padding:10px 12px;color:white;background:#174b46}
+.ca-connect-box>p,.ca-platform-detail>p,.ca-bottom-note p{color:#647c6a;font-size:12px;line-height:1.8;margin:12px 0}
+.ca-prompt-copy{margin-top:11px;background:#e8f2e7;border:1px solid #bfdbc8;color:#2d694d}
+.ca-section-title{display:flex;align-items:center;gap:9px;color:#315b49}
+.ca-section-title h2{font-size:21px;margin:0}
+.ca-platforms{display:flex;flex-wrap:wrap;gap:9px;margin:16px 0}
+.ca-platforms button{border:1px solid #d0dfd2;border-radius:10px;padding:9px 17px;color:#4c7060;background:white;font-size:13px;font-weight:800;cursor:pointer}
+.ca-platforms button.selected{background:#174b46;color:#fff;border-color:#174b46}
+.ca-scope{display:flex;gap:10px;flex-wrap:wrap;border-bottom:1px solid #e8eee7;padding:0 0 16px}
+.ca-scope button{display:flex;align-items:center;gap:8px;cursor:pointer;padding:9px 13px;border:1px solid #d2ded4;border-radius:9px;font-size:12px;font-weight:800;color:#52715e;background:#f8fbf8}
+.ca-scope button.selected{background:#e4f0e6;border-color:#8dad9c;color:#1d6448}
+.ca-platform-detail h3{font-size:18px;margin:21px 0 2px;color:#214c3b}.ca-connection-status{font-size:12px;color:#4f7b5d;background:#eef5ed;padding:11px 13px;border-radius:9px;margin-bottom:18px}
+.ca-platform-detail label{color:#517563;font-size:12px;font-weight:800;display:block;margin-bottom:8px}
+.ca-platform-detail pre{overflow:auto;max-width:100%;padding:15px;background:#163c33;color:#f4f8ed;border-radius:11px;font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere}
+.ca-setup-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.ca-setup-actions a{font-size:12px;font-weight:800;color:#356e56;text-decoration:none;display:flex;align-items:center;gap:6px}
+.ca-bottom-note{display:flex;align-items:start;gap:15px;background:#f1f6ef}.ca-bottom-note svg{flex:none;color:#347451;margin-top:3px}.ca-bottom-note strong{font-size:14px;color:#275543}.ca-bottom-note small{font-size:11px;color:#708975}
+@media(max-width:680px){.ca-header{padding:0 12px;height:65px;gap:6px}.ca-brand{font-size:12px;gap:5px}.ca-brand span{width:32px;height:32px}.ca-header nav{gap:8px}.ca-header nav a{display:none}.ca-header nav button{font-size:11px}.ca-content{padding:18px 13px 40px}.ca-intro{padding:26px 18px}.ca-intro h1{font-size:30px}.ca-connect-box,.ca-setup,.ca-bottom-note{padding:17px;border-radius:12px}.ca-platforms{gap:6px}.ca-platforms button{padding:8px 11px;font-size:12px}.ca-copyline code{font-size:11px}.ca-copyline button{padding:9px 9px}.ca-scope button{font-size:11px}.ca-setup-actions{align-items:flex-start}}
