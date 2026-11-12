@@ -54,7 +54,7 @@ export default function GuildMemberHub() {
   const [githubError, setGithubError] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-  const [fetching, setFetching] = useState(false);
+  const [fetching, setFetching] = useState(true);
   const text = (zh: string, english: string) => en ? english : zh;
 
   useEffect(() => {
@@ -220,6 +220,12 @@ export default function GuildMemberHub() {
   if (!target || !validId(target)) return <main className="gm-root"><div className="gm-shell gm-empty">
     <UserRound size={42}/><h1>{text('加入公會，建立冒險者檔案','Join to create your adventurer profile')}</h1>
     <p>{text('使用首頁的登入／註冊功能即可開始。','Use the sign-in or sign-up option on the home page.')}</p><a className="gm-btn" href="/">{text('回到冒險者公會','Go to the guild')}</a></div></main>;
+
+  if (!fetching && !identity) return <main className="gm-root"><div className="gm-shell gm-empty">
+    <UserRound size={42}/><h1>{text('找不到這位冒險者','Adventurer not found')}</h1>
+    <p>{error || text('此會員資料不存在，或暫時無法公開讀取。','No public member profile is available.')}</p>
+    <a className="gm-btn" href="/">{text('回到冒險者公會','Go to the guild')}</a>
+  </div></main>;
 
   return <main className="gm-root">
     <header className="gm-topbar"><div className="gm-shell gm-header">
