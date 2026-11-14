@@ -22,3 +22,8 @@
 真實會員自行登入 → 確認服務文案、價格、刊登 → 公開 MCP 查到該服務 → 另一個真人回覆／詢價 → 用 J1 完成一件可交付的真實任務 → 收款證據。所有對外寫入須本人確認。
 
 來源條款：https://himalayas.app/docs/remote-jobs-api 與 https://himalayas.app/mcp。API 資料每日更新；原始應徵連結與來源標示不得移除。僅個人網站展示，不得重新配發給其他求職聚合平台。
+
+## 台灣本地工作來源增量（2026-11-14）
+- 政府資料開放平臺 `https://data.gov.tw/dataset/44062`，授權「政府資料開放授權條款-第1版」，官方 API `https://free.taiwanjobs.gov.tw/webservice_taipei/Webservice.ashx` 實測可用，`zipno` 三碼郵遞區號、`count=200`，回傳 CDATA；官方回傳的元素名稱帶全形括號，不是標準 XML tag，因此僅識別政府文件列出的固定欄位 CDATA，不以 HTML parser 爬取其他站。/api/taiwan-opportunities 支援 title/domain/expired 受限驗證與來源標示。提供常見郵區 104台北中山、220新北板橋、407台中西屯、807高雄三民，亦可輸入任意合法三碼郵遞區號。查詢僅返回該郵區前 200 筆中的符合結果，不得聲稱全市、全台完整涵蓋，結果可能為零；有效期限仍須至職缺原站核對。
+- 小雞上工 `https://www.chickpt.com.tw/`、接案任務 `/cases`、出任務 `https://www.tasker.com.tw/cases`、PRO360、104、1111、518熊班：只提供官方入口，不抓取、不複製職缺、不自動登入／投遞。小雞上工官方服務條款第 21 條明確限制未授權自動搜尋／擷取；104 的 Job API 公開資訊為企業刊登資料寫入，不是我們可讀取所有職缺的公開資料 API。日後要整批資料須先取得合作／API 授權。
+- 後續驗收：固定 4 郵區至少各一筆真實官方職缺，台灣 API 異常時不假造數據；新頁面 390px 無橫向溢出；原 `/earn`、`/connect`、Himalayas 可用；原正式 main 不動。
