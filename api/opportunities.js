@@ -13,7 +13,7 @@ export function mapJob(job, now = Date.now()) {
   if (regions.length && !regions.includes('Taiwan') && !regions.includes('Worldwide')) return null;
   return {
     title: clean(job?.title), company: clean(job?.companyName), source: 'Himalayas', sourceUrl, applicationLink,
-    regions: regions.slice(0, 6).map(x=>clean(x,60)),
+    regions: regions.includes('Taiwan') ? ['Taiwan'] : (regions.includes('Worldwide') ? ['Worldwide'] : []),
     employmentType: clean(job?.employmentType, 50),
     publishedAt: Number(job?.pubDate) || null,
     expiresAt: Number(job?.expiryDate) || null,
@@ -22,6 +22,19 @@ export function mapJob(job, now = Date.now()) {
     salaryCurrency: clean(job?.salaryCurrency, 6),
     salaryPeriod: clean(job?.salaryPeriod, 20),
   };
+}
+function relevance(job, keyword) {
+  const title = (job.title || '').toLowerCase();
+  const patterns = {
+    'ai agent': /\b(ai|agent|machine learning|llm|automation)\b/,
+    'automation': /automat|workflow|integration|agent/i,
+    'excel': /excel|spreadsheet|data analyst|financial analyst/i,
+    'remote it': /desktop|helpdesk|support|endpoint|system|it engineer|infrastructure/i,
+    'mcp': /\bmcp\b|agent|integration|ai/i,
+    'software engineer': /engineer|developer|software/i,
+    'customer support': /customer|support|success/i,
+  };
+  return (patterns[keyword]?.test(title) ? 1 : 0);
 }
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -36,9 +49,9 @@ export default async function handler(req, res) {
     const response = await fetch(url, {headers:{'Accept':'application/json'}, signal:AbortSignal.timeout(9000)});
     if (!response.ok) return res.status(502).json({error:'upstream_unavailable',upstreamStatus:response.status});
     const data = await response.json();
-    const jobs = (Array.isArray(data.jobs) ? data.jobs : []).map(x=>mapJob(x)).filter(Boolean).slice(0,12);
+    const jobs = (Array.isArray(data.jobs) ? data.jobs : []).map(x=>mapJob(x)).filter(Boolean).sort((a,b)=>relevance(b,q)-relevance(a,q)).slice(0,12);
     res.setHeader('Cache-Control','public, s-maxage=3600, stale-while-revalidate=86400');
-    return res.status(200).json({source:'Himalayas',sourceUrl:'https://himalayas.app/',keyword:q,country:'TW',type:'employment_not_freelance',updatedAt:data.updatedAt||null,jobs});
+    return res.status(200).json({source:'Himalayas',sourceUrl:'https://himalayas.app/',keyword:q,country:'TW',type:'employment_not_freelance',sortNote:'job-title-keyword-first-not-qualification',updatedAt:data.updatedAt||null,jobs});
   } catch {
     return res.status(502).json({error:'upstream_unavailable'});
   }

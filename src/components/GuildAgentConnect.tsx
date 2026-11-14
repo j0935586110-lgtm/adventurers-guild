@@ -5,6 +5,7 @@ import './guild-agent-connect.css';
 
 type Platform='chatgpt'|'claude'|'gemini'|'opencode';
 const memberUrl='https://wrwsjlydozfzejixofwm.supabase.co/functions/v1/guild-mcp-friend-beta';
+const himalayasUrl='https://mcp.himalayas.app/mcp';
 const info:Record<Platform,{title:string,zh:string,en:string,doc:string}>={
   chatgpt:{title:'ChatGPT',zh:'支援 MCP App 的工作空間：到 Apps 建立／連接自訂 MCP App，填入公會 MCP 網址並確認權限。一般 ChatGPT 對話貼網站連結不會自動安裝工具。',en:'In supported workspaces, create or connect a custom MCP App under Apps and review permissions. A plain website link cannot install tools in a standard conversation.',doc:'https://help.openai.com/en/articles/12584461-developer-mode-and-full-mcp-connectors-in-chatgpt'},
   claude:{title:'Claude',zh:'到「Customize／自訂 → Connectors／連接器 → Add custom connector」，輸入公會 MCP 網址；如有需要再登入授權。',en:'Customize → Connectors → Add custom connector. Paste the Guild MCP URL. Grant access when requested.',doc:'https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp'},
@@ -20,13 +21,13 @@ export default function GuildAgentConnect(){
  const tx=(zh:string,english:string)=>en?english:zh;
  const home=location.origin+'/';
  const mcp=scope==='public'?location.origin+'/mcp':memberUrl;
- const config=platform==='gemini'?JSON.stringify({mcpServers:{'adventurers-guild':{httpUrl:mcp}}},null,2)
- :platform==='opencode'?JSON.stringify({$schema:'https://opencode.ai/config.json',mcp:{'adventurers-guild':{type:'remote',url:mcp,enabled:true}}},null,2)
+ const config=platform==='gemini'?JSON.stringify({mcpServers:{'adventurers-guild':{httpUrl:mcp},'himalayas-remote-jobs':{httpUrl:himalayasUrl}}},null,2)
+ :platform==='opencode'?JSON.stringify({$schema:'https://opencode.ai/config.json',mcp:{'adventurers-guild':{type:'remote',url:mcp,enabled:true},'himalayas-remote-jobs':{type:'remote',url:himalayasUrl,enabled:true}}},null,2)
  :mcp;
- const invitation=tx('請先閱讀 '+home+'llms.txt，了解冒險者公會可以提供的公開 MCP 工具。如果你支援遠端 MCP，請幫我設定 '+home+'mcp 並告訴我如何授權；如不支援，不要假裝已經連接。請先搜尋公會目前公開的任務。','Read '+home+'llms.txt for Adventurers Guild MCP tools. If you support remote MCP, help me connect '+home+'mcp and explain approval. If you do not, do not claim connected access. Start by searching real published quests.');
+ const invitation=tx('請先閱讀 '+home+'llms.txt，了解冒險者公會可以提供的公開 MCP 工具。如果你支援遠端 MCP，請幫我設定 '+home+'mcp 並告訴我如何授權；如不支援，不要假裝已經連接。請搜尋公會公開任務，並使用 Himalayas 官方 MCP '+himalayasUrl+' 搜尋可以在台灣應徵的遠端工作。刊登我的技能服務前必須先向我確認。','Read '+home+'llms.txt for Adventurers Guild MCP tools. If you support remote MCP, help me connect '+home+'mcp and explain approval. If you do not, do not claim connected access. Search real Guild quests, then use official Himalayas MCP '+himalayasUrl+' to find remote jobs eligible in Taiwan. Confirm with me before publicly publishing my services.');
  async function copy(text:string,label:string){try{await navigator.clipboard.writeText(text);setCopied(label);}catch{setCopied('');}}
  return <main className="ca-site">
-  <header className="ca-header"><a href="/" className="ca-brand"><span><Swords size={22}/></span>{tx('冒險者公會','Adventurers Guild')}</a><nav><a href="/">{tx('首頁','Home')}</a><a href="/community">{tx('論壇','Forum')}</a><a href="/me">{tx('我的任務','My quests')}</a><button type="button" onClick={()=>setEn(!en)}>{en?'中文':'EN'}</button></nav></header>
+  <header className="ca-header"><a href="/" className="ca-brand"><span><Swords size={22}/></span>{tx('冒險者公會','Adventurers Guild')}</a><nav><a href="/">{tx('首頁','Home')}</a><a href="/earn">{tx('我要賺錢','Earn')}</a><a href="/community">{tx('論壇','Forum')}</a><a href="/me">{tx('我的任務','My quests')}</a><button type="button" onClick={()=>setEn(!en)}>{en?'中文':'EN'}</button></nav></header>
   <section className="ca-intro">
    <div className="ca-overline"><Bot size={18}/> BRING YOUR OWN AI</div>
    <h1>{tx('帶你的 AI，加入冒險者公會。','Bring your AI to the Guild.')}</h1>
@@ -55,6 +56,12 @@ export default function GuildAgentConnect(){
      <pre><code>{config}</code></pre>
      <div className="ca-setup-actions"><button type="button" onClick={()=>void copy(config,'config')}><Copy size={16}/>{copied==='config'?tx('已複製','Copied'):tx('複製連線設定','Copy connection settings')}</button><a href={info[platform].doc} target="_blank" rel="noopener noreferrer">{tx('官方教學','Official guide')} <ExternalLink size={14}/></a></div>
     </div>
+   </section>
+   <section className="ca-connect-box" aria-label="外部職缺 MCP">
+    <div className="ca-label">{tx('真正的遠端工作機會｜官方 MCP','Remote jobs | official MCP')}</div>
+    <p>{tx('公會 MCP 目前只搜尋公會會員資料。要讓你的 GPT、Claude 或 Gemini 查詢真實外部職缺，另外接入 Himalayas 官方 MCP；上述 Gemini／OpenCode 設定已同時包含兩個。','Guild MCP reads Guild listings only. For external remote jobs, connect the official Himalayas MCP too. Gemini/OpenCode configuration above includes both servers.')}</p>
+    <div className="ca-copyline"><code>{himalayasUrl}</code><button type="button" onClick={()=>void copy(himalayasUrl,'jobs')}><Copy size={16}/>{copied==='jobs'?tx('已複製','Copied'):tx('複製','Copy')}</button></div>
+    <p><a href="/earn">{tx('先在公會網站找工作與上架技能','Find jobs and publish skills inside the Guild')}</a> · <a href="https://himalayas.app/mcp" target="_blank" rel="noopener noreferrer">{tx('職缺來源與官方文件','Official job provider and docs')}</a></p>
    </section>
    <section className="ca-bottom-note"><ShieldCheck size={20}/><div><strong>{tx('只讓 AI 做會員同意的事情','Only authorized actions')}</strong><p>{tx('公開查詢可以直接做；刊登、回覆、付款與論壇發文必須具備相應的會員授權和使用者確認。不會提供共用管理員權杖。','Public reads are available immediately; posting, replying, payments and forum writing require appropriate user-scoped permissions and confirmation. Admin credentials are never shared.')}</p><small>{user?tx('你已登入公會，但仍需在 AI 客戶端授權。','You are signed in; your AI still requires separate authorization.'):tx('你尚未登入；可以先試公開搜尋。','You can try public MCP without signing in.')}</small></div></section>
   </div>
