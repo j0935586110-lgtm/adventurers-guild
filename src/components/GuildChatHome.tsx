@@ -76,6 +76,7 @@ export default function GuildChatHome(){
 
   async function search(request:string){
     const raw=request.trim().slice(0,300);if(!raw||busy)return;
+    if(/想賺錢|賺錢|收入|接案|找工作|求職|想上架|上架技能|上架服務|make money|find a job|freelance/i.test(raw)){location.assign('/earn?q='+encodeURIComponent(raw));return;}
     setInput('');setBusy(true);
     setThread(a=>[...a,{id:key(),role:'user',text:raw}]);
     const filter=classify(raw);const newEntry:Entry={id:key(),role:'guild',text:'',results:[],needKind:filter.kind};
@@ -157,13 +158,13 @@ export default function GuildChatHome(){
     }catch(e){setThread(a=>[...a,{id:key(),role:'guild',text:e instanceof Error?e.message:String(e),type:'error'}]);}
     finally{setReplyBusy(false);}
   }
-  const starter=['我想找一起創業的夥伴','我想找工作','我想看看有報酬的任務'];
+  const starter=['我想賺錢','我想找一起創業的夥伴','我想看看有報酬的任務'];
   return <AuthLanguageContext.Provider value={lang}><div className="ch-site">
     <header className="ch-header">
       <a className="ch-brand" href="/" aria-label={t('冒險者公會首頁','Guild home')}><span className="ch-mark"><Swords size={22} strokeWidth={1.9}/></span><span>{t('冒險者公會','Adventurers Guild')}</span></a>
       <nav className={'ch-nav '+(menu?'ch-nav-open':'')} aria-label={t('網站選單','Site navigation')}>
         <button type="button" className="ch-nav-board" onClick={()=>{setBoardOpen(!boardOpen);setMenu(false)}}>{t('任務布告欄','Quest board')}</button>
-        <a href="/community">{t('論壇','Forum')}</a><a href="/me">{t('我的任務','My quests')}</a><a href="/ai">AI / MCP</a>
+        <a href="/earn">{t('我要賺錢','Earn')}</a><a href="/community">{t('論壇','Forum')}</a><a href="/me">{t('我的任務','My quests')}</a><a href="/ai">AI / MCP</a>
       </nav>
       <div className="ch-actions">
         {!user?<button className="ch-login" type="button" onClick={()=>setAuth(true)}>{t('登入／註冊','Sign in')}</button>

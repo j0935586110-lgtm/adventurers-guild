@@ -9,6 +9,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/earn",
+      "destination": "/index.html"
+    },
+    {
       "source": "/me",
       "destination": "/index.html"
     },
