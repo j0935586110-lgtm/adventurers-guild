@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Award, Bookmark, Coins, ExternalLink, Github, HeartHandshake, LoaderCircle, MessageSquareText, RefreshCw, Save, ShieldCheck, UserRound, Wrench } from 'lucide-react';
 import { useGuild } from './GuildProvider';
+import GuildWorkDesk from './GuildWorkDesk';
+import GuildBottomNav from './GuildBottomNav';
 import { supabase } from '../lib/supabase';
 import { LEGACY_DEMO_CLIENT_ID } from '../lib/quest-visibility';
 import './guild-home.css';
@@ -12,7 +14,7 @@ type Need = { id: string; owner_id: string; title: string; kind: string; status:
 type PublicProfile = { id: string; display_name: string; avatar_url: string | null; bio: string | null; skill_tags: string[] | null; reputation_points: number };
 type Repo = { id: number; name: string; html_url: string; description: string | null; language: string | null; stargazers_count: number; fork: boolean; archived: boolean };
 type ForumStats = { username: string; url: string; topiccount: number; postcount: number; reputation: number };
-type Tab = 'quests' | 'saved' | 'works' | 'forum' | 'explore';
+type Tab = 'desk' | 'quests' | 'saved' | 'works' | 'forum' | 'explore';
 type BookmarkTarget = { type: 'quest' | 'need'; id: string };
 const emptyShowcase = (uid: string): Showcase => ({ user_id: uid, tagline: '', github_login: '', forum_username: '', featured_repositories: [] });
 const validGithub = (s: string) => s === '' || /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$/.test(s);
@@ -36,7 +38,7 @@ export default function GuildMemberHub() {
   const publicId = window.location.pathname.startsWith('/adventurers/') ? window.location.pathname.split('/')[2] : '';
   const viewingSelf = !publicId || (!!user && publicId === user.id);
   const target = publicId || user?.id || '';
-  const [tab, setTab] = useState<Tab>(()=>new URLSearchParams(window.location.search).get('tab')==='explore'?'explore':'quests');
+  const [tab, setTab] = useState<Tab>(()=>{const requested=new URLSearchParams(window.location.search).get('tab');return requested==='explore'?'explore':requested==='desk'?'desk':'quests';});
   const [identity, setIdentity] = useState<PublicProfile | null>(null);
   const [showcase, setShowcase] = useState<Showcase | null>(null);
   const [editing, setEditing] = useState(false);
@@ -261,11 +263,12 @@ export default function GuildMemberHub() {
         <button className="gm-btn" type="button" disabled={busy} onClick={()=>void saveProfile()}><Save size={17}/>{busy?text('儲存中…','Saving…'):text('儲存公開展示','Save profile')}</button>
       </section>}
       <nav className="gm-tabs" aria-label={text('會員功能','Member navigation')}>
-        {([{id:'quests',zh:'我的任務',en:'My quests'},{id:'saved',zh:'感興趣',en:'Saved'},{id:'explore',zh:'探索任務',en:'Explore'},{id:'works',zh:'作品集',en:'Projects'},{id:'forum',zh:'論壇',en:'Forum'}] as {id:Tab;zh:string;en:string}[])
+        {([{id:'desk',zh:'我的工作台',en:'My workspace'},{id:'quests',zh:'我的任務',en:'My quests'},{id:'saved',zh:'感興趣',en:'Saved'},{id:'explore',zh:'探索任務',en:'Explore'},{id:'works',zh:'作品集',en:'Projects'},{id:'forum',zh:'論壇',en:'Forum'}] as {id:Tab;zh:string;en:string}[])
           .filter(x => viewingSelf || x.id==='quests' || x.id==='works' || x.id==='forum')
           .map(x=><button key={x.id} type="button" className={tab===x.id?'gm-active':''} onClick={()=>setTab(x.id)}>{en?x.en:x.zh}</button>)}
       </nav>
       {fetching && <p className="gm-loading"><LoaderCircle size={17}/> {text('更新會員資料中…','Loading account data…')}</p>}
+      {tab==='desk' && viewingSelf && <GuildWorkDesk quests={quests} needs={needs}/> }
       {tab==='quests' && <section className="gm-content"><div className="gm-section-head"><h2>{text('我的任務與合作','Quests and collaborations')}</h2><button type="button" className="gm-mini-btn" onClick={()=>void reload()}><RefreshCw size={15}/>{text('重新整理','Refresh')}</button></div>
         {quests.length ? <div className="gm-grid">{quests.map(q=>renderQuest(q))}</div> : <p className="gm-note">{text('目前沒有可展示的任務。公開頁只顯示已驗收的任務。','No quests to show. Public profiles display verified quests only.')}</p>}
         {needs.length>0 && <><h3>{text('我發布的需求','My published requests')}</h3><div className="gm-grid">{needs.map(n=>renderNeed(n))}</div></>}
@@ -301,5 +304,6 @@ export default function GuildMemberHub() {
       </section>}
       <footer className="gm-footer"><HeartHandshake size={16}/>{text('真實任務與作品才會建立信譽；不提供每日登入 G 幣。','Only real, verified contributions build reputation; no daily G-Coin reward.')}</footer>
     </div>
+    {viewingSelf&&<GuildBottomNav active={tab==='desk'?'messages':'account'}/>}
   </main>;
 }

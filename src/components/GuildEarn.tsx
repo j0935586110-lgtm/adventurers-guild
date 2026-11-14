@@ -4,6 +4,7 @@ import {useGuild} from './GuildProvider';
 import {AuthLanguageContext, GuildAuthDialog} from './GuildAuthDialog';
 import {publishService, listMyServices, type GuildService} from '../lib/marketplace';
 import './guild-earn.css';
+import GuildBottomNav from './GuildBottomNav';
 
 type TaiwanJob = {title:string;company:string;city:string;employmentType:string;description:string;salaryType:string;minSalary:number|null;maxSalary:number|null;updatedAt:string;deadline:string;source:string;applicationLink:string};
 const districts=[['104','台北中山'],['220','新北板橋'],['407','台中西屯'],['807','高雄三民']] as const;
@@ -109,7 +110,7 @@ export default function GuildEarn(){
         {busy?<p role="status" className="earn-notice">正在查詢可由台灣申請的工作…</p>:error?<p role="alert" className="earn-error">案源暫時無法查詢（{error}），請稍後重試；不會虛構職缺。</p>:!jobs.length?<p className="earn-notice">目前這組條件沒有可顯示的工作。可以換關鍵字，或先上架自己的服務。</p>:<div className="earn-jobs">{jobs.map((job,i)=><article key={job.sourceUrl+i} className="earn-job"><div><small className="earn-source">來源：Himalayas · {job.employmentType||'類型未標明'}</small><h3>{job.title}</h3><p>{job.company}</p><small>可應徵地區：{job.regions.join('、')||'以原始職缺說明為準'}{job.minSalary!=null&&job.salaryCurrency?` · ${job.salaryCurrency} ${job.minSalary.toLocaleString()}${job.maxSalary!=null?'–'+job.maxSalary.toLocaleString():''} / ${job.salaryPeriod}`:''}</small></div><a href={job.applicationLink} target="_blank" rel="noopener noreferrer" aria-label={'到 Himalayas 查看並申請 '+job.title}>查看並申請 <ArrowUpRight size={16}/></a></article>)}</div>}
         <p className="earn-credits">職缺由 <a href="https://himalayas.app/" target="_blank" rel="noopener noreferrer">Himalayas</a> 提供（每日更新），申請按鈕保留原始連結。請自行查核工作地點、資格、費用與真實性；我們不代表雇主或招募方。</p>
       </section>
-      <section className="earn-section" aria-label="上架我的技能服務">
+      <section className="earn-section" id="publish-service" aria-label="上架我的技能服務">
         <div className="earn-section-head"><div><h2><Store size={20}/> 上架我的能力</h2><p>下方是根據目前提供的技術方向整理的<b>可修改草稿</b>，未經你確認不會公開。請刪除尚未具備或無法交付的能力。</p></div></div>
         {!user&&<p className="earn-notice">你還沒登入。可以先修改內容，發布前必須登入自己的會員帳號。</p>}
         {published&&<div role="status" className="earn-success"><CheckCircle2 size={20}/> 服務已由你的會員帳號公開發布：{published.title}（{published.id}）。可以在下方「我的服務」確認。</div>}
@@ -125,6 +126,6 @@ export default function GuildEarn(){
         {!!mine.length&&<div className="earn-mine"><h3>我的服務（{mine.length}）</h3>{mine.slice(0,8).map(m=><p key={m.id}><ShieldCheck size={15}/>{m.title} · {m.status==='published'?'已公開':'草稿'}</p>)}</div>}
       </section>
       <section className="earn-next"><BriefcaseBusiness size={21}/><div><strong>接到任務之後</strong><p>可使用既有的 GPT、Gemini、Claude、Hermes 和 J1 協助分析、實作及保留成果證據；本頁尚未提供自動投遞、代接案、代收款或 J1 自動執行。</p></div><a href="/connect">連接我的 AI <ArrowUpRight size={15}/></a></section>
-    </main>{showAuth&&<GuildAuthDialog onClose={()=>setShowAuth(false)}/>}
+    </main><GuildBottomNav/>{showAuth&&<GuildAuthDialog onClose={()=>setShowAuth(false)}/>}
   </div></AuthLanguageContext.Provider>;
 }

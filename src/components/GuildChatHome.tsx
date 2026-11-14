@@ -1,9 +1,11 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {ArrowRight, Bot, BriefcaseBusiness, CheckCircle2, ChevronDown, Compass, Github, LogIn, Menu, MessageCircle, Send, ShieldCheck, Sparkles, UserRound, X, Swords, ScrollText, ChevronRight} from 'lucide-react';
+import {ArrowRight, Bot, BriefcaseBusiness, CheckCircle2, PlusCircle, Bell, ChevronDown, Compass, Github, LogIn, Menu, MessageCircle, Send, ShieldCheck, Sparkles, UserRound, X, Swords, ScrollText, ChevronRight} from 'lucide-react';
 import {useGuild} from './GuildProvider';
 import {AuthLanguageContext, GuildAuthDialog} from './GuildAuthDialog';
 import {listPublishedNeeds, createNeedDraft, publishNeed, replyToNeed, type GuildNeed, type NeedKind} from '../lib/needs';
-import {searchServices, type GuildService} from '../lib/marketplace';
+import {searchServices, sendInquiry, type GuildService} from '../lib/marketplace';
+import GuildBulletin from './GuildBulletin';
+import GuildBottomNav from './GuildBottomNav';
 import {supabase} from '../lib/supabase';
 import {LEGACY_DEMO_CLIENT_ID} from '../lib/quest-visibility';
 import './guild-chat-home.css';
@@ -68,6 +70,11 @@ export default function GuildChatHome(){
   const [replyTo,setReplyTo]=useState<GuildNeed|null>(null);
   const [replyText,setReplyText]=useState('');
   const [replyBusy,setReplyBusy]=useState(false);
+  const [showPublishOptions,setShowPublishOptions]=useState(()=>new URLSearchParams(location.search).get('post')==='1');
+  const [inquiryService,setInquiryService]=useState<GuildService|null>(null);
+  const [inquiryText,setInquiryText]=useState('');
+  const [inquiryBusy,setInquiryBusy]=useState(false);
+  const [inquiryError,setInquiryError]=useState('');
   const scrollEnd=useRef<HTMLDivElement>(null);
   const t=(zh:string,en:string)=>lang==='en'?en:zh;
   useEffect(()=>{document.documentElement.lang=lang==='en'?'en':'zh-TW';},[lang]);
@@ -158,13 +165,36 @@ export default function GuildChatHome(){
     }catch(e){setThread(a=>[...a,{id:key(),role:'guild',text:e instanceof Error?e.message:String(e),type:'error'}]);}
     finally{setReplyBusy(false);}
   }
+  function beginNeedDraft(){
+    startDraft({id:key(),role:'guild',text:'',needKind:'cooperation'});
+    setDraftTitle('');setDraftDescription('');setDraftCity('線上服務');
+    setShowPublishOptions(false);
+    requestAnimationFrame(()=>document.getElementById('guild-private-draft')?.scrollIntoView({block:'center',behavior:'smooth'}));
+  }
+  function contactService(service:GuildService){
+    setInquiryService(service);setInquiryText('');setInquiryError('');
+    if(!user)setAuth(true);
+    requestAnimationFrame(()=>document.getElementById('guild-service-inquiry')?.scrollIntoView({block:'center',behavior:'smooth'}));
+  }
+  async function sendServiceInquiry(){
+    if(!user){setAuth(true);return;}
+    if(!inquiryService||inquiryText.trim().length<6)return;
+    if(inquiryService.owner_id===user.id){setInquiryError('不能向自己的服務送出詢價。');return;}
+    setInquiryBusy(true);setInquiryError('');
+    try{
+      await sendInquiry({serviceId:inquiryService.id,requesterId:user.id,message:inquiryText.trim().slice(0,1200)});
+      setThread(v=>[...v,{id:key(),role:'guild',text:t('詢價已送出；對方可在會員工作台查看。','Inquiry sent; the provider can see it in their workspace.'),type:'note'}]);
+      setInquiryService(null);setInquiryText('');
+    }catch(e){setInquiryError(e instanceof Error?e.message:String(e));}
+    finally{setInquiryBusy(false);}
+  }
   const starter=['我想賺錢','我想找一起創業的夥伴','我想看看有報酬的任務'];
   return <AuthLanguageContext.Provider value={lang}><div className="ch-site">
     <header className="ch-header">
       <a className="ch-brand" href="/" aria-label={t('冒險者公會首頁','Guild home')}><span className="ch-mark"><Swords size={22} strokeWidth={1.9}/></span><span>{t('冒險者公會','Adventurers Guild')}</span></a>
       <nav className={'ch-nav '+(menu?'ch-nav-open':'')} aria-label={t('網站選單','Site navigation')}>
         <button type="button" className="ch-nav-board" onClick={()=>{setBoardOpen(!boardOpen);setMenu(false)}}>{t('任務布告欄','Quest board')}</button>
-        <a href="/earn">{t('我要賺錢','Earn')}</a><a href="/community">{t('論壇','Forum')}</a><a href="/me">{t('我的任務','My quests')}</a><a href="/ai">AI / MCP</a>
+        <a href="/earn">{t('我要賺錢','Earn')}</a><a href="#guild-discovery">{t('探索','Explore')}</a><a href="/community">{t('論壇','Forum')}</a><a href="/me?tab=desk">{t('我的工作台','My workspace')}</a><a href="/ai">AI / MCP</a>
       </nav>
       <div className="ch-actions">
         {!user?<button className="ch-login" type="button" onClick={()=>setAuth(true)}>{t('登入／註冊','Sign in')}</button>
@@ -200,8 +230,8 @@ export default function GuildChatHome(){
       <div className="ch-center">
         {!thread.length&&<section className="ch-greeting">
           <div className="ch-avatar"><Sparkles size={23}/></div>
-          <h1>{t('你想找什麼？','What are you looking for?')}</h1>
-          <p>{t('找人、找工作、找任務、找活動。一句話告訴公會。','Find people, work, quests and events. Start with one sentence.')}</p>
+          <h1>{t('找人、找事、找機會。','Find people, tasks and opportunities.')}</h1>
+          <p>{t('說出你需要什麼，或你能提供什麼。','Describe what you need or what you can offer.')}</p>
           <a className="ch-greeting-agent" href="/connect"><Bot size={15}/>{t('想用自己的 GPT、Gemini、Claude 或 OpenCode？','Using your own GPT, Gemini, Claude or OpenCode?')} <ArrowRight size={14}/></a>
         </section>}
         {!!thread.length&&<section className="ch-thread" role="log" aria-label={t('公會搜尋對話','Guild search conversation')}>
@@ -223,7 +253,7 @@ export default function GuildChatHome(){
           {busy&&<div className="ch-thinking"><Sparkles size={17}/>{t('正在查詢公會公開資料…','Searching public guild records…')}</div>}
           <div ref={scrollEnd}/>
         </section>}
-        {draftFrom&&<section className="ch-draft" aria-label={t('私人草稿','Private draft')}>
+        {draftFrom&&<section className="ch-draft" id="guild-private-draft" aria-label={t('私人草稿','Private draft')}>
           <div className="ch-draft-heading"><h2>{t('需求草稿','Request draft')}</h2><button type="button" aria-label={t('關閉草稿','Close draft')} onClick={()=>{setDraftFrom(null);setDraftId(null)}}><X size={18}/></button></div>
           <p>{t('僅在你按下公開確認後，其他人才看得到。','Nobody else can see this until you explicitly publish it.')}</p>
           <label>{t('標題','Title')}<input maxLength={140} disabled={!!draftId} value={draftTitle} onChange={e=>setDraftTitle(e.target.value)}/></label>
@@ -238,16 +268,30 @@ export default function GuildChatHome(){
           <p>{replyTo.title}</p><textarea rows={3} value={replyText} maxLength={1200} onChange={e=>setReplyText(e.target.value)} placeholder={t('簡單說明你的專長與合作意願','Describe your relevant experience')}/>
           <button className="ch-submit-draft" type="button" disabled={replyBusy||replyText.trim().length<6} onClick={()=>void sendReply()}>{t('確認送出','Confirm send')}</button>
         </section>}
+        {inquiryService&&<section className="ch-draft" id="guild-service-inquiry" aria-label={t('服務詢價','Service inquiry')}>
+          <div className="ch-draft-heading"><h2>{t('聯絡服務提供者','Contact service provider')}</h2><button type="button" aria-label={t('關閉','Close')} onClick={()=>setInquiryService(null)}><X size={18}/></button></div>
+          <p>{inquiryService.title} · {inquiryService.business_name}</p>
+          <label>{t('詢價內容','Inquiry message')}<textarea rows={3} maxLength={1200} value={inquiryText} onChange={e=>setInquiryText(e.target.value)} placeholder={t('描述你需要的服務與預算（請勿留下私人聯絡資訊）','Describe your request without personal contact details')}/></label>
+          {inquiryError&&<p className="ch-error" role="alert">{inquiryError}</p>}
+          <button type="button" className="ch-submit-draft" disabled={inquiryBusy||inquiryText.trim().length<6} onClick={()=>void sendServiceInquiry()}>{inquiryBusy?t('傳送中','Sending'):t('確認送出詢價','Confirm inquiry')}</button>
+        </section>}
         <div className="ch-compose-area">
           <form className="ch-composer" onSubmit={e=>{e.preventDefault();void search(input)}}>
             <textarea aria-label={t('輸入你想找的人、事或機會','Describe what you need')} value={input} onChange={e=>setInput(e.target.value.slice(0,300))} maxLength={300} rows={2} placeholder={t('我想找……','I’m looking for…')} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();void search(input)}}}/>
             <button type="submit" aria-label={t('送出','Send')} disabled={busy||!input.trim()}><ArrowRight size={22}/></button>
           </form>
-          {!thread.length&&<div className="ch-starters">{starter.map((s,i)=><button key={s} type="button" onClick={()=>void search(s)}>{lang==='en'?['Find a cofounder','Find a job','Browse rewarded quests'][i]:s}</button>)}</div>}
-          <p className="ch-footnote">{t('目前查詢公會公開資料，不會自動公開你輸入的內容。','Searches public guild records; your message is never automatically published.')}</p>
+          {!thread.length&&<div className="ch-starters">{starter.map((s,i)=><button key={s} type="button" onClick={()=>void search(s)}>{lang==='en'?['Make money','Find a cofounder','Browse rewarded quests'][i]:s}</button>)}</div>}
+          <p className="ch-footnote">{t('輸入只用於搜尋；發布需求或服務須經你確認。','Search is private; publishing requires your confirmation.')}</p>
         </div>
+        {!thread.length&&<section id="guild-actions" className="ch-quick-actions" aria-label={t('公會主要操作','Main actions')}>
+          <a href="#guild-discovery" className="ch-quick-action"><Compass size={20}/><strong>{t('探索機會','Explore opportunities')}</strong><span>{t('查看真實需求與服務','Browse real needs and services')}</span></a>
+          <button type="button" className="ch-quick-action" aria-expanded={showPublishOptions} aria-controls="guild-publish-options" onClick={()=>setShowPublishOptions(v=>!v)}><PlusCircle size={20}/><strong>{t('發布需求／服務','Post a need / service')}</strong><span>{t('確認內容後公開','You approve before posting')}</span></button>
+        </section>}
+        {showPublishOptions&&<div className="ch-publish-options" id="guild-publish-options"><button type="button" onClick={beginNeedDraft}>{t('我要發布需求','Publish a need')} <ArrowRight size={15}/></button><a href="/earn#publish-service">{t('我要上架服務','List a service')} <ArrowRight size={15}/></a></div>}
+        <GuildBulletin onReply={need=>{setReplyTo(need);setReplyText('');if(!user)setAuth(true);requestAnimationFrame(()=>document.querySelector('.ch-draft')?.scrollIntoView({block:'center',behavior:'smooth'}));}} onInquiry={contactService} onPublish={()=>{setShowPublishOptions(true);setTimeout(()=>document.getElementById('guild-publish-options')?.scrollIntoView({block:'center',behavior:'smooth'}),0);}} isSignedIn={!!user}/>
       </div>
     </main>
+    <GuildBottomNav active="explore" onPost={()=>{setShowPublishOptions(true);setTimeout(()=>document.getElementById('guild-publish-options')?.scrollIntoView({block:'center',behavior:'smooth'}),0);}}/>
     <footer className="ch-footer"><a href="/community">{t('論壇','Community')}</a><a href="/me">{t('會員中心','My profile')}</a><a href="/ai">MCP</a><span>{t('沒有真實資料就不顯示結果','No fabricated listings')}</span></footer>
     {auth&&<GuildAuthDialog onClose={()=>setAuth(false)}/>}
   </div></AuthLanguageContext.Provider>;
