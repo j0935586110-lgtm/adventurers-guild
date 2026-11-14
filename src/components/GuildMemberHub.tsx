@@ -3,6 +3,7 @@ import { Award, Bookmark, Coins, ExternalLink, Github, HeartHandshake, LoaderCir
 import { useGuild } from './GuildProvider';
 import GuildWorkDesk from './GuildWorkDesk';
 import GuildBottomNav from './GuildBottomNav';
+import {GuildAuthDialog} from './GuildAuthDialog';
 import { supabase } from '../lib/supabase';
 import { LEGACY_DEMO_CLIENT_ID } from '../lib/quest-visibility';
 import './guild-home.css';
@@ -35,6 +36,7 @@ function getLang(): boolean {
 export default function GuildMemberHub() {
   const { user, profile, loading: authLoading, signOut } = useGuild();
   const [en, setEn] = useState(getLang);
+  const [authOpen,setAuthOpen]=useState(false);
   const publicId = window.location.pathname.startsWith('/adventurers/') ? window.location.pathname.split('/')[2] : '';
   const viewingSelf = !publicId || (!!user && publicId === user.id);
   const target = publicId || user?.id || '';
@@ -222,7 +224,12 @@ export default function GuildMemberHub() {
   if (authLoading && !publicId) return <main className="gm-root"><div className="gm-shell"><p>{text('正在讀取會員…','Loading member…')}</p></div></main>;
   if (!target || !validId(target)) return <main className="gm-root"><div className="gm-shell gm-empty">
     <UserRound size={42}/><h1>{text('加入公會，建立冒險者檔案','Join to create your adventurer profile')}</h1>
-    <p>{text('使用首頁的登入／註冊功能即可開始。','Use the sign-in or sign-up option on the home page.')}</p><a className="gm-btn" href="/">{text('回到冒險者公會','Go to the guild')}</a></div></main>;
+    <p>{text('登入後即可管理你發布的需求、合作回覆與詢價，不必先選擇個人或企業身分。','Sign in to manage your own needs, replies and inquiries. No account type required.')}</p>
+    <button type="button" className="gm-btn" onClick={()=>setAuthOpen(true)}>{text('登入／註冊','Sign in / Sign up')}</button>
+    <a className="gm-link" href="/">{text('先探索公開機會','Explore public opportunities')}</a></div>
+    <GuildBottomNav active={window.location.search.includes('tab=desk')?'messages':'account'}/>
+    {authOpen&&<GuildAuthDialog onClose={()=>setAuthOpen(false)}/>}
+  </main>;
 
   if (!fetching && !identity) return <main className="gm-root"><div className="gm-shell gm-empty">
     <UserRound size={42}/><h1>{text('找不到這位冒險者','Adventurer not found')}</h1>

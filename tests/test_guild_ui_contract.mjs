@@ -13,9 +13,10 @@ assert(home.includes('sendInquiry({serviceId:inquiryService.id'),'inquiry uses r
 assert(board.includes('listPublishedNeeds()')&&board.includes('searchServices({})'),'board uses published data only');
 assert(board.includes('目前沒有公會會員公開需求')&&!board.includes('假案件名稱'),'no demo listings');
 assert(hub.includes('tab===\'desk\'')&&hub.includes('<GuildWorkDesk '),'member work desk wired');
+assert(hub.includes('setAuthOpen(true)')&&hub.includes('<GuildAuthDialog onClose'),'member auth directly accessible');
 assert(desk.includes('listIncomingInquiries')&&desk.includes('listMyReplies'),'inbox reads actual user records');
 assert(desk.includes('quoteInquiry(')&&desk.includes('decideReply('),'authorized existing actions');
 assert(bottom.includes('href="/me?tab=desk"')&&bottom.includes('href="/?post=1"'),'navigation works');
 assert(earn.includes('id="publish-service"'),'services anchored to publication form');
 assert(!/createMock|fakeTask|demoJob/.test(home+board+desk),'no demo generators');
-console.log('guild-ui-contract: 11 assertions passed');
+console.log('guild-ui-contract: 12 assertions passed');
