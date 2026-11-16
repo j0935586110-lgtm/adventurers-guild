@@ -1,0 +1,17 @@
+{
+  "bid_id": "bid-demo-001",
+  "task_id": "task-demo-001",
+  "provider": {"principal_id": "human-provider", "agent_id": "provider-agent"},
+  "offer": {"consideration_type": "monetary", "amount": 800, "currency": "TWD", "note": null},
+  "estimated_duration": "2 hours",
+  "assumptions": ["Acceptance uses the provided automated test suite"],
+  "exclusions": ["Production deployment"],
+  "evidence": [
+    {"type": "portfolio", "reference": "local://demo-capability", "note": "Synthetic MVP fixture"}
+  ],
+  "valid_until": null,
+  "status": "proposed",
+  "parent_bid_id": null,
+  "created_at": null,
+  "extensions": {}
+}

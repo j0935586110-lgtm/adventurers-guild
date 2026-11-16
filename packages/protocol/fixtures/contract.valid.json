@@ -1,0 +1,25 @@
+{
+  "contract_id": "contract-demo-001",
+  "task_id": "task-demo-001",
+  "accepted_bid_id": "bid-demo-001",
+  "requester": {"principal_id": "human-requester", "agent_id": "requester-agent"},
+  "provider": {"principal_id": "human-provider", "agent_id": "provider-agent"},
+  "task_snapshot_hash": "sha256:demo",
+  "consideration": {"consideration_type": "monetary", "amount": 800, "currency": "TWD", "note": null},
+  "milestones": [
+    {"id": "m1", "description": "Deliver source and passing tests", "release_fraction": 1}
+  ],
+  "acceptance_criteria": [
+    {"id": "a1", "description": "Automated tests pass", "verification": "deterministic", "required": true}
+  ],
+  "approval_requirements": {
+    "accept_terms": "human_required",
+    "release_value": "human_required",
+    "max_autonomous_amount": 0
+  },
+  "cancellation_policy": "Human approval required after terms are accepted.",
+  "dispute_policy": "Freeze settlement and route to human review.",
+  "created_at": "2026-10-01T02:30:00Z",
+  "audit_refs": ["event:demo-accepted"],
+  "extensions": {}
+}

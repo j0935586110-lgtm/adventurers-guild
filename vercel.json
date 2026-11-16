@@ -1,6 +1,51 @@
 {
-  "framework": null,
-  "buildCommand": "vite build",
-  "outputDirectory": "dist",
-  "installCommand": "npm install"
+  "rewrites": [
+    {
+      "source": "/mcp",
+      "destination": "https://wrwsjlydozfzejixofwm.supabase.co/functions/v1/guild-community-mcp-v1"
+    },
+    {
+      "source": "/oauth/consent",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/earn",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/me",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/community",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/ai",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/connect",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/community/topic/:tid",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/adventurers/:id",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/oauth/consent",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    }
+  ]
 }

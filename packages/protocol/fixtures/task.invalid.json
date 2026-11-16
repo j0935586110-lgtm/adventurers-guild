@@ -1,0 +1,12 @@
+{
+  "task_id": "task-invalid-001",
+  "task_type": "software_task",
+  "goal": "This fixture must fail because required protocol fields are missing.",
+  "requester": {"principal_id": "human-requester", "agent_id": "requester-agent"},
+  "requirements": [],
+  "budget": {"consideration_type": "monetary", "max_amount": -1, "currency": "TWD", "note": null},
+  "deliverables": [],
+  "execution_mode": "agent",
+  "approval_policy": {"accept_terms": "human_required", "release_value": "human_required", "max_autonomous_amount": 0},
+  "privacy_level": "public"
+}

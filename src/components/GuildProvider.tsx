@@ -19,8 +19,9 @@ interface GuildContextType {
   profile: GuildProfile | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
-  signUp: (email: string, password: string, name: string) => Promise<{ error?: string }>;
-  signInWithGoogle: () => Promise<void>;
+  signUp: (email: string, password: string, name: string) => Promise<{ error?: string; confirmationRequired?: boolean }>;
+  signInWithGoogle: () => Promise<{ error?: string }>;
+  sendEmailLoginLink: (email: string) => Promise<{ error?: string; sent?: boolean }>;
   signOut: () => Promise<void>;
 }
 
@@ -44,38 +45,49 @@ export const GuildProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Fetch guild profile from users table
   const fetchProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', userId)
-      .single();
+    const [profileResult, walletResult] = await Promise.all([
+      supabase.from('users')
+        .select('id,display_name,avatar_url,bio,skill_tags,reputation_points')
+        .eq('id', userId).maybeSingle(),
+      supabase.rpc('guild_my_wallet'),
+    ]);
+    const data = profileResult.data;
+    const wallet = walletResult.data?.[0];
     if (data) {
       setProfile({
         id: data.id,
         display_name: data.display_name,
         avatar_url: data.avatar_url || '',
-        balance_g_coin: data.balance_g_coin,
-        frozen_g_coin: data.frozen_g_coin,
+        balance_g_coin: wallet ? Number(wallet.balance_g_coin) : 0,
+        frozen_g_coin: wallet ? Number(wallet.frozen_g_coin) : 0,
         reputation_points: data.reputation_points,
         rank: repToRank(data.reputation_points),
         bio: data.bio || '',
         skill_tags: data.skill_tags || [],
       });
+    } else {
+      // An Auth session is sufficient for the personal marketplace, but
+      // never fabricate balances/permissions if the legacy profile is absent.
+      setProfile(null);
     }
   };
 
   useEffect(() => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: AuthChangeEvent, session: Session | null) => {
+      (_event: AuthChangeEvent, session: Session | null) => {
         const currentUser = session?.user ?? null;
         setUser(currentUser);
         if (currentUser) {
-          await fetchProfile(currentUser.id);
+          // Don't await a Supabase database call inside the auth callback.
+          // It can deadlock while the auth client's internal lock is held.
+          setTimeout(() => {
+            void fetchProfile(currentUser.id).finally(() => setLoading(false));
+          }, 0);
         } else {
           setProfile(null);
+          setLoading(false);
         }
-        setLoading(false);
       }
     );
 
@@ -106,15 +118,17 @@ export const GuildProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const signUp = async (email: string, password: string, name: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { name } }
+      // Preserve authorization_id across the email verification roundtrip.
+      // Site origin/path must be in the Supabase Redirect URLs allow list.
+      options: { data: { name, guild_nickname: name }, emailRedirectTo: window.location.href }
     });
     if (error) return { error: error.message };
-    // Wait for trigger to create users row
-    await new Promise(r => setTimeout(r, 1500));
-    return {};
+    // Hosted projects commonly require email confirmation: do not
+    // tell users they are signed in when the provider returned no session.
+    return { confirmationRequired: !data.session };
   };
 
   const signOut = async () => {
@@ -123,15 +137,25 @@ export const GuildProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setProfile(null);
   };
 
-  const signInWithGoogle = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.origin }
+  const sendEmailLoginLink = async (email: string) => {
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: { emailRedirectTo: window.location.href }
     });
+    return error ? { error: error.message } : { sent: true };
+  };
+
+  const signInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      // Preserve OAuth consent URL and its authorization_id on social sign-in.
+      options: { redirectTo: window.location.href }
+    });
+    return error ? { error: error.message } : {};
   };
 
   return (
-    <GuildContext.Provider value={{ user, profile, loading, signIn, signUp, signInWithGoogle, signOut }}>
+    <GuildContext.Provider value={{ user, profile, loading, signIn, signUp, signInWithGoogle, sendEmailLoginLink, signOut }}>
       {children}
     </GuildContext.Provider>
   );

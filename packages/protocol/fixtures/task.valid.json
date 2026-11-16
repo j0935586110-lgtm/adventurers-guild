@@ -1,0 +1,26 @@
+{
+  "task_id": "task-demo-001",
+  "task_type": "software_task",
+  "goal": "Create a deterministic CLI that validates one JSON file.",
+  "requester": {"principal_id": "human-requester", "agent_id": "requester-agent"},
+  "requirements": ["Python 3.11+", "Include tests"],
+  "constraints": ["No network dependency"],
+  "budget": {"consideration_type": "monetary", "max_amount": 1000, "currency": "TWD", "note": null},
+  "deadline": null,
+  "location": null,
+  "required_credentials": [],
+  "deliverables": [
+    {"id": "d1", "description": "CLI source and tests"}
+  ],
+  "acceptance_criteria": [
+    {"id": "a1", "description": "Automated tests pass", "verification": "deterministic", "required": true}
+  ],
+  "execution_mode": "agent",
+  "approval_policy": {
+    "accept_terms": "human_required",
+    "release_value": "human_required",
+    "max_autonomous_amount": 0
+  },
+  "privacy_level": "public",
+  "extensions": {}
+}

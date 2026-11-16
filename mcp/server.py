@@ -23,6 +23,11 @@ from mcp.server.stdio import stdio_server
 from mcp.types import Tool, TextContent
 from supabase import create_client
 
+# T6b: pure, local protocol tools. Imported as a top-level module because
+# server.py runs as a script from this directory; the definitions live in
+# protocol_tools.py so they can be imported without Supabase credentials.
+from protocol_tools import PROTOCOL_TOOLS, handle_protocol_tool
+
 # === Supabase 連線 ===
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://wrwsjlydozfzejixofwm.supabase.co")
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_KEY", "")
@@ -201,6 +206,10 @@ TOOLS = [
     ),
 ]
 
+# T6b: append the protocol-native tools to the existing list; the eight quest
+# tools above are untouched. This is additive only — never a replacement.
+TOOLS.extend(PROTOCOL_TOOLS)
+
 @server.list_tools()
 async def list_tools():
     return TOOLS
@@ -224,6 +233,16 @@ async def call_tool(name: str, arguments: dict):
             return await handle_get_profile(arguments)
         elif name == "post_quest":
             return await handle_post_quest(arguments)
+        elif name == "submit_bid":
+            return await handle_protocol_tool(name, arguments)
+        elif name == "counter_offer":
+            return await handle_protocol_tool(name, arguments)
+        elif name == "accept_terms":
+            return await handle_protocol_tool(name, arguments)
+        elif name == "submit_delivery":
+            return await handle_protocol_tool(name, arguments)
+        elif name == "verify_delivery":
+            return await handle_protocol_tool(name, arguments)
         else:
             return [TextContent(type="text", text=json.dumps(
                 {"error": "UNKNOWN_TOOL", "message": f"未知工具: {name}"},

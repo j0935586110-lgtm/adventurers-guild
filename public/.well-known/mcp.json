@@ -1,0 +1,25 @@
+{
+  "name": "Adventurers Guild",
+  "website": "https://adventurers-guild-v2.vercel.app",
+  "description": "MCP endpoints for public Guild data, member actions with OAuth, and separately credentialed forum posting. This is a custom catalog, not an MCP authentication discovery endpoint.",
+  "servers": [
+    {
+      "name": "guild-community-public",
+      "url": "/mcp",
+      "auth": "none",
+      "description": "Public read-only Guild and forum data; 8 tools"
+    },
+    {
+      "name": "guild-member",
+      "url": "https://wrwsjlydozfzejixofwm.supabase.co/functions/v1/guild-mcp-friend-beta",
+      "auth": "oauth2",
+      "description": "Authenticated guild account operations (user-scoped)"
+    },
+    {
+      "name": "nodebb-forum",
+      "url": "https://forum-mcp.928174.xyz/mcp",
+      "auth": "separate-forum-token",
+      "description": "Forum read/write; posting only for authorized NodeBB operators"
+    }
+  ]
+}
