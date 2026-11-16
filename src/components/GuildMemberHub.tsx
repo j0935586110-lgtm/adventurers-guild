@@ -45,6 +45,7 @@ export default function GuildMemberHub() {
   const [showcase, setShowcase] = useState<Showcase | null>(null);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Showcase | null>(null);
+  const [displayNameDraft, setDisplayNameDraft] = useState('');
   const [quests, setQuests] = useState<Quest[]>([]);
   const [needs, setNeeds] = useState<Need[]>([]);
   const [savedQuests, setSavedQuests] = useState<string[]>([]);
@@ -163,6 +164,11 @@ export default function GuildMemberHub() {
 
   async function saveProfile() {
     if (!user || !viewingSelf || !draft) return;
+    const newDisplayName = displayNameDraft.trim().replace(/\s+/g, ' ');
+    if (!newDisplayName || Array.from(newDisplayName).length > 40) {
+      setError(text('暱稱請輸入 1～40 個字。','Display name must be 1–40 characters.'));
+      return;
+    }
     const candidate = { ...draft, tagline: draft.tagline.trim().slice(0,160), github_login: draft.github_login.trim(), forum_username: draft.forum_username.trim(), featured_repositories: draft.github_login.trim() === showcase?.github_login ? draft.featured_repositories.slice(0,6) : [] };
     if (!validGithub(candidate.github_login)) { setError(text('GitHub 使用者名稱格式不正確。','Invalid GitHub username.')); return; }
     if (!validForum(candidate.forum_username)) { setError(text('論壇名稱包含不支援的字元。','Invalid forum username.')); return; }
@@ -170,6 +176,19 @@ export default function GuildMemberHub() {
     try {
       const { error: saveError } = await supabase.from('guild_member_showcases').upsert({ ...candidate, user_id: user.id, updated_at: new Date().toISOString() }, { onConflict:'user_id' });
       if (saveError) throw saveError;
+      if (newDisplayName !== identity?.display_name) {
+        // Update only this member's display name; RLS and column grants prevent
+        // editing anyone else's identity, G-Coins, reputation or member ID.
+        const updatedName = await supabase.from('users')
+          .update({ display_name: newDisplayName }).eq('id', user.id)
+          .select('id,display_name').single();
+        if (updatedName.error) throw updatedName.error;
+        if (updatedName.data.id !== user.id || updatedName.data.display_name !== newDisplayName) {
+          throw new Error(text('暱稱儲存驗證失敗。','Could not verify the saved display name.'));
+        }
+        setIdentity(current => current ? { ...current, display_name: updatedName.data.display_name } : current);
+        await (window as any).__guildRefreshProfile?.();
+      }
       setEditing(false); await reload();
     } catch(err) { setError(err instanceof Error ? err.message : String(err)); }
     finally { setBusy(false); }
@@ -254,7 +273,7 @@ export default function GuildMemberHub() {
             {showcase?.forum_username && <a target="_blank" rel="noopener noreferrer" href={'https://forum.928174.xyz/user/'+encodeURIComponent(showcase.forum_username)}><MessageSquareText size={16}/> {showcase.forum_username} <ExternalLink size={12}/></a>}
           </div>
         </div>
-        {viewingSelf && user && <div className="gm-profile-actions"><button type="button" className="gm-btn" onClick={() => {setDraft(showcase||emptyShowcase(user.id));setEditing(!editing);}}><Wrench size={17}/>{text('編輯展示資料','Edit profile')}</button><a href={'/adventurers/'+user.id} className="gm-link">{text('查看公開頁','View public page')} ↗</a></div>}
+        {viewingSelf && user && <div className="gm-profile-actions"><button type="button" className="gm-btn" onClick={() => {setDraft(showcase||emptyShowcase(user.id));setDisplayNameDraft(identity?.display_name || '');setEditing(!editing);}}><Wrench size={17}/>{text('編輯展示資料','Edit profile')}</button><a href={'/adventurers/'+user.id} className="gm-link">{text('查看公開頁','View public page')} ↗</a></div>}
       </div>
       <section className="gm-stats">
         <div><Award size={21}/><small>{text('現有信譽值','Reputation')}</small><strong>{identity?.reputation_points ?? '—'}</strong><span>{text('沿用既有資料，不灌水','Existing verified source only')}</span></div>
@@ -264,6 +283,7 @@ export default function GuildMemberHub() {
       {error && <div className="gm-error" role="alert">{error}<button type="button" onClick={()=>setError('')}>×</button></div>}
       {editing && viewingSelf && draft && <section className="gm-edit">
         <h2>{text('編輯個人展示','Edit public showcase')}</h2><p>{text('GitHub 與論壇名稱為自填公開連結，尚未進行帳號所有權驗證。請勿冒用他人。','GitHub and forum handles are public, self-declared and not ownership-verified.')}</p>
+        <label>{text('冒險者暱稱','Display name')}<input type="text" autoComplete="nickname" maxLength={40} value={displayNameDraft} onChange={e=>setDisplayNameDraft(e.target.value)} placeholder={text('請輸入公開顯示名稱','Choose your public display name')}/></label>
         <label>{text('個人介紹','Short tagline')}<input maxLength={160} value={draft.tagline} onChange={e=>setDraft({...draft,tagline:e.target.value})} placeholder={text('你擅長什麼？想找什麼合作？','Skills and collaboration interests')}/></label>
         <div className="gm-edit-grid"><label>{text('GitHub 使用者名稱','GitHub username')}<input value={draft.github_login} onChange={e=>setDraft({...draft,github_login:e.target.value})} maxLength={39} placeholder="octocat"/></label>
           <label>{text('NodeBB 論壇名稱','Forum username')}<input value={draft.forum_username} onChange={e=>setDraft({...draft,forum_username:e.target.value})} maxLength={60} placeholder={text('論壇暱稱','Forum handle')}/></label></div>

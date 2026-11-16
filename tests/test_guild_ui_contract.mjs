@@ -13,10 +13,16 @@ assert(home.includes('sendInquiry({serviceId:inquiryService.id'),'inquiry uses r
 assert(board.includes('listPublishedNeeds()')&&board.includes('searchServices({})'),'board uses published data only');
 assert(board.includes('目前沒有公會會員公開需求')&&!board.includes('假案件名稱'),'no demo listings');
 assert(hub.includes('tab===\'desk\'')&&hub.includes('<GuildWorkDesk '),'member work desk wired');
+assert(hub.includes("text('冒險者暱稱','Display name')")&&hub.includes('setDisplayNameDraft(e.target.value)'),'owner can edit display name');
+assert(hub.includes(".update({ display_name: newDisplayName }).eq('id', user.id)"),'name update restricted to signed-in owner');
+assert(hub.includes(".select('id,display_name').single()")&&hub.includes('updatedName.data.id !== user.id'),'name update readback verifies owner');
+assert(hub.includes('Array.from(newDisplayName).length > 40')&&hub.includes('!newDisplayName'),'invalid nickname rejected');
+assert(!hub.includes('.update({ reputation_points:')&&!hub.includes('.update({ balance_g_coin:'),'member rename never alters earned value');
+
 assert(hub.includes('setAuthOpen(true)')&&hub.includes('<GuildAuthDialog onClose'),'member auth directly accessible');
 assert(desk.includes('listIncomingInquiries')&&desk.includes('listMyReplies'),'inbox reads actual user records');
 assert(desk.includes('quoteInquiry(')&&desk.includes('decideReply('),'authorized existing actions');
 assert(bottom.includes('href="/me?tab=desk"')&&bottom.includes('href="/?post=1"'),'navigation works');
 assert(earn.includes('id="publish-service"'),'services anchored to publication form');
 assert(!/createMock|fakeTask|demoJob/.test(home+board+desk),'no demo generators');
-console.log('guild-ui-contract: 12 assertions passed');
+console.log('guild-ui-contract: 17 assertions passed');
