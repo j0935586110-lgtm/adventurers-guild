@@ -49,3 +49,9 @@
 .gn-chat-line p{margin:3px 0 0}
 .gn-chat-actions{display:flex;justify-content:space-between;gap:9px;margin-top:15px;flex-wrap:wrap}
 .gn-chat-block{border:1px solid #dcaab0;border-radius:10px;background:#fff5f5;color:#9c2b39;padding:8px 13px;cursor:pointer}
+
+.gn-line-exchange{padding:14px;border:1px solid #c6ddce;border-radius:12px;background:#f1f9f3;margin:15px 0}
+.gn-line-exchange strong{color:#1b6650}
+.gn-line-exchange p{font-size:13px;color:#4c7562;overflow-wrap:anywhere}
+.gn-line-exchange a{font-size:12px;color:#18604d;font-weight:700}
+.gn-line-id{font-size:15px;font-weight:900;color:#174b46;user-select:all}

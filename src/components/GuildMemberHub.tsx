@@ -6,6 +6,7 @@ import GuildBottomNav from './GuildBottomNav';
 import {GuildAuthDialog} from './GuildAuthDialog';
 import { supabase } from '../lib/supabase';
 import { LEGACY_DEMO_CLIENT_ID } from '../lib/quest-visibility';
+import {getMyLineContact,saveMyLineContact,type LineContact} from '../lib/line-contact';
 import './guild-home.css';
 import './guild-member-hub.css';
 
@@ -46,6 +47,8 @@ export default function GuildMemberHub() {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Showcase | null>(null);
   const [displayNameDraft, setDisplayNameDraft] = useState('');
+  const [lineContact,setLineContact]=useState<LineContact|null>(null);
+  const [lineDraft,setLineDraft]=useState<LineContact>({line_id:'',share_after_match:false});
   const [quests, setQuests] = useState<Quest[]>([]);
   const [needs, setNeeds] = useState<Need[]>([]);
   const [savedQuests, setSavedQuests] = useState<string[]>([]);
@@ -102,6 +105,12 @@ export default function GuildMemberHub() {
   }, [target, viewingSelf, user?.id]);
 
   useEffect(() => { void reload(); }, [reload]);
+  useEffect(()=>{
+    if(!user||!viewingSelf){setLineContact(null);return;}
+    let mounted=true;
+    void getMyLineContact(user.id).then(v=>{if(mounted)setLineContact(v);}).catch(e=>{if(mounted)setError(e.message||'LINE 設定讀取失敗');});
+    return ()=>{mounted=false;};
+  },[user?.id,viewingSelf]);
 
   const loadExplore = useCallback(async () => {
     const [q, n] = await Promise.all([
@@ -169,6 +178,9 @@ export default function GuildMemberHub() {
       setError(text('暱稱請輸入 1～40 個字。','Display name must be 1–40 characters.'));
       return;
     }
+    if(lineDraft.line_id.trim() && !/^@?[A-Za-z0-9._-]{3,39}$/.test(lineDraft.line_id.trim())){
+      setError(text('LINE ID 格式不正確。','Invalid LINE ID.'));return;
+    }
     const candidate = { ...draft, tagline: draft.tagline.trim().slice(0,160), github_login: draft.github_login.trim(), forum_username: draft.forum_username.trim(), featured_repositories: draft.github_login.trim() === showcase?.github_login ? draft.featured_repositories.slice(0,6) : [] };
     if (!validGithub(candidate.github_login)) { setError(text('GitHub 使用者名稱格式不正確。','Invalid GitHub username.')); return; }
     if (!validForum(candidate.forum_username)) { setError(text('論壇名稱包含不支援的字元。','Invalid forum username.')); return; }
@@ -189,6 +201,8 @@ export default function GuildMemberHub() {
         setIdentity(current => current ? { ...current, display_name: updatedName.data.display_name } : current);
         await (window as any).__guildRefreshProfile?.();
       }
+      const savedLine=await saveMyLineContact(user.id,lineDraft);
+      setLineContact(savedLine);
       setEditing(false); await reload();
     } catch(err) { setError(err instanceof Error ? err.message : String(err)); }
     finally { setBusy(false); }
@@ -273,13 +287,14 @@ export default function GuildMemberHub() {
             {showcase?.forum_username && <a target="_blank" rel="noopener noreferrer" href={'https://forum.928174.xyz/user/'+encodeURIComponent(showcase.forum_username)}><MessageSquareText size={16}/> {showcase.forum_username} <ExternalLink size={12}/></a>}
           </div>
         </div>
-        {viewingSelf && user && <div className="gm-profile-actions"><button type="button" className="gm-btn" onClick={() => {setDraft(showcase||emptyShowcase(user.id));setDisplayNameDraft(identity?.display_name || '');setEditing(!editing);}}><Wrench size={17}/>{text('編輯展示資料','Edit profile')}</button><a href={'/adventurers/'+user.id} className="gm-link">{text('查看公開頁','View public page')} ↗</a></div>}
+        {viewingSelf && user && <div className="gm-profile-actions"><button type="button" className="gm-btn" onClick={() => {setDraft(showcase||emptyShowcase(user.id));setDisplayNameDraft(identity?.display_name || '');setLineDraft(lineContact||{line_id:'',share_after_match:false});setEditing(!editing);}}><Wrench size={17}/>{text('編輯展示資料','Edit profile')}</button><a href={'/adventurers/'+user.id} className="gm-link">{text('查看公開頁','View public page')} ↗</a></div>}
       </div>
       <section className="gm-stats">
         <div><Award size={21}/><small>{text('現有信譽值','Reputation')}</small><strong>{identity?.reputation_points ?? '—'}</strong><span>{text('沿用既有資料，不灌水','Existing verified source only')}</span></div>
         <div><ShieldCheck size={21}/><small>{text('已驗收任務','Verified quests')}</small><strong>{verifiedCount}</strong><span>{text('不含待驗收案件','Accepted deliveries only')}</span></div>
         <div><Coins size={21}/><small>{text('我的 G 幣','My G-Coins')}</small><strong>{viewingSelf && profile ? Number(profile.balance_g_coin).toLocaleString() : '—'}</strong><span>{text('僅本人可見，未啟用每日發幣','Private; no daily minting')}</span></div>
       </section>
+      {viewingSelf&&user&&<p className="gm-line-status">{text('LINE 交換：','LINE sharing: ')}{lineContact?.line_id?(lineContact.share_after_match?text('已開啟（僅媒合成功後）','Enabled for accepted matches'):text('已儲存，但不分享','Saved, private')):text('未設定（預設不分享）','Off by default')}</p>}
       {error && <div className="gm-error" role="alert">{error}<button type="button" onClick={()=>setError('')}>×</button></div>}
       {editing && viewingSelf && draft && <section className="gm-edit">
         <h2>{text('編輯個人展示','Edit public showcase')}</h2><p>{text('GitHub 與論壇名稱為自填公開連結，尚未進行帳號所有權驗證。請勿冒用他人。','GitHub and forum handles are public, self-declared and not ownership-verified.')}</p>
@@ -287,6 +302,11 @@ export default function GuildMemberHub() {
         <label>{text('個人介紹','Short tagline')}<input maxLength={160} value={draft.tagline} onChange={e=>setDraft({...draft,tagline:e.target.value})} placeholder={text('你擅長什麼？想找什麼合作？','Skills and collaboration interests')}/></label>
         <div className="gm-edit-grid"><label>{text('GitHub 使用者名稱','GitHub username')}<input value={draft.github_login} onChange={e=>setDraft({...draft,github_login:e.target.value})} maxLength={39} placeholder="octocat"/></label>
           <label>{text('NodeBB 論壇名稱','Forum username')}<input value={draft.forum_username} onChange={e=>setDraft({...draft,forum_username:e.target.value})} maxLength={60} placeholder={text('論壇暱稱','Forum handle')}/></label></div>
+        <div className="gm-line-editor"><h3>{text('LINE 聯絡設定（完全自願）','LINE contact preference (optional)')}</h3>
+          <p>{text('LINE ID 不會出現在公開需求。只有你接受合作、且自己勾選分享後，對方才能看見。','Your LINE ID is never public. It is available only after an accepted match if you opt in.')}</p>
+          <label>{text('我的 LINE ID（留空即刪除）','My LINE ID (leave blank to remove)')}<input autoComplete="off" maxLength={40} value={lineDraft.line_id} onChange={e=>setLineDraft({...lineDraft,line_id:e.target.value})} placeholder="LINE ID"/></label>
+          <label className="gm-line-choice"><input type="checkbox" checked={lineDraft.share_after_match} onChange={e=>setLineDraft({...lineDraft,share_after_match:e.target.checked})}/>{text('僅在我與對方確認媒合後，才允許對方查看我的 LINE ID','Let matched partners see my LINE ID after I accept a match')}</label>
+        </div>
         <button className="gm-btn" type="button" disabled={busy} onClick={()=>void saveProfile()}><Save size={17}/>{busy?text('儲存中…','Saving…'):text('儲存公開展示','Save profile')}</button>
       </section>}
       <nav className="gm-tabs" aria-label={text('會員功能','Member navigation')}>

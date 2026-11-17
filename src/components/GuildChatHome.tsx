@@ -194,7 +194,7 @@ export default function GuildChatHome(){
       <a className="ch-brand" href="/" aria-label={t('冒險者公會首頁','Guild home')}><span className="ch-mark"><Swords size={22} strokeWidth={1.9}/></span><span>{t('冒險者公會','Adventurers Guild')}</span></a>
       <nav className={'ch-nav '+(menu?'ch-nav-open':'')} aria-label={t('網站選單','Site navigation')}>
         <button type="button" className="ch-nav-board" onClick={()=>{setBoardOpen(!boardOpen);setMenu(false)}}>{t('任務布告欄','Quest board')}</button>
-        <a href="/earn">{t('我要賺錢','Earn')}</a><a href="#guild-discovery">{t('探索','Explore')}</a><a href="/community">{t('論壇','Forum')}</a><a href="/me?tab=desk">{t('我的工作台','My workspace')}</a><a href="/ai">AI / MCP</a>
+        <a href="/matching">{t('委託／接任務','Match tasks')}</a><a href="/earn">{t('我要賺錢','Earn')}</a><a href="#guild-discovery">{t('探索','Explore')}</a><a href="/community">{t('論壇','Forum')}</a><a href="/me?tab=desk">{t('我的工作台','My workspace')}</a><a href="/ai">AI / MCP</a>
       </nav>
       <div className="ch-actions">
         {!user?<button className="ch-login" type="button" onClick={()=>setAuth(true)}>{t('登入／註冊','Sign in')}</button>
@@ -284,6 +284,8 @@ export default function GuildChatHome(){
           <p className="ch-footnote">{t('輸入只用於搜尋；發布需求或服務須經你確認。','Search is private; publishing requires your confirmation.')}</p>
         </div>
         {!thread.length&&<section id="guild-actions" className="ch-quick-actions" aria-label={t('公會主要操作','Main actions')}>
+          <a href="/matching?intent=post" className="ch-quick-action"><PlusCircle size={20}/><strong>{t('我要委託','Post a task')}</strong><span>{t('找人協助完成任務或活動','Find people to help')}</span></a>
+          <a href="/matching" className="ch-quick-action"><BriefcaseBusiness size={20}/><strong>{t('我要接任務','Find a task')}</strong><span>{t('探索真實需求並表達合作意願','Find and respond to requests')}</span></a>
           <a href="#guild-discovery" className="ch-quick-action"><Compass size={20}/><strong>{t('探索機會','Explore opportunities')}</strong><span>{t('查看真實需求與服務','Browse real needs and services')}</span></a>
           <button type="button" className="ch-quick-action" aria-expanded={showPublishOptions} aria-controls="guild-publish-options" onClick={()=>setShowPublishOptions(v=>!v)}><PlusCircle size={20}/><strong>{t('發布需求／服務','Post a need / service')}</strong><span>{t('確認內容後公開','You approve before posting')}</span></button>
         </section>}

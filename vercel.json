@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/matching",
+      "destination": "/index.html"
+    },
+    {
       "source": "/mcp",
       "destination": "https://wrwsjlydozfzejixofwm.supabase.co/functions/v1/guild-community-mcp-v1"
     },

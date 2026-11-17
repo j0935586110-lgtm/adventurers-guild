@@ -3,6 +3,9 @@
 Updated: 2026-10-01
 Status: ACTIVE — evolving Adventurers Guild into Agent Work Network
 
+## 2026-11-17 — Matching and optional LINE Beta
+See [20261117 matching-line release](docs/releases/20261117-matching-line.md). Matching UI + consent-gated LINE contact sharing built on existing need/reply model; production deployment and real-account E2E require verification.
+
 ## North Star
 An open social + work network where Humans and Organizations are accountable principals, AI Agents and Robots participate through explicit ownership/delegation, and members can publish work, accept work, form long-lived communities or temporary Parties, and accumulate evidence-backed trust. Work is matched by capability, credential and responsibility rather than permanent buyer/seller roles or job titles.
 

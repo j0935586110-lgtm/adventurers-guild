@@ -5,12 +5,14 @@ import {TAIWAN_CITIES} from '../lib/marketplace';
 import {NEED_CATEGORIES,listPublishedNeeds,createNeedDraft,publishNeed,closeNeed,
  replyToNeed,listMyReplies,decideReply,reportNeed,listNeedMessages,sendNeedMessage,blockNeedChat,isNeedChatBlocked,type NeedChatMessage,type GuildNeed,type GuildNeedReply,type NeedKind} from '../lib/needs';
 import './guild-needs.css';
+import {getMatchedLine} from '../lib/line-contact';
 
 type Language='zh'|'en';
 const catName=(k:NeedKind,l:Language)=>{const c=NEED_CATEGORIES.find(c=>c.value===k);return l==='en'?(c?.en||k):(c?.zh||k);};
 export default function GuildNeeds({lang,onLogin}:{lang:Language;onLogin:()=>void}){
  const t=(zh:string,en:string)=>lang==='en'?en:zh;
- const {user}=useGuild();
+ const {user,loading:authLoading}=useGuild();
+ const [initialPostPending,setInitialPostPending]=useState(()=>new URLSearchParams(location.search).get('intent')==='post');
  const [items,setItems]=useState<GuildNeed[]>([]);
  const [replies,setReplies]=useState<GuildNeedReply[]>([]);
  const [kind,setKind]=useState('');
@@ -41,6 +43,8 @@ export default function GuildNeeds({lang,onLogin}:{lang:Language;onLogin:()=>voi
  const [chatMessages,setChatMessages]=useState<NeedChatMessage[]>([]);
  const [chatText,setChatText]=useState('');
  const [chatBlocked,setChatBlocked]=useState(false);
+ const [chatLine,setChatLine]=useState<string|null>(null);
+ const [chatLineLoaded,setChatLineLoaded]=useState(false);
 
  const [reportReason,setReportReason]=useState('');
  const [myOpen,setMyOpen]=useState(false);
@@ -55,6 +59,10 @@ export default function GuildNeeds({lang,onLogin}:{lang:Language;onLogin:()=>voi
   try{setReplies(await listMyReplies());}catch{/* read may be unavailable until migration is ready */}
  }
  useEffect(()=>{void refresh();},[]);
+ useEffect(()=>{if(!initialPostPending||authLoading)return;
+  setInitialPostPending(false);
+  if(user)setPosting(true);else {setPendingAction('post');onLogin();}
+ },[initialPostPending,authLoading,user?.id]);
  useEffect(()=>{void refreshReplies();},[user?.id]);
  useEffect(()=>{
   if(user&&pendingAction==='post'){setPosting(true);setPendingAction(null);}
@@ -97,13 +105,13 @@ export default function GuildNeeds({lang,onLogin}:{lang:Language;onLogin:()=>voi
  }
  async function refreshChat(replyId:string){
   try{
-   const [messages,blocked]=await Promise.all([listNeedMessages(replyId),isNeedChatBlocked(replyId)]);
-   setChatMessages(messages);setChatBlocked(blocked);
+   const [messages,blocked,line]=await Promise.all([listNeedMessages(replyId),isNeedChatBlocked(replyId),getMatchedLine(replyId)]);
+   setChatMessages(messages);setChatBlocked(blocked);setChatLine(line);setChatLineLoaded(true);
   }catch(e){setError(e instanceof Error?e.message:'Could not load messages');}
  }
  function openChat(reply:GuildNeedReply){
   if(reply.status!=='accepted')return;
-  setChatReply(reply);setChatText('');setChatMessages([]);setChatBlocked(false);
+  setChatReply(reply);setChatText('');setChatMessages([]);setChatBlocked(false);setChatLine(null);setChatLineLoaded(false);
   void refreshChat(reply.id);
  }
  async function submitChat(e:React.FormEvent){
@@ -157,7 +165,7 @@ export default function GuildNeeds({lang,onLogin}:{lang:Language;onLogin:()=>voi
      </div>}
     </div>;
    })}
-   <small>{t('目前先記錄雙方意願，私訊聊天室尚未開放。請勿公開個人電話或住址。','This currently records mutual interest. Private chat is not available yet.')}</small>
+   <small>{t('接受合作後可在私人對話中選擇交換 LINE ID。雙方都有權不提供聯絡方式。','After acceptance, members can opt in to LINE exchange in private chat.')}</small>
   </div>}
   <div className="gn-filters">
    <button type="button" className={!kind?'active':''} onClick={()=>setKind('')}>{t('全部需求','All')}</button>
@@ -209,6 +217,10 @@ export default function GuildNeeds({lang,onLogin}:{lang:Language;onLogin:()=>voi
     <button className="gn-close" type="button" aria-label="Close" onClick={()=>setChatReply(null)}><X size={21}/></button>
     <h2>{t('雙方私訊','Private chat')}</h2>
     <p>{t('只有已互相同意的兩位會員能看見。','Only the two members who agreed can view this conversation.')}</p>
+    {!chatBlocked&&<div className="gn-line-exchange"><strong>{t('自願交換 LINE','Optional LINE exchange')}</strong>
+      <p>{!chatLineLoaded?t('正在檢查聯絡設定…','Checking contact preferences…'):chatLine?t('對方已自願提供 LINE ID：','The other member opted to share LINE ID: '):t('對方尚未選擇交換 LINE，仍可使用站內私訊。','The other member has not opted in. You may continue chatting here.')}{chatLine&&<span className="gn-line-id"> {chatLine}</span>}</p>
+      <a href="/me">{t('到我的會員資料設定是否分享自己的 LINE','Set my LINE sharing preference in profile')}</a>
+    </div>}
     <div className="gn-chat-messages" aria-live="polite">
      {chatMessages.length===0?<p>{t('目前還沒有訊息。','No messages yet.')}</p>:
       chatMessages.map(m=><div key={m.id} className={'gn-chat-line '+(m.sender_id===user?.id?'gn-chat-mine':'')}>
