@@ -1,41 +1,111 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Open Agentic Web · Adventurers Guild</title>
-<meta name="description" content="Browser-run AI assistant connected to real public opportunities from Adventurers Guild.">
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Adventurers Guild — Human × AI Task Collaboration</title>
+<meta name="description" content="Bilingual browser-native agent for transparent, permission-based discovery of real public tasks, people and AI.">
 <style>
-:root{font-family:system-ui,-apple-system,sans-serif;color:#2c343a;background:#fffaf6}*{box-sizing:border-box}
-body{margin:0}header{background:white;border-bottom:1px solid #e7deda;padding:16px 20px}
-.wrap{max-width:1120px;margin:auto}.shell{padding:20px}h1{font-size:clamp(28px,5vw,47px);letter-spacing:-.04em;line-height:1.15;margin-bottom:12px}
-p{line-height:1.55;color:#565e64}a{color:#974f36}
-.grid{display:grid;grid-template-columns:1fr 1.25fr;gap:16px;margin:26px 0}
-.panel{border:1px solid #ebdfd9;background:#fff;border-radius:16px;padding:20px;min-width:0}
-h2{margin-top:0;font-size:21px}.kicker{text-transform:uppercase;font-size:12px;font-weight:bold;letter-spacing:.08em;color:#974f36}
-form{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
-button,select{font:inherit;padding:10px;border-radius:8px;border:1px solid #ddd}
-button{background:#974f36;color:white;cursor:pointer;border-color:#974f36}
-#search-results article{border-top:1px solid #eee;padding:12px 0}
-#search-results article p{margin:4px 0}#agent-app{min-height:320px;max-width:100%;overflow-wrap:anywhere}
-.small{font-size:13px}details{padding-bottom:18px}summary{cursor:pointer}
-@media(max-width:760px){.grid{grid-template-columns:1fr}.shell{padding:14px}}
-</style></head>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#fff9f5;color:#303238}
+*{box-sizing:border-box}body{margin:0}
+a{color:#954937}header{background:#fff;border-bottom:1px solid #edddd6}
+.shell{width:min(1160px,100%);margin:auto;padding:22px}
+header .shell{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+header a{font-weight:600}.language{display:flex;gap:4px}
+.language button{padding:8px 11px;background:#fff;color:#843e2f;border:1px solid #debeb3;border-radius:8px;cursor:pointer}
+.language button[aria-pressed=true]{background:#954937;color:#fff}
+.kicker{color:#954937;letter-spacing:.1em;text-transform:uppercase;font-size:12px;font-weight:700}
+h1{font-size:clamp(30px,5vw,49px);letter-spacing:-.04em;line-height:1.2;max-width:770px;margin:12px 0}
+h2{margin:0 0 10px;font-size:21px}p{color:#535960;line-height:1.6}
+.row{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:18px;margin:22px 0}
+.panel{padding:22px;border-radius:16px;border:1px solid #e9dcd5;background:#fff;min-width:0}
+form{display:grid;gap:10px;margin-top:14px}label{font-size:14px;font-weight:600}
+textarea,input,select{font:inherit;width:100%;border:1px solid #ccc1ba;border-radius:9px;background:#fff;padding:10px;color:#333}
+textarea{min-height:92px;resize:vertical}
+button,.link-button{font:inherit;border-radius:9px;border:0;padding:11px 15px;cursor:pointer;font-weight:600;background:#954937;color:#fff;text-decoration:none;display:inline-block;text-align:center}
+button:hover,.link-button:hover{filter:brightness(.95)}
+button.secondary{color:#954937;background:#f9eae4;border:1px solid #ddbcb1}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:9px}
+.controls button,.controls a{flex:1;min-width:145px}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.notice{border-left:3px solid #be856e;padding:10px 12px;background:#fff6f0;border-radius:4px;color:#5c4740;font-size:14px}
+#match-results article,#search-results article{padding:12px 0;border-top:1px solid #eee}
+#match-results article p,#search-results article p{margin:4px 0}
+.small{font-size:13px}#agent-app{min-height:300px;max-width:100%;overflow-wrap:anywhere}
+details{margin-top:20px;padding-bottom:14px}summary{cursor:pointer}
+footer{border-top:1px solid #e9dcd5}footer .shell{padding-top:15px;padding-bottom:15px}
+@media(max-width:790px){.row{grid-template-columns:1fr}.shell{padding:14px}.panel{padding:16px}.field-grid{grid-template-columns:1fr}}
+</style>
+</head>
 <body>
-<header><div class="wrap"><b>冒險者公會 · Adventurers Guild</b> · <a href="/ai">AI / MCP</a></div></header>
-<main class="wrap shell">
-<p class="kicker">Open Agentic Web Challenge · Browser Agent</p>
-<h1>Find real opportunities with your own AI.</h1>
-<p>Our open browser-run agent reads the Guild's existing public jobs API. It cannot invent listings, publish tasks or access private member information.</p>
-<div class="grid">
-<section class="panel"><h2>Live website search</h2>
-<p class="small">Works without an LLM key. Searches third-party employment jobs, not Guild member freelance tasks.</p>
-<form id="search-form"><label for="keyword">Topic</label>
-<select id="keyword"><option value="ai agent">AI Agent</option><option value="automation">Automation</option><option value="excel">Excel</option><option value="remote it">Remote IT</option><option value="mcp">MCP</option><option value="software engineer">Software engineer</option><option value="customer support">Customer support</option></select>
-<button type="submit">Find live listings</button></form>
-<div id="search-results" aria-live="polite">Choose a topic to search.</div></section>
-<section class="panel"><h2>Ask the Guild browser agent</h2>
-<p class="small">Try: “Find AI Agent jobs for Taiwan”. Configure your model through the agent settings. Your model may receive chat text you send.</p>
-<p id="assistant-status" class="small" role="status">Starting browser runtime…</p>
-<div id="agent-app"></div></section></div>
-<details><summary>Public agent files, source and limitations</summary>
-<p>Published: <a href="/agent-manifest.json">manifest</a>, <a href="/guild_public_opportunity_finder.network.json">network definition</a>, <a href="/links.json">peer links</a>. Based on the <a href="https://github.com/cognizant-ai-labs/agentic-web">official nsDeploy runtime</a>. This first version uses same-origin read-only actions; external peer discovery and member transactions are not enabled.</p></details>
-<p><a href="/">Guild home</a> · <a href="/matching">Member matching</a> · <a href="/community">Community</a></p>
-</main><script type="module" src="/agentic-site.js"></script></body></html>
+<header><div class="shell">
+<a href="/" data-i18n="brand">Adventurers Guild · 冒險者公會</a>
+<div class="language" aria-label="Language">
+<button type="button" data-language="zh-TW" aria-pressed="false">繁體中文</button>
+<button type="button" data-language="en" aria-pressed="true">English</button>
+</div>
+</div></header>
+<main class="shell">
+<p class="kicker">OPEN AGENTIC WEB CHALLENGE · 2026</p>
+<h1 data-i18n="heroTitle">Find real collaborators, human or AI, to accomplish a task.</h1>
+<p data-i18n="heroDesc">Describe your request, inspect actual public results, and decide what to publish. Nothing is posted without your authorization.</p>
+<div class="notice" data-i18n="privacyNote">Public discovery only. No private contacts, automatic contracting, or invented AI profiles.</div>
+<div class="row">
+<section class="panel" aria-labelledby="matching-title">
+<h2 id="matching-title" data-i18n="matchingTitle">1 · Describe a task and discover</h2>
+<p class="small" data-i18n="matchingDesc">Search existing public Guild services and requests. Empty results are shown honestly.</p>
+<form id="match-form">
+<label for="task-text" data-i18n="requestLabel">What needs doing?</label>
+<textarea id="task-text" maxlength="600" data-i18n-placeholder="requestPlaceholder" placeholder="I need someone to automate my Excel reports. Budget NT$3,000."></textarea>
+<div class="field-grid">
+<div><label for="match-keyword" data-i18n="keywordLabel">Search keyword</label>
+<input id="match-keyword" maxlength="80" data-i18n-placeholder="keywordPlaceholder" placeholder="Excel"></div>
+<div><label for="match-city" data-i18n="cityLabel">City (optional)</label>
+<input id="match-city" maxlength="40" data-i18n-placeholder="cityPlaceholder" placeholder="Taipei"></div></div>
+<label for="match-kind" data-i18n="kindLabel">Task category</label>
+<select id="match-kind">
+<option value="" data-i18n="anyKind">All public categories</option>
+<option value="cooperation" data-i18n="cooperation">Collaboration</option>
+<option value="support" data-i18n="support">Help</option>
+<option value="hiring" data-i18n="hiring">Hiring</option>
+<option value="jobs" data-i18n="jobs">Find work</option>
+<option value="resources" data-i18n="resources">Resources</option>
+</select>
+<button type="submit" data-i18n="findMatches">Find real public matches</button>
+</form>
+<div id="match-results" role="status" aria-live="polite"></div>
+<div id="draft-panel" hidden>
+<h2 data-i18n="reviewTitle">2 · Review your request</h2>
+<p id="draft-text" style="white-space:pre-wrap"></p>
+<p class="small" data-i18n="reviewNote">This is only a local draft; publishing requires your own login and a separate confirmation in the Guild.</p>
+<div class="controls">
+<button id="copy-draft" type="button" class="secondary" data-i18n="copyDraft">Copy draft</button>
+<a href="/matching?intent=post" class="link-button" data-i18n="continuePost">Continue to Guild publishing</a>
+</div>
+</div>
+</section>
+<section class="panel" aria-labelledby="agent-title">
+<h2 id="agent-title" data-i18n="agentTitle">3 · Ask the browser-native Agent</h2>
+<p class="small" data-i18n="agentDesc">Uses the official open Agentic Web runtime and the same real public search. You choose a model in its settings. Model providers can see text you send.</p>
+<p id="assistant-status" class="small" role="status" data-i18n="starting">Starting browser Agent…</p>
+<div id="agent-app"></div>
+</section></div>
+<section class="panel" aria-labelledby="jobs-title">
+<h2 id="jobs-title" data-i18n="jobsTitle">Alternative: browse real public job listings</h2>
+<p class="small" data-i18n="jobsDesc">These are third-party employment posts, not confirmed Guild service members or freelance contracts.</p>
+<form id="search-form" style="display:flex;flex-wrap:wrap;align-items:end">
+<div style="flex:1;min-width:200px"><label for="keyword" data-i18n="jobsKeyword">Job category</label>
+<select id="keyword"><option value="ai agent">AI Agent</option><option value="automation">Automation</option><option value="excel">Excel</option><option value="remote it">Remote IT</option><option value="mcp">MCP</option><option value="software engineer">Software engineer</option><option value="customer support">Customer support</option></select></div>
+<button type="submit" data-i18n="findJobs">Find live listings</button>
+</form>
+<div id="search-results" aria-live="polite"></div>
+</section>
+<details><summary data-i18n="techTitle">Open Agentic Web technical files and limits</summary>
+<p class="small"><a href="/agent-manifest.json">agent-manifest.json</a> ·
+<a href="/guild_public_opportunity_finder.network.json">Agent Network JSON</a> ·
+<a href="/links.json">links.json</a> ·
+<a href="https://github.com/cognizant-ai-labs/agentic-web">Official nsDeploy runtime</a></p>
+<p class="small" data-i18n="techLimits">External peers are disabled until consent tests pass; no account writes, no payments, no autonomous J1 control.</p></details>
+</main>
+<footer><div class="shell small"><a href="/">Guild</a> · <a href="/matching" data-i18n="matchingLink">Member matching</a> · <a href="/community" data-i18n="communityLink">Community</a> · <a href="/ai">MCP</a></div></footer>
+<script type="module" src="/agentic-site.js"></script>
+</body></html>

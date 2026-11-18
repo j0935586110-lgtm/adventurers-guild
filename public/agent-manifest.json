@@ -5,16 +5,16 @@
       "name": "guild_public_opportunity_finder",
       "front_man": "guild_matchmaker",
       "hocon": "./guild_public_opportunity_finder.network.json",
-      "description": "Search real public employment listings on the Guild website using a browser-run agent.",
+      "description": "Bilingual (繁體中文 / English) task discovery for real published Guild member services, needs and third-party jobs, with human-controlled publishing.",
       "tags": [
         "nsdeploy",
         "read-only",
         "taiwan"
       ],
       "sample_queries": [
-        "Find AI Agent jobs in Taiwan",
-        "Find software engineer opportunities",
-        "What real public job search does the Guild offer?"
+        "Find public Guild services for Excel report automation in Taipei.",
+        "我需要一位能協助 Excel 自動化的真人或 AI。",
+        "Find AI Agent employment opportunities in Taiwan."
       ]
     }
   ],
@@ -70,6 +70,7 @@
     "module": "./agentic-actions.js",
     "agentTools": [
       "search_public_jobs",
+      "search_guild_public_matches",
       "get_guild_capabilities"
     ]
   }

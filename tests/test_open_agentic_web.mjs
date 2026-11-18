@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import {readFileSync,existsSync} from "node:fs";
 import {test} from "node:test";
-import {registerActions,searchPublicJobs,KEYWORDS} from "../public/agentic-actions.js";
+import {registerActions,searchPublicJobs,searchPublicGuild,KEYWORDS} from "../public/agentic-actions.js";
 const get=f=>JSON.parse(readFileSync(new URL("../public/"+f,import.meta.url),"utf8"));
 test("public manifest resolves real browser runtime",()=>{
  const m=get("agent-manifest.json"),n=get("guild_public_opportunity_finder.network.json");
@@ -14,7 +14,7 @@ test("public manifest resolves real browser runtime",()=>{
 });
 test("agent actions are only public reads",()=>{
  const regs=[];registerActions({register:a=>regs.push(a)});
- assert.deepEqual(regs.map(x=>x.name),["search_public_jobs","get_guild_capabilities"]);
+ assert.deepEqual(regs.map(x=>x.name),["search_public_jobs","search_guild_public_matches","get_guild_capabilities"]);
  assert.ok(regs.every(x=>x.effect==="read"));
  assert.deepEqual(regs[0].inputSchema.properties.keyword.enum,[...KEYWORDS]);
 });
@@ -35,4 +35,17 @@ test("invalid keyword never calls remote endpoint",async()=>{
 test("upstream error does not produce fake success",async()=>{
  const r=await searchPublicJobs("excel",async()=>({ok:false,status:502}));
  assert.equal(r.ok,false);assert.equal(r.error,"upstream_unavailable");
+});
+
+test("public Guild search rejects invalid kind without network", async()=>{
+  const r=await searchPublicGuild({keyword:"Excel",kind:"private_data"},()=>{throw Error("should not call");});
+  assert.equal(r.ok,false);assert.equal(r.error,"invalid_search");
+});
+test("public Guild search preserves genuine empty results", async()=>{
+  const r=await searchPublicGuild({keyword:"Excel"},async(path,options)=>{
+    assert.match(path,/\/api\/agentic-directory\?/);
+    assert.equal(options.credentials,"omit");
+    return {ok:true,json:async()=>({ok:true,services:[],needs:[],agents:[],count:0})};
+  });
+  assert.equal(r.ok,true);assert.equal(r.count,0);
 });
