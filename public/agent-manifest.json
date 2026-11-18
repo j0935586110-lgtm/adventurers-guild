@@ -1,0 +1,76 @@
+{
+  "brand": "Adventurers Guild | Agentic Web",
+  "networks": [
+    {
+      "name": "guild_public_opportunity_finder",
+      "front_man": "guild_matchmaker",
+      "hocon": "./guild_public_opportunity_finder.network.json",
+      "description": "Search real public employment listings on the Guild website using a browser-run agent.",
+      "tags": [
+        "nsdeploy",
+        "read-only",
+        "taiwan"
+      ],
+      "sample_queries": [
+        "Find AI Agent jobs in Taiwan",
+        "Find software engineer opportunities",
+        "What real public job search does the Guild offer?"
+      ]
+    }
+  ],
+  "llm_router": {
+    "base_url": "https://api.otari.ai/api/v1",
+    "mock": false,
+    "byok_router": "https://api.otari.ai/api/v1"
+  },
+  "allowed_peers": [],
+  "peer_policy": {
+    "mode": "closed",
+    "deny_origins": [],
+    "note": "MVP uses first-party read-only website tools. Peer access is disabled pending consent and origin tests."
+  },
+  "agent_mcp": {
+    "protocol": "nsdeploy-agent-mcp/v1",
+    "network": "guild_public_opportunity_finder",
+    "front_man": "guild_matchmaker",
+    "available": false,
+    "reason": "Existing Guild MCP is a separate service. No nsDeploy public facade for this browser network."
+  },
+  "theme": {
+    "primary": "#98513b"
+  },
+  "linking": {
+    "protocol": "nsdeploy-link/v1",
+    "exports": [
+      {
+        "network": "guild_public_opportunity_finder",
+        "front_man": "guild_matchmaker",
+        "aliases": [
+          "guild_public_opportunity_finder",
+          "guild_matchmaker"
+        ],
+        "url": "guild_public_opportunity_finder"
+      }
+    ],
+    "imports": [],
+    "link_updates": {
+      "mode": "browser-local"
+    }
+  },
+  "deployment": {
+    "mode": "static",
+    "self_contained_runtime": true,
+    "browser_mock": false,
+    "direct_byok": true,
+    "direct_mcp_requires_cors": true,
+    "public_mcp_facade": false
+  },
+  "actions": {
+    "version": 1,
+    "module": "./agentic-actions.js",
+    "agentTools": [
+      "search_public_jobs",
+      "get_guild_capabilities"
+    ]
+  }
+}

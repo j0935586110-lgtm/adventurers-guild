@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Open Agentic Web · Adventurers Guild</title>
+<meta name="description" content="Browser-run AI assistant connected to real public opportunities from Adventurers Guild.">
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color:#2c343a;background:#fffaf6}*{box-sizing:border-box}
+body{margin:0}header{background:white;border-bottom:1px solid #e7deda;padding:16px 20px}
+.wrap{max-width:1120px;margin:auto}.shell{padding:20px}h1{font-size:clamp(28px,5vw,47px);letter-spacing:-.04em;line-height:1.15;margin-bottom:12px}
+p{line-height:1.55;color:#565e64}a{color:#974f36}
+.grid{display:grid;grid-template-columns:1fr 1.25fr;gap:16px;margin:26px 0}
+.panel{border:1px solid #ebdfd9;background:#fff;border-radius:16px;padding:20px;min-width:0}
+h2{margin-top:0;font-size:21px}.kicker{text-transform:uppercase;font-size:12px;font-weight:bold;letter-spacing:.08em;color:#974f36}
+form{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+button,select{font:inherit;padding:10px;border-radius:8px;border:1px solid #ddd}
+button{background:#974f36;color:white;cursor:pointer;border-color:#974f36}
+#search-results article{border-top:1px solid #eee;padding:12px 0}
+#search-results article p{margin:4px 0}#agent-app{min-height:320px;max-width:100%;overflow-wrap:anywhere}
+.small{font-size:13px}details{padding-bottom:18px}summary{cursor:pointer}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.shell{padding:14px}}
+</style></head>
+<body>
+<header><div class="wrap"><b>冒險者公會 · Adventurers Guild</b> · <a href="/ai">AI / MCP</a></div></header>
+<main class="wrap shell">
+<p class="kicker">Open Agentic Web Challenge · Browser Agent</p>
+<h1>Find real opportunities with your own AI.</h1>
+<p>Our open browser-run agent reads the Guild's existing public jobs API. It cannot invent listings, publish tasks or access private member information.</p>
+<div class="grid">
+<section class="panel"><h2>Live website search</h2>
+<p class="small">Works without an LLM key. Searches third-party employment jobs, not Guild member freelance tasks.</p>
+<form id="search-form"><label for="keyword">Topic</label>
+<select id="keyword"><option value="ai agent">AI Agent</option><option value="automation">Automation</option><option value="excel">Excel</option><option value="remote it">Remote IT</option><option value="mcp">MCP</option><option value="software engineer">Software engineer</option><option value="customer support">Customer support</option></select>
+<button type="submit">Find live listings</button></form>
+<div id="search-results" aria-live="polite">Choose a topic to search.</div></section>
+<section class="panel"><h2>Ask the Guild browser agent</h2>
+<p class="small">Try: “Find AI Agent jobs for Taiwan”. Configure your model through the agent settings. Your model may receive chat text you send.</p>
+<p id="assistant-status" class="small" role="status">Starting browser runtime…</p>
+<div id="agent-app"></div></section></div>
+<details><summary>Public agent files, source and limitations</summary>
+<p>Published: <a href="/agent-manifest.json">manifest</a>, <a href="/guild_public_opportunity_finder.network.json">network definition</a>, <a href="/links.json">peer links</a>. Based on the <a href="https://github.com/cognizant-ai-labs/agentic-web">official nsDeploy runtime</a>. This first version uses same-origin read-only actions; external peer discovery and member transactions are not enabled.</p></details>
+<p><a href="/">Guild home</a> · <a href="/matching">Member matching</a> · <a href="/community">Community</a></p>
+</main><script type="module" src="/agentic-site.js"></script></body></html>

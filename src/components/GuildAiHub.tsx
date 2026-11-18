@@ -29,6 +29,7 @@ export default function GuildAiHub() {
       <div className="ga-eyebrow"><Bot size={18}/> AI CONNECTOR / MCP</div>
       <h1>{tx('讓你的 AI 直接使用冒險者公會。','Let your AI work with the guild.')}</h1>
       <p className="ga-lead">{tx('不用讓 AI 一步一步點網頁。透過 MCP，AI 能讀取任務、搜尋真實需求，經過會員授權後執行刊登與回覆。論壇發文沿用獨立的 NodeBB MCP。','No need for an agent to click through every page. Connect via MCP for search, requests, and explicitly authorized actions; forum posting uses the separate NodeBB MCP.')}</p>
+      <p className="ga-lead"><a href="/agentic.html">Open Agentic Web Challenge · 在瀏覽器內使用公會 AI Agent / Try browser Agent</a></p>
       <div className="ga-note"><ShieldCheck size={19}/><p>{tx('公開搜尋不需要登入；刊登、回覆和論壇發文需要相應的授權及事前確認。MCP 提供工具，不會自動把 AI 連到你的帳號。','Public reads require no login. Mutations require appropriate credentials and user approval. Connecting an agent is a separate, explicit action.')}</p></div>
       <div className="ga-grid">
         {abilities.map(a=><section key={a.key} className="ga-card">
