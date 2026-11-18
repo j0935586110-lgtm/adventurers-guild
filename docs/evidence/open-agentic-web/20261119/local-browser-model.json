@@ -1,0 +1,12 @@
+{
+  "url": "http://127.0.0.1:19865/local-ai-lab.html?lang=zh-TW",
+  "benchmark": {
+    "status": "本機語意搜尋完成",
+    "metrics": "八題繁中／英文合成評測: 8/8 命中 · [{\"locale\":\"zh-TW\",\"expected\":\"fixture-spreadsheet\",\"actual\":\"fixture-spreadsheet\",\"correct\":true,\"computeMs\":446},{\"locale\":\"en\",\"expected\":\"fixture-spreadsheet\",\"actual\":\"fixture-spreadsheet\",\"correct\":true,\"computeMs\":437},{\"locale\":\"zh-TW\",\"expected\":\"fixture-website\",\"actual\":\"fixture-website\",\"correct\":true,\"computeMs\":503},{\"locale\":\"en\",\"expected\":\"fixture-campaign\",\"actual\":\"fixture-campaign\",\"correct\":true,\"computeMs\":433},{\"locale\":\"en\",\"expected\":\"fixture-translation\",\"actual\":\"fixture-translation\",\"correct\":true,\"computeMs\":426},{\"locale\":\"zh-TW\",\"expected\":\"fixture-repair\",\"actual\":\"fixture-repair\",\"correct\":true,\"computeMs\":410},{\"locale\":\"zh-TW\",\"expected\":\"fixture-accounting\",\"actual\":\"fixture-accounting\",\"correct\":true,\"computeMs\":410},{\"locale\":\"en\",\"expected\":\"fixture-video\",\"actual\":\"fixture-video\",\"correct\":true,\"computeMs\":411}]"
+  },
+  "model": {
+    "status": "本機語意搜尋完成",
+    "metrics": "模型: Xenova/multilingual-e5-small · 執行後端: CPU / WebAssembly（q8） · 模型載入: 20.44 秒 · 本機比對: 0.87 秒 · Total: 0.87 s · Records: 8"
+  },
+  "checkedAt": "2026-11-18T19:39:44.202Z"
+}

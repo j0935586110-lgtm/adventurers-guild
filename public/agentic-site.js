@@ -23,6 +23,7 @@ const TEXT={
   jobsKeyword:"職缺類別",findJobs:"搜尋即時職缺",
   techTitle:"公開 Agent 技術檔與安全限制",techLimits:"外部跨網站呼叫尚未授權開放；無法操作會員帳號、付款或自主控制 J1。",
   matchingLink:"真人媒合",communityLink:"社群",
+  localAiLink:"免 API Key：使用瀏覽器本機語意媒合（約 118 MB，按需下載）",
   matchingLoading:"正在查詢公會公開資料…",
   autoKeyword:"已從需求辨識出搜尋關鍵字：{keyword}，可以自行修改。",
   searchKeywordRequired:"無法可靠辨識需求中的搜尋詞。請先填入關鍵字，再搜尋，避免回傳無關結果。",matchingEmpty:"目前沒有符合條件的公開會員服務或委託。不會虛構媒合結果。你可以登入後發布自己的需求。",
@@ -51,6 +52,7 @@ const TEXT={
   jobsKeyword:"Job category",findJobs:"Find live listings",
   techTitle:"Open Agentic Web technical files and limits",techLimits:"External peers disabled pending consent tests; no member writes, payments, or autonomous J1 control.",
   matchingLink:"Member matching",communityLink:"Community",
+  localAiLink:"No API key: Try local browser semantic matching (~118 MB on demand)",
   matchingLoading:"Looking up published Guild records…",
   autoKeyword:"Suggested search keyword from your task: {keyword}. You can edit it.",
   searchKeywordRequired:"Could not reliably identify a search keyword. Enter one before searching, rather than displaying unrelated results.",matchingEmpty:"No matching public member services or tasks are currently available. Nothing is invented. You can log in and publish a request.",
@@ -114,6 +116,7 @@ function applyLanguage(next,{userAction=false}={}){
  for(const e of document.querySelectorAll("[data-i18n]")) e.textContent=t(e.dataset.i18n);
  for(const e of document.querySelectorAll("[data-i18n-placeholder]")) e.placeholder=t(e.dataset.i18nPlaceholder);
  for(const b of document.querySelectorAll("[data-language]")) b.setAttribute("aria-pressed",String(b.dataset.language===lang));
+ document.querySelector("#local-ai-link")?.setAttribute("href","/local-ai-lab.html?lang="+encodeURIComponent(lang));
  try{localStorage.setItem("guild.agentic.language",lang)}catch{}
  // Manual language changes win over an old ?lang= query parameter.
  // Keep other query parameters (such as the runtime's safe runner option) unchanged.
