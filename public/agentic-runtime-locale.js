@@ -50,6 +50,8 @@ const ZH = new Map(Object.entries({
   "You are using a free model. There may be daily usage limits.":"目前使用免費模型，可能有每日用量限制。",
 }));
 const BOOT_EN = "To start, connect an AI provider. In ⚙ AI model settings, select Connect with OpenRouter. Or choose a provider, create a key on its site, paste it into the API key field and select Save and start. Your key is saved in this browser.";
+const NETWORK_EN = "Bilingual (繁體中文 / English) task discovery for real published Guild member services, needs and third-party jobs, with human-controlled publishing.";
+const NETWORK_ZH = "繁體中文／英文的真實公會媒合搜尋：查詢會員已公開的服務、委託與第三方職缺；委託發布完全由使用者決定。";
 const BOOT_ZH = "開始使用前請連接 AI 模型供應商。在「⚙ AI 模型設定」中選擇 OpenRouter 連接，或選擇供應商、建立金鑰後貼到金鑰欄位，再選擇「儲存並開始」。金鑰會儲存在你目前的瀏覽器。";
 const originalTexts=new WeakMap();
 const originalAttrs=new WeakMap();
@@ -57,10 +59,18 @@ const observers=new WeakMap();
 let locale="en";
 function translate(value){
   if(locale!=="zh-TW")return value;
-  if(ZH.has(value))return ZH.get(value);
-  if(/^\d+ website actions connected$/.test(value))return value.replace("website actions connected","項網站操作已連接");
-  if(value.includes(BOOT_EN))return value.replace(BOOT_EN,BOOT_ZH);
-  return value;
+  // Upstream uses nested elements whose static labels can carry whitespace.
+  const trimmed=value.trim();
+  if(ZH.has(trimmed)){
+    const start=value.match(/^\s*/)?.[0]||"";
+    const end=value.match(/\s*$/)?.[0]||"";
+    return start+ZH.get(trimmed)+end;
+  }
+  if(/^\d+ website actions connected$/.test(trimmed))return value.replace("website actions connected","項網站操作已連接");
+  let updated=value;
+  if(updated.includes(NETWORK_EN))updated=updated.replace(NETWORK_EN,NETWORK_ZH);
+  if(updated.includes(BOOT_EN))updated=updated.replace(BOOT_EN,BOOT_ZH);
+  return updated;
 }
 function skipped(node){
   const el=node.parentElement;
