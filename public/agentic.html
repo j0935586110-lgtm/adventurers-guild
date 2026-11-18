@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="/guild-mark.svg">
 <title>Adventurers Guild — Human × AI Task Collaboration</title>
 <meta name="description" content="Bilingual browser-native agent for transparent, permission-based discovery of real public tasks, people and AI.">
 <style>
@@ -31,6 +32,26 @@ button.secondary{color:#954937;background:#f9eae4;border:1px solid #ddbcb1}
 #match-results article,#search-results article{padding:12px 0;border-top:1px solid #eee}
 #match-results article p,#search-results article p{margin:4px 0}
 .small{font-size:13px}#agent-app{min-height:300px;max-width:100%;overflow-wrap:anywhere}
+/* Adapt the upstream nsDeploy presentation without forking its runtime. */
+#agent-app .ns-header{min-width:0;flex-wrap:wrap;gap:6px 9px}
+#agent-app .ns-title{flex:1 1 180px;min-width:0;overflow-wrap:anywhere}
+#agent-app .ns-breadcrumb{display:none}
+#agent-app .ns-llmbadge{margin-left:0;max-width:100%;white-space:normal}
+#agent-app .ns-devtoggle{margin-left:auto;position:static;flex:0 0 auto}
+#agent-app .ns-inputbar{min-width:0;flex-wrap:wrap}
+#agent-app .ns-input{min-width:0;width:100%;flex:1 1 160px}
+@media(max-width:1020px){
+  #agent-app .ns-app{width:100%;min-width:0;max-width:100%;height:auto;
+      grid-template-columns:minmax(0,1fr)!important;
+      grid-template-rows:auto minmax(400px,auto) auto!important;
+      overflow-x:hidden;overflow-y:visible}
+  #agent-app .ns-header{grid-column:1;grid-row:1}
+  #agent-app .ns-main{grid-column:1;grid-row:2;min-width:0;min-height:420px}
+  #agent-app .ns-main>.ns-chat{min-width:0;max-width:100%;min-height:420px}
+  #agent-app .ns-agents,#agent-app .ns-dev{grid-column:1;grid-row:3;min-width:0}
+  #agent-app .ns-split{display:none!important}
+}
+
 details{margin-top:20px;padding-bottom:14px}summary{cursor:pointer}
 footer{border-top:1px solid #e9dcd5}footer .shell{padding-top:15px;padding-bottom:15px}
 @media(max-width:790px){.row{grid-template-columns:1fr}.shell{padding:14px}.panel{padding:16px}.field-grid{grid-template-columns:1fr}}
@@ -71,6 +92,7 @@ footer{border-top:1px solid #e9dcd5}footer .shell{padding-top:15px;padding-botto
 <option value="resources" data-i18n="resources">Resources</option>
 </select>
 <button type="submit" data-i18n="findMatches">Find real public matches</button>
+<p id="search-explanation" class="small" role="status" aria-live="polite"></p>
 </form>
 <div id="match-results" role="status" aria-live="polite"></div>
 <div id="draft-panel" hidden>

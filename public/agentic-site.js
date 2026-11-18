@@ -1,5 +1,7 @@
 import {boot} from "./agentic-runtime/index.js";
 import {searchPublicJobs,searchPublicGuild} from "./agentic-actions.js";
+import {resolveGuildKeyword} from "./guild-intent.js";
+import {localizeAgentRuntime} from "./agentic-runtime-locale.js";
 
 const TEXT={
  "zh-TW":{
@@ -21,7 +23,9 @@ const TEXT={
   jobsKeyword:"職缺類別",findJobs:"搜尋即時職缺",
   techTitle:"公開 Agent 技術檔與安全限制",techLimits:"外部跨網站呼叫尚未授權開放；無法操作會員帳號、付款或自主控制 J1。",
   matchingLink:"真人媒合",communityLink:"社群",
-  matchingLoading:"正在查詢公會公開資料…",matchingEmpty:"目前沒有符合條件的公開會員服務或委託。不會虛構媒合結果。你可以登入後發布自己的需求。",
+  matchingLoading:"正在查詢公會公開資料…",
+  autoKeyword:"已從需求辨識出搜尋關鍵字：{keyword}，可以自行修改。",
+  searchKeywordRequired:"無法可靠辨識需求中的搜尋詞。請先填入關鍵字，再搜尋，避免回傳無關結果。",matchingEmpty:"目前沒有符合條件的公開會員服務或委託。不會虛構媒合結果。你可以登入後發布自己的需求。",
   matchingFound:"實際公開資料：{s} 項會員服務、{n} 項委託；已驗證的 AI Agent：0。",
   matchingError:"公會公開搜尋暫時無法使用：",service:"公開服務",need:"公開委託",profileUnverified:"會員／服務身份尚未獨立驗證",
   explore:"前往公會查看",jobsLoading:"正在搜尋公開職缺…",jobsError:"無法取得已驗證結果：",jobsEmpty:"目前沒有符合的公開職缺。",
@@ -47,7 +51,9 @@ const TEXT={
   jobsKeyword:"Job category",findJobs:"Find live listings",
   techTitle:"Open Agentic Web technical files and limits",techLimits:"External peers disabled pending consent tests; no member writes, payments, or autonomous J1 control.",
   matchingLink:"Member matching",communityLink:"Community",
-  matchingLoading:"Looking up published Guild records…",matchingEmpty:"No matching public member services or tasks are currently available. Nothing is invented. You can log in and publish a request.",
+  matchingLoading:"Looking up published Guild records…",
+  autoKeyword:"Suggested search keyword from your task: {keyword}. You can edit it.",
+  searchKeywordRequired:"Could not reliably identify a search keyword. Enter one before searching, rather than displaying unrelated results.",matchingEmpty:"No matching public member services or tasks are currently available. Nothing is invented. You can log in and publish a request.",
   matchingFound:"Published results: {s} member services, {n} task requests; verified AI agents: 0.",
   matchingError:"Public Guild search is unavailable: ",service:"Published service",need:"Published request",profileUnverified:"Identity and service not independently verified",
   explore:"Review on Guild",jobsLoading:"Searching public jobs…",jobsError:"No verified results: ",jobsEmpty:"No public listings found for this term.",
@@ -103,25 +109,46 @@ function renderJobs(result){
   card.append(a);ui.jobs.append(card);
  }
 }
-function applyLanguage(next){
+function applyLanguage(next,{userAction=false}={}){
  lang=next;document.documentElement.lang=lang;document.title=lang==="zh-TW"?"冒險者公會 — 真人 × AI 任務協作":"Adventurers Guild — Human × AI Task Collaboration";
  for(const e of document.querySelectorAll("[data-i18n]")) e.textContent=t(e.dataset.i18n);
  for(const e of document.querySelectorAll("[data-i18n-placeholder]")) e.placeholder=t(e.dataset.i18nPlaceholder);
  for(const b of document.querySelectorAll("[data-language]")) b.setAttribute("aria-pressed",String(b.dataset.language===lang));
  try{localStorage.setItem("guild.agentic.language",lang)}catch{}
+ // Manual language changes win over an old ?lang= query parameter.
+ // Keep other query parameters (such as the runtime's safe runner option) unchanged.
+ if(userAction){
+   const url=new URL(location.href);
+   url.searchParams.set("lang",lang);
+   history.replaceState(history.state,"",url.pathname+url.search+url.hash);
+ }
+ localizeAgentRuntime(document.querySelector("#agent-app"),lang);
  localizedStatus();renderGuild(lastGuild);renderJobs(lastJobs);
 }
-for(const b of document.querySelectorAll("[data-language]")) b.addEventListener("click",()=>applyLanguage(b.dataset.language));
+for(const b of document.querySelectorAll("[data-language]")) b.addEventListener("click",()=>applyLanguage(b.dataset.language,{userAction:true}));
 applyLanguage(lang);
 
 el("match-form").addEventListener("submit",async e=>{
  e.preventDefault();
  const brief=el("task-text").value.trim();
- const keyword=el("match-keyword").value.trim();
+ const chosen=resolveGuildKeyword(brief,el("match-keyword").value);
+ const keyword=chosen.keyword;
  const city=el("match-city").value.trim();
  const kind=el("match-kind").value;
  el("draft-panel").hidden=!brief;
  if(brief) el("draft-text").textContent=brief;
+ // Never silently use a broad match-all query for a nonempty task brief.
+ if(brief && !keyword) {
+   ui.match.textContent=t("searchKeywordRequired");
+   el("match-keyword").focus();
+   return;
+ }
+ if(chosen.reason==="recognized_domain"){
+   el("match-keyword").value=keyword;
+   el("search-explanation").textContent=t("autoKeyword",{keyword});
+ }else{
+   el("search-explanation").textContent="";
+ }
  ui.match.textContent=t("matchingLoading");
  lastGuild=await searchPublicGuild({keyword,city,kind});
  renderGuild(lastGuild);
@@ -147,6 +174,7 @@ try{
  await boot("#agent-app",{originUrl:new URL("./",import.meta.url).href,
    sandboxWorkerUrl:new URL("agentic-runtime/sandbox-worker.js",import.meta.url).href});
  agentState="ready";localizedStatus();
+ localizeAgentRuntime(document.querySelector("#agent-app"),lang);
 }catch(error){
  agentState="error";agentError=String(error?.message||"unknown");localizedStatus();
  console.error("Guild browser Agent boot failed",error);
