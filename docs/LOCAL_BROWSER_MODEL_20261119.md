@@ -41,3 +41,16 @@
 - 需要經本人同意的真實會員服務、任務、接單、協作及證據驗收；目前公開資料為零，不用假資料模擬成功。
 - 外部 Agent peer 呼叫和使用者授權仍需獨立實測。
 - 先在真實舊 Win11／Android／M1 做冷／熱載入效能測試，再決定是否廣泛啟用。沒有實證缺口之前，不增加第二套 WebLLM 或自訓模型。
+
+## 公開 Vercel Preview 的實際閉環（同日追加）
+- 靜態公開網址：https://adventurers-guild-v2-fz5k6asv7-johnfu.vercel.app/local-ai-lab.html?lang=zh-TW
+- 部署程式碼 SHA：f600adf6b73a9d5019e4b58b4a359284b016f498，Vercel 狀態 READY，僅 Preview。
+- 確認該網址 HTTP 200，真正 Chromium 在公開網址執行小模型，modelExecuted=true。
+- 該次首次載入 **21.02 秒**、8 個合成候選推論 **0.56 秒**、完整點擊至結果 **21.85 秒**。
+- 該次 8 題繁體中文／英文合成排名 top-1 **8/8**，沒有 JS exceptions、consoleErrors 或 HTTP errors。
+- 1440/390/320px 瀏覽器模擬版面無水平超框按鈕；真實公開候選人為 0 時，畫面說明為 0 且 **不會下載模型**。
+- 注意：以上是 **模擬手機視窗大小**，不是 Android 實體手機效能測試。
+- 公開網址原始 E2E 回報：docs/evidence/open-agentic-web/20261119/public-browser-model.json
+- 公開網址結果截圖：docs/evidence/open-agentic-web/20261119/public-browser-model.png
+- 公開網址 RWD 與資料為零的測試：docs/evidence/open-agentic-web/20261119/public-browser-layout.json
+- 正式網址 https://adventurers-guild-v2.vercel.app/local-ai-lab.html 仍為 404，未變更正式站。

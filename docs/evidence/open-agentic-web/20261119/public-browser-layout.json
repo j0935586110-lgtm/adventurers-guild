@@ -1,0 +1,35 @@
+{
+  "site": "https://adventurers-guild-v2-fz5k6asv7-johnfu.vercel.app",
+  "viewports": [
+    {
+      "width": 1440,
+      "innerWidth": 1440,
+      "scrollWidth": 1440,
+      "lang": "zh-TW",
+      "headline": "完全在瀏覽器執行的繁中／英文語意媒合",
+      "invalidButtons": []
+    },
+    {
+      "width": 390,
+      "innerWidth": 390,
+      "scrollWidth": 390,
+      "lang": "zh-TW",
+      "headline": "完全在瀏覽器執行的繁中／英文語意媒合",
+      "invalidButtons": []
+    },
+    {
+      "width": 320,
+      "innerWidth": 320,
+      "scrollWidth": 320,
+      "lang": "zh-TW",
+      "headline": "完全在瀏覽器執行的繁中／英文語意媒合",
+      "invalidButtons": []
+    }
+  ],
+  "realEmpty": {
+    "status": "就緒：可點擊開始",
+    "result": "目前匿名公開資料中沒有可搜尋的會員服務／委託（0 筆）。沒有虛構候選人。可切換『合成基準案例』測試模型，或返回公會發布需求。",
+    "metrics": "尚未執行。首次下載可能較久。"
+  },
+  "pass": true
+}

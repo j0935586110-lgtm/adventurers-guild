@@ -1,0 +1,36 @@
+{
+  "url": "https://adventurers-guild-v2-fz5k6asv7-johnfu.vercel.app",
+  "attempted": true,
+  "start": "2026-11-18T19:46:31.464Z",
+  "initial": {
+    "heading": "完全在瀏覽器執行的繁中／英文語意媒合",
+    "button": "啟用本機 AI 並搜尋"
+  },
+  "browser": {
+    "webgpu": true,
+    "threads": 6,
+    "memoryGiB": 16
+  },
+  "input": "我想請人把每週 Excel 報表流程自動化",
+  "complete": {
+    "status": "本機語意搜尋完成",
+    "metrics": "模型: Xenova/multilingual-e5-small · 執行後端: CPU / WebAssembly（q8） · 模型載入: 21.02 秒 · 本機比對: 0.56 秒 · Total: 21.85 s · Records: 8",
+    "resultText": "合成基準結果（全部是虛構測試條目，不是真人服務）\n試算表資料整合與每週報告產生\n\nautomation · 語意相似度: 0.880\n\n記帳與稅務表單整理\n\naccounting · 語意相似度: 0.836\n\n前端網站介面與響應式版型\n\nweb · 語意相似度: 0.829\n\n社群貼文與品牌行銷\n\nmarketing · 語意相似度: 0.823\n\n活動海報及品牌視覺\n\ndesign · 語意相似度: 0.820\n\n電腦故障檢查與維修\n\nrepair · 語意相似度: 0.818\n\n影片字幕與剪輯服務\n\nvideo · 語意相似度: 0.815\n\n中文與英文雙向翻譯\n\ntranslation · 語意相似度: 0.808",
+    "progress": "done: model_quantized.onnx "
+  },
+  "elapsedMs": 22079,
+  "screenshot": "/var/tmp/guild-public-local-model-e2e-20261119/local-model-result.png",
+  "modelExecuted": true,
+  "benchmarkClick": true,
+  "benchmark": {
+    "status": "本機語意搜尋完成",
+    "metrics": "八題繁中／英文合成評測: 8/8 命中 · [{\"locale\":\"zh-TW\",\"expected\":\"fixture-spreadsheet\",\"actual\":\"fixture-spreadsheet\",\"correct\":true,\"computeMs\":431},{\"locale\":\"en\",\"expected\":\"fixture-spreadsheet\",\"actual\":\"fixture-spreadsheet\",\"correct\":true,\"computeMs\":442},{\"locale\":\"zh-TW\",\"expected\":\"fixture-website\",\"actual\":\"fixture-website\",\"correct\":true,\"computeMs\":420},{\"locale\":\"en\",\"expected\":\"fixture-campaign\",\"actual\":\"fixture-campaign\",\"correct\":true,\"computeMs\":414},{\"locale\":\"en\",\"expected\":\"fixture-translation\",\"actual\":\"fixture-translation\",\"correct\":true,\"computeMs\":412},{\"locale\":\"zh-TW\",\"expected\":\"fixture-repair\",\"actual\":\"fixture-repair\",\"correct\":true,\"computeMs\":409},{\"locale\":\"zh-TW\",\"expected\":\"fixture-accounting\",\"actual\":\"fixture-accounting\",\"correct\":true,\"computeMs\":410},{\"locale\":\"en\",\"expected\":\"fixture-video\",\"actual\":\"fixture-video\",\"correct\":true,\"computeMs\":409}]"
+  },
+  "events": {
+    "jsExceptions": [],
+    "httpErrors": [],
+    "consoleErrors": [],
+    "downloads": []
+  },
+  "end": "2026-11-18T19:47:04.116Z"
+}
