@@ -42,6 +42,8 @@ results.mobile.debugControl=await evaluate("(()=>{const x=document.querySelector
 await send("Emulation.setDeviceMetricsOverride",{width:320,height:720,deviceScaleFactor:2,mobile:true,screenWidth:320,screenHeight:720});await send("Page.reload",{ignoreCache:true});await waitFor("document.querySelector('#assistant-status')?.textContent",x=>(x?.includes("已啟動")||x?.includes("ready")));results.mobile320=await evaluate(layout);results.mobile320.image=await snapshot("mobile320-zh.png");
 await send("Emulation.setDeviceMetricsOverride",{width:390,height:844,deviceScaleFactor:3,mobile:true,screenWidth:390,screenHeight:844});await send("Page.reload",{ignoreCache:true});await waitFor("document.querySelector('#assistant-status')?.textContent",x=>(x?.includes("已啟動")||x?.includes("ready")));
  results.languageSwitch=await evaluate("(()=>{document.querySelector('[data-language=en]').click();return {lang:document.documentElement.lang,h1:document.querySelector('h1').textContent,stored:localStorage.getItem('guild.agentic.language')}})()");
+ results.languageRoundTrip=await evaluate("(()=>{document.querySelector('[data-language=zh-TW]').click();const zh=document.querySelector('.ns-settings>summary')?.textContent;document.querySelector('[data-language=en]').click();const en=document.querySelector('.ns-settings>summary')?.textContent;return {zh,en,lang:document.documentElement.lang}})()");
+
  await send("Page.reload",{ignoreCache:true});
  await waitFor("document.querySelector('#assistant-status')?.textContent",x=>(x?.includes("已啟動")||x?.includes("ready")));
  results.languageAfterReload=await evaluate("({lang:document.documentElement.lang,h1:document.querySelector('h1').textContent,stored:localStorage.getItem('guild.agentic.language'),url:location.href})");
@@ -63,6 +65,9 @@ results.briefOnly.requestUrl=await evaluate("window.__lastGuildDirectoryUrl");
  assert.equal(results.mobile.overflowButtons.length,0);
  assert.equal(results.mobile320.overflowButtons.length,0);
  assert.ok(results.mobile.debugControl.right<=390);
+ assert.match(results.languageRoundTrip.zh,/模型設定/);
+ assert.match(results.languageRoundTrip.en,/AI model settings/);
+ assert.equal(results.languageRoundTrip.lang,"en");
  assert.equal(results.languageSwitch.lang,"en");
  assert.equal(results.languageAfterReload.lang,"en");
  assert.ok(results.languageAfterReload.url.includes("lang=en"));

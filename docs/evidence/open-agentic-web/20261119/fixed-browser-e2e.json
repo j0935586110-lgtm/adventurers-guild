@@ -1,0 +1,140 @@
+{
+  "desktop": {
+    "width": 1440,
+    "client": 1425,
+    "scroll": 1425,
+    "bodyScroll": 1425,
+    "lang": "zh-TW",
+    "h1": "找到真正能協助你完成任務的真人或 AI",
+    "agent": "瀏覽器 Agent 已啟動。請在模型設定中選擇供應商，勿把金鑰貼在對話中。",
+    "overflowButtons": [],
+    "image": {
+      "file": "/var/tmp/guild-agentic-verified-fixes-20261119/desktop-zh.png",
+      "bytes": 194523
+    }
+  },
+  "directory": {
+    "http": 200,
+    "ok": true,
+    "count": 0,
+    "needs": 0,
+    "services": 0,
+    "agents": 0,
+    "fields": [
+      "ok",
+      "source",
+      "visibility",
+      "keyword",
+      "city",
+      "kind",
+      "services",
+      "needs",
+      "agents",
+      "count",
+      "limitation",
+      "nextAction"
+    ]
+  },
+  "manifest": {
+    "http": 200,
+    "name": "guild_public_opportunity_finder",
+    "actions": [
+      "search_public_jobs",
+      "search_guild_public_matches",
+      "get_guild_capabilities"
+    ]
+  },
+  "mobile": {
+    "width": 390,
+    "client": 390,
+    "scroll": 390,
+    "bodyScroll": 390,
+    "lang": "zh-TW",
+    "h1": "找到真正能協助你完成任務的真人或 AI",
+    "agent": "瀏覽器 Agent 已啟動。請在模型設定中選擇供應商，勿把金鑰貼在對話中。",
+    "overflowButtons": [],
+    "image": {
+      "file": "/var/tmp/guild-agentic-verified-fixes-20261119/mobile-zh.png",
+      "bytes": 277179
+    },
+    "runtimeChinese": {
+      "dev": "⚙ 開發工具",
+      "settings": "⚙ AI 模型設定",
+      "badge": "需要設定模型金鑰",
+      "help": "\n        還沒有 API 金鑰？\n        API 金鑰是模型供應商發給你的私密代碼，讓網頁替你呼叫模型；它不是登入密碼。\n        什麼是 API 金鑰？如何取得？ ↗\n        選擇下方模型供應商並建立金鑰，系統會帶入建議設定。\n        \n        Otari ↗可能需要付費\n        Google AI Studio ↗提供免費額度\n        Groq ↗提供免費額度\n        OpenAI ↗可能需要付費\n        Anth"
+    },
+    "debugControl": {
+      "left": 263.109375,
+      "right": 347,
+      "width": 83.890625,
+      "screen": 390,
+      "hiddenByParent": 347
+    }
+  },
+  "mobile320": {
+    "width": 320,
+    "client": 320,
+    "scroll": 320,
+    "bodyScroll": 320,
+    "lang": "zh-TW",
+    "h1": "找到真正能協助你完成任務的真人或 AI",
+    "agent": "瀏覽器 Agent 已啟動。請在模型設定中選擇供應商，勿把金鑰貼在對話中。",
+    "overflowButtons": [],
+    "image": {
+      "file": "/var/tmp/guild-agentic-verified-fixes-20261119/mobile320-zh.png",
+      "bytes": 167406
+    }
+  },
+  "languageSwitch": {
+    "lang": "en",
+    "h1": "Find real collaborators, human or AI, to accomplish a task.",
+    "stored": "en"
+  },
+  "languageRoundTrip": {
+    "zh": "⚙ AI 模型設定",
+    "en": "⚙ AI model settings",
+    "lang": "en"
+  },
+  "languageAfterReload": {
+    "lang": "en",
+    "h1": "Find real collaborators, human or AI, to accomplish a task.",
+    "stored": "en",
+    "url": "https://adventurers-guild-v2-amiddze2n-johnfu.vercel.app/agentic.html?lang=en"
+  },
+  "match": {
+    "draftVisible": true,
+    "draft": "Automate Excel reports for my company. Budget NT$3,000",
+    "response": "No matching public member services or tasks are currently available. Nothing is invented. You can log in and publish a request.",
+    "image": {
+      "file": "/var/tmp/guild-agentic-verified-fixes-20261119/mobile-match-en.png",
+      "bytes": 259030
+    }
+  },
+  "briefOnly": {
+    "brief": "Automate Excel reports for my company. Budget NT$3,000",
+    "keyword": "Excel",
+    "requestUrl": "/api/agentic-directory?mode=all&keyword=Excel"
+  },
+  "handoff": {
+    "path": "/matching",
+    "stored": "Automate Excel reports for my company. Budget NT$3,000",
+    "body": "冒險者公會：讓你的專長被看見\n\n探索台灣在地技能與服務、刊登專長，尋找適合的合作對象與任務。\n\n找合作 · 找支援 · 找資源 · 找活動 · 找工作\n\n了解冒險者公會的服務與合作方式 · 閱讀實戰技能與公開作品 · 台灣 AI 論壇：Agent、工具與實戰經驗",
+    "after": {
+      "path": "/matching",
+      "stored": "Automate Excel reports for my company. Budget NT$3,000",
+      "hasDialog": true,
+      "draftInputs": [],
+      "body": "冒險者公會\n探索委託\n發布委託\n我的合作\nTHE ADVENTURERS GUILD · MATCHING\n一個會員，既能委託，也能接任務\n\n公開說明你要完成的事，或向其他人的需求提出合作意願。只有雙方同意後，才可以進入私人對話與自願交換 LINE。\n\n我要委託\n我要接任務\n我的媒合紀錄\n公開需求 · 找到人與機會\n大家正在尋找什麼？\n\n真實會員發布的需求。沒有虛構的工作、活動或人物。\n\n發布我的需求\n全部需求\n找合作伙伴\n找員工／人才"
+    },
+    "image": {
+      "file": "/var/tmp/guild-agentic-verified-fixes-20261119/mobile-handoff.png",
+      "bytes": 219735
+    }
+  },
+  "pass": true,
+  "events": {
+    "exceptions": [],
+    "console": [],
+    "httpErrors": []
+  }
+}
