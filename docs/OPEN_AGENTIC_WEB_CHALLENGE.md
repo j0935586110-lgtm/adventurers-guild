@@ -4,7 +4,7 @@
 - Official source: https://github.com/cognizant-ai-labs/agentic-web , revision a39df2b 2026-11-17.
 - Runtime reused unchanged from skills/agentify-website/runtime, with Apache 2.0 license in public/agentic-runtime/LICENSE.txt.
 - New standalone preview page: /agentic.html
-- Public contract: /agent-manifest.json, /guild_public_opportunity_finder.network.json, /links.json
+- Public contract: /agent-manifest.json, /guild_public_opportunity_finder.network.json, /links.json. Cross-origin GET CORS enabled only for these public static JSON artifacts.
 - Browser action API: /api/opportunities?q=..., same as public Guild website.
 - All actions are read only, credentials omit, no separate MCP facade or private data.
 - No external peer calls; deny-by-default pending consent tests.
